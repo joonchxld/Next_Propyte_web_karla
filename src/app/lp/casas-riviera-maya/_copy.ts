@@ -193,6 +193,24 @@ export interface CopyCasas {
     verPrecios: (total: number) => string;
   };
 
+  /** Cadenas del diseño «monografía» (portada, colofón y láminas). */
+  monografia: {
+    enPortada: string;
+    engancheDesde: (pct: number) => string;
+    casas: (total: number) => string;
+    /** «12 casas en Tulum». */
+    en: string;
+    /** «3 de 15». */
+    de: string;
+    ariaPortada: string;
+    ariaInventario: string;
+    recamaras: (n: number) => string;
+    banos: (n: number) => string;
+    construidos: string;
+    estacionamientos: (n: number) => string;
+    albercaDetalle: string;
+  };
+
   /** Pie legal. `rango` es null cuando el inventario no declara precios. */
   pie: {
     aviso: string;
@@ -373,6 +391,21 @@ export const COPY_ES: CopyCasas = {
 
   barra: {
     verPrecios: (total) => `Ver precios de las ${total}`,
+  },
+
+  monografia: {
+    enPortada: 'En portada',
+    engancheDesde: (pct) => `Enganche desde ${pct}%`,
+    casas: (total) => (total === 1 ? 'casa' : 'casas'),
+    en: 'en',
+    de: 'de',
+    ariaPortada: 'Filtrar por ciudad desde la portada',
+    ariaInventario: 'Filtrar el inventario por ciudad',
+    recamaras: (n) => (n === 1 ? 'recámara' : 'recámaras'),
+    banos: (n) => (n === 1 ? 'baño' : 'baños'),
+    construidos: 'construidos',
+    estacionamientos: (n) => (n === 1 ? 'estacionamiento' : 'estacionamientos'),
+    albercaDetalle: 'propia o en amenidades',
   },
 
   pie: {
@@ -576,6 +609,21 @@ export const COPY_EN: CopyCasas = {
 
   barra: {
     verPrecios: (total) => `See prices for all ${total}`,
+  },
+
+  monografia: {
+    enPortada: 'On the cover',
+    engancheDesde: (pct) => `Down payment from ${pct}%`,
+    casas: (total) => (total === 1 ? 'home' : 'homes'),
+    en: 'in',
+    de: 'of',
+    ariaPortada: 'Filter by city from the cover',
+    ariaInventario: 'Filter the inventory by city',
+    recamaras: (n) => (n === 1 ? 'bedroom' : 'bedrooms'),
+    banos: (n) => (n === 1 ? 'bathroom' : 'bathrooms'),
+    construidos: 'built',
+    estacionamientos: (n) => (n === 1 ? 'parking space' : 'parking spaces'),
+    albercaDetalle: 'private or shared',
   },
 
   pie: {

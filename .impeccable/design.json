@@ -1,0 +1,354 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-09T00:00:00Z",
+  "title": "Design System: Propyte Landings (family)",
+  "extensions": {
+    "colorMeta": {
+      "aqua": {
+        "role": "primary",
+        "displayName": "New Aqua",
+        "canonical": "#a2f9ff",
+        "tonalRamp": [
+          "#416466",
+          "#619599",
+          "#82c7cc",
+          "#a2f9ff",
+          "#b9faff",
+          "#d0fcff",
+          "#e5fdff",
+          "#f4feff"
+        ]
+      },
+      "onahau": {
+        "role": "secondary",
+        "displayName": "Onahau",
+        "canonical": "#ccffff",
+        "tonalRamp": [
+          "#526666",
+          "#7a9999",
+          "#a3cccc",
+          "#ccffff",
+          "#d9ffff",
+          "#e6ffff",
+          "#f1ffff",
+          "#f9ffff"
+        ]
+      },
+      "water-dew": {
+        "role": "neutral",
+        "displayName": "Water Dew",
+        "canonical": "#ebfdff",
+        "tonalRamp": [
+          "#5e6566",
+          "#8d9899",
+          "#bccacc",
+          "#ebfdff",
+          "#f0feff",
+          "#f5feff",
+          "#f9feff",
+          "#fdffff"
+        ]
+      },
+      "retro-cyan": {
+        "role": "secondary",
+        "displayName": "Retro Cyan",
+        "canonical": "#68a4a9",
+        "tonalRamp": [
+          "#2a4244",
+          "#3e6265",
+          "#538387",
+          "#68a4a9",
+          "#8ebbbe",
+          "#b4d2d4",
+          "#d5e6e7",
+          "#edf4f5"
+        ]
+      },
+      "dull-teal": {
+        "role": "secondary",
+        "displayName": "Dull Teal",
+        "canonical": "#487379",
+        "tonalRamp": [
+          "#1d2e30",
+          "#2b4549",
+          "#3a5c61",
+          "#487379",
+          "#76969a",
+          "#a4b9bc",
+          "#ccd8d9",
+          "#e9eeef"
+        ]
+      },
+      "dark-slate": {
+        "role": "neutral",
+        "displayName": "Dark Slate",
+        "canonical": "#2e4f52",
+        "tonalRamp": [
+          "#122021",
+          "#1c2f31",
+          "#253f42",
+          "#2e4f52",
+          "#627b7d",
+          "#96a7a8",
+          "#c4cecf",
+          "#e6eaea"
+        ]
+      },
+      "deep-onyx": {
+        "role": "neutral",
+        "displayName": "Deep Onyx",
+        "canonical": "#223232",
+        "tonalRamp": [
+          "#0e1414",
+          "#141e1e",
+          "#1b2828",
+          "#223232",
+          "#596565",
+          "#909898",
+          "#c1c6c6",
+          "#e4e6e6"
+        ]
+      },
+      "aztec": {
+        "role": "neutral",
+        "displayName": "Aztec",
+        "canonical": "#0a1c1e",
+        "tonalRamp": [
+          "#040b0c",
+          "#061112",
+          "#081618",
+          "#0a1c1e",
+          "#475556",
+          "#848e8e",
+          "#babfc0",
+          "#e2e4e4"
+        ]
+      },
+      "tech-white": {
+        "role": "neutral",
+        "displayName": "Tech White",
+        "canonical": "#f5f5f5",
+        "tonalRamp": [
+          "#626262",
+          "#939393",
+          "#c4c4c4",
+          "#f5f5f5",
+          "#f8f8f8",
+          "#fafafa",
+          "#fcfcfc",
+          "#fefefe"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Cover headline, section headlines, prices. Inter 500, tight."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "House titles in plates."
+      },
+      "subtitle": {
+        "displayName": "Subtitle",
+        "purpose": "Short headings in notes and closing list, Space Grotesk 600."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Running text, DM Sans."
+      },
+      "detail": {
+        "displayName": "Detail",
+        "purpose": "Captions, chips, filters, form labels, Space Grotesk."
+      },
+      "figure": {
+        "displayName": "Figure",
+        "purpose": "Counts in the colofon, tabular lining numerals."
+      }
+    },
+    "shadows": [
+      {
+        "name": "plate",
+        "value": "0 1px 2px rgb(10 28 30 / 0.05), 0 18px 40px -28px rgb(10 28 30 / 0.35)",
+        "purpose": "White plate resting on Tech White."
+      },
+      {
+        "name": "sheet",
+        "value": "0 30px 70px -30px rgb(0 0 0 / 0.6)",
+        "purpose": "Aztec glass request sheet over photo."
+      },
+      {
+        "name": "glass-blur",
+        "value": "blur(18px) saturate(1.2)",
+        "purpose": "backdrop-filter of the request sheet."
+      }
+    ],
+    "motion": [
+      {
+        "name": "settle",
+        "value": "1600ms cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Cover photo scales 1.045 to 1 on load."
+      },
+      {
+        "name": "rise",
+        "value": "view() timeline, entry 0%-45%, translateY 28px, opacity .55 to 1",
+        "purpose": "Plates rise as they enter; only without reduced motion."
+      },
+      {
+        "name": "state",
+        "value": "200ms ease",
+        "purpose": "Background, color and border on chips and buttons."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Aztec pill, full-width in plates.",
+      "html": "<button class=\"ds-btn\">Solicitar ficha técnica</button>",
+      "css": ".ds-btn{display:inline-flex;align-items:center;gap:.75rem;min-height:56px;padding:0 1.5rem;border:0;border-radius:999px;background:#0a1c1e;color:#fff;font:500 .9875rem 'DM Sans',sans-serif;cursor:pointer;transition:background-color 200ms ease,color 200ms ease}.ds-btn:hover{background:#2e4f52}.ds-btn:focus-visible{outline:2px solid #487379;outline-offset:3px}.ds-btn:active{background:#223232}"
+    },
+    {
+      "name": "Chosen Button",
+      "kind": "button",
+      "refersTo": "button-chosen",
+      "description": "Selected state of the plate button.",
+      "html": "<button class=\"ds-btn-chosen\">Casa elegida</button>",
+      "css": ".ds-btn-chosen{min-height:56px;padding:0 1.5rem;border:0;border-radius:999px;background:#a2f9ff;color:#0a1c1e;font:500 .9875rem 'DM Sans',sans-serif;cursor:pointer;transition:background-color 200ms ease}.ds-btn-chosen:hover{background:#ccffff}.ds-btn-chosen:focus-visible{outline:2px solid #487379;outline-offset:3px}"
+    },
+    {
+      "name": "Form Submit",
+      "kind": "button",
+      "refersTo": "button-submit",
+      "description": "New Aqua pill on the Aztec glass sheet.",
+      "html": "<button class=\"ds-submit\">Recibir información</button>",
+      "css": ".ds-submit{min-height:52px;padding:0 1.5rem;border:0;border-radius:999px;background:#a2f9ff;color:#0a1c1e;font:600 1rem 'DM Sans',sans-serif;cursor:pointer}.ds-submit:hover{background:#fff}.ds-submit:focus-visible{outline:2px solid #a2f9ff;outline-offset:3px}"
+    },
+    {
+      "name": "Colofon Option",
+      "kind": "chip",
+      "refersTo": "colofon-option",
+      "description": "City filter on the Aztec strip: tabular count plus label; aqua when pressed.",
+      "html": "<button class=\"ds-col\" aria-pressed=\"false\"><span class=\"ds-col-n\">6</span><span>Playa del Carmen</span></button>",
+      "css": ".ds-col{display:inline-flex;align-items:center;gap:.55rem;min-height:48px;padding:0 1.1rem 0 .9rem;border:1px solid rgb(162 249 255/.24);border-radius:999px;background:#0a1c1e;color:rgb(255 255 255/.78);font:.9375rem 'Space Grotesk',sans-serif;cursor:pointer;transition:all 200ms ease}.ds-col-n{font:600 1.5rem/1 'Inter',sans-serif;letter-spacing:-.02em;font-variant-numeric:tabular-nums lining-nums}.ds-col:hover{border-color:#a2f9ff;color:#fff}.ds-col[aria-pressed=true]{background:#a2f9ff;border-color:#a2f9ff;color:#0a1c1e}.ds-col:focus-visible{outline:2px solid #a2f9ff;outline-offset:3px}"
+    },
+    {
+      "name": "Index Option",
+      "kind": "chip",
+      "refersTo": "index-option",
+      "description": "Light city filter above the plates; inverts to Aztec with aqua text.",
+      "html": "<button class=\"ds-idx\" aria-pressed=\"true\">Todas</button>",
+      "css": ".ds-idx{min-height:44px;padding:0 1.1rem;border:1px solid rgb(10 28 30/.16);border-radius:999px;background:#fff;color:#2e4f52;font:.9375rem 'Space Grotesk',sans-serif;cursor:pointer;transition:all 200ms ease}.ds-idx:hover{border-color:#487379}.ds-idx[aria-pressed=true]{background:#0a1c1e;border-color:#0a1c1e;color:#a2f9ff}.ds-idx:focus-visible{outline:2px solid #487379;outline-offset:3px}"
+    },
+    {
+      "name": "Status Chip",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "Delivery status on a plate.",
+      "html": "<span class=\"ds-chip\">Entrega inmediata</span>",
+      "css": ".ds-chip{display:inline-flex;align-items:center;gap:.4rem;padding:.35rem .8rem;border-radius:999px;background:#ccffff;color:#2e4f52;font:500 .8125rem 'Space Grotesk',sans-serif}"
+    },
+    {
+      "name": "Plate",
+      "kind": "card",
+      "refersTo": "plate",
+      "description": "White plate holding photo and data column; one per house.",
+      "html": "<div class=\"ds-plate\"><h3 class=\"ds-t\">Casa Ejemplo</h3><p class=\"ds-p\">$4.2 M</p></div>",
+      "css": ".ds-plate{background:#fff;border-radius:28px;padding:1rem;box-shadow:0 1px 2px rgb(10 28 30/.05),0 18px 40px -28px rgb(10 28 30/.35);color:#0a1c1e}.ds-t{margin:0;font:500 1.5rem/1.15 'Inter',sans-serif;letter-spacing:-.02em}.ds-p{margin:1rem 0 0;font:500 2.5rem/1 'Inter',sans-serif;letter-spacing:-.035em;font-variant-numeric:tabular-nums lining-nums}"
+    },
+    {
+      "name": "Data Table",
+      "kind": "custom",
+      "refersTo": "data-table",
+      "description": "Water Dew glass table with round white icon discs; value over label.",
+      "html": "<div class=\"ds-datos\"><div class=\"ds-row\"><span class=\"ds-disc\"></span><div><p class=\"ds-v\">3</p><p class=\"ds-l\">recámaras</p></div></div></div>",
+      "css": ".ds-datos{background:#ebfdff;border:1px solid rgb(72 115 121/.14);border-radius:14px;overflow:hidden}.ds-row{display:flex;align-items:center;gap:.75rem;padding:.875rem;border-bottom:1px solid rgb(72 115 121/.12)}.ds-disc{width:2.75rem;height:2.75rem;border-radius:999px;background:#fff;box-shadow:inset 0 0 0 1px rgb(72 115 121/.16)}.ds-v{margin:0;font:600 1.0625rem/1.2 'DM Sans',sans-serif;font-variant-numeric:tabular-nums lining-nums;color:#0a1c1e}.ds-l{margin:0;font:.8125rem/1.2 'DM Sans',sans-serif;color:#487379}"
+    },
+    {
+      "name": "Request Sheet",
+      "kind": "custom",
+      "refersTo": "request-sheet",
+      "description": "Aztec glass panel that holds the shared form; 22px, blur, aqua hairline.",
+      "html": "<div class=\"ds-sheet\"><label class=\"ds-lab\">Nombre</label><input class=\"ds-in\" placeholder=\"Tu nombre\"></div>",
+      "css": ".ds-sheet{padding:1.5rem;border-radius:22px;border:1px solid rgb(162 249 255/.24);background:rgb(10 28 30/.8);backdrop-filter:blur(18px) saturate(1.2);box-shadow:0 30px 70px -30px rgb(0 0 0/.6)}.ds-lab{display:block;margin-bottom:.4rem;font:500 .875rem 'Space Grotesk',sans-serif;color:rgb(235 253 255/.76)}.ds-in{width:100%;box-sizing:border-box;padding:.8rem 1rem;border:1px solid rgb(162 249 255/.28);border-radius:14px;background:transparent;color:#fff;font:1rem 'DM Sans',sans-serif}.ds-in:focus-visible{outline:2px solid #a2f9ff;outline-offset:2px}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Monograph",
+    "overview": "A monograph about real inventory. The page opens on one real house full-bleed with its entry price in the headline, a black colofon strip states how many houses exist and where, and each house is a white plate: large photo beside a data column, alternating sides. Palette, glass panels, grid of lines and nodes and pills come from the official Propyte brand manual (2026).\n\nDensity is calm and legible: large Inter display type, DM Sans text, Space Grotesk for details and figures. Aqua is rare and sits on Aztec; light areas are Tech White and Water Dew. The same system is the family base for all nine /lp/* landings; each landing keeps its own idea around its photo and its figure.",
+    "keyCharacteristics": [
+      "Aztec dark with New Aqua accent, Tech White ground",
+      "Photo full-bleed cover with Aztec veil and node grid",
+      "Colofon strip of live counts that doubles as the city filter",
+      "White plates alternating 8/4 and 7/5 columns",
+      "Glass request sheet in the first viewport, mobile included",
+      "All pressables are pills; sentence case everywhere; no exit links"
+    ],
+    "rules": [
+      {
+        "name": "The Live Figure Rule",
+        "body": "Every number on screen is computed from the live inventory; a missing value says Confirmar, never a guess.",
+        "section": "overview"
+      },
+      {
+        "name": "The Aqua On Dark Rule",
+        "body": "New Aqua carries meaning only on Aztec, the veil or the gradient. It never sets text on a light surface.",
+        "section": "colors"
+      },
+      {
+        "name": "The Brand Gradient Rule",
+        "body": "The one gradient is Aztec to Deep Onyx to Dull Teal to Retro Cyan at 170deg, on the closing section. The cover uses an Aztec veil, not a second gradient.",
+        "section": "colors"
+      },
+      {
+        "name": "The Sentence Case Rule",
+        "body": "No uppercase tracked labels anywhere; small text is Space Grotesk at normal tracking.",
+        "section": "typography"
+      },
+      {
+        "name": "The Glass Is For Data Rule",
+        "body": "Blur glass is reserved for the request sheet (Aztec glass) and the data table (Water Dew glass).",
+        "section": "elevation"
+      },
+      {
+        "name": "The Pill Rule",
+        "body": "Anything the visitor can press is a 999px pill; surfaces that hold content are 14, 22 or 28px.",
+        "section": "shapes"
+      }
+    ],
+    "dos": [
+      "Do keep every figure (price, down payment, counts, ranges) derived from live inventory; where the developer did not declare a value print the muted 'Confirmar' note in Dull Teal.",
+      "Do keep zero exit links except legal ones; 'choose this house' scrolls to the form and preselects the house.",
+      "Do keep the request form visible in the first viewport, including mobile (Nombre field measured at about 760px on 390x844).",
+      "Do write labels in sentence case at normal tracking; the form's tracked uppercase label style is neutralised inside the glass sheet.",
+      "Do use New Aqua as text only on Aztec, the Aztec veil or the closing gradient; on light surfaces use Aztec or Dull Teal.",
+      "Do pill every pressable control (999px), round large surfaces at 22px (plates 28px) and nested data panels at 14px.",
+      "Do recolor the shared form through CSS variables on the sheet wrapper, never by forking the component.",
+      "Do paint the grid of lines and nodes as a background-image at 25% #D8ECE9, masked to fade toward the left.",
+      "Do pair the cover photo with the house the headline price names (entry house that has a photo).",
+      "Do take icons only from the custom Propyte icon set once it exists as SVG."
+    ],
+    "donts": [
+      "Don't use uppercase tracked eyebrows or kickers above blocks.",
+      "Don't split the first view 50/50 with a dark form panel, build grids of identical cards, or number steps 01/02/03.",
+      "Don't invent urgency (counters, 'quedan 2') or testimonials, and don't name developments or developers.",
+      "Don't hardcode prices or counts in copy.",
+      "Don't use hard offset shadows; depth is glass, veil and soft ambient shadow only.",
+      "Don't use Aureoline Yellow or Bright Pastel Green on these landings; they belong to Propyte MX and Propyte Market.",
+      "Don't treat Lucide as the system's icon language; it is a placeholder.",
+      "Don't add new !important overrides; the ones on the form shell are inherited debt."
+    ]
+  }
+}

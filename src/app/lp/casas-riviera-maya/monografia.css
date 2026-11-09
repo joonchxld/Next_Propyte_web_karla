@@ -1,0 +1,476 @@
+/* ============================================================
+   Monografía de arquitectura, con la identidad oficial de Propyte
+   («PROPYTE PRESENTACIÓN OFICIAL», manual de marca 2026).
+
+   Paleta del manual (identidad principal, aqua):
+     New Aqua      #A2F9FF  acento: cifras, CTA, selección
+     Onahau        #CCFFFF  / Water Dew #EBFDFF  superficies claras
+     Retro Cyan    #68A4A9  / Dull Teal #487379  iconos, texto secundario
+     Dark Slate    #2E4F52  / Deep Onyx #223232
+     Aztec         #0A1C1E  fondo oscuro de marca
+     Tech White    #F5F5F5
+   Elementos gráficos del manual: retícula de líneas y nodos (#D8ECE9 al
+   25 %), degradado Aztec → Dull Teal → New Aqua, efecto «glassy» para
+   tablas y paneles, pastillas redondeadas.
+
+   Tipografía: el manual pide Neue Haas Grotesk Display Pro (títulos) y
+   Normalidad VF (texto), ambas de pago; el sitio ya usa sus sustitutos
+   libres Inter y DM Sans (ver src/app/layout.tsx). Space Grotesk, también
+   del manual, para detalles y cifras pequeñas.
+   ============================================================ */
+
+.lpm-root {
+  --lpm-aqua: #a2f9ff;
+  --lpm-onahau: #ccffff;
+  --lpm-dew: #ebfdff;
+  --lpm-cyan: #68a4a9;
+  --lpm-teal: #487379;
+  --lpm-slate: #2e4f52;
+  --lpm-onyx: #223232;
+  --lpm-aztec: #0a1c1e;
+  --lpm-tech: #f5f5f5;
+  --lpm-nodo: rgb(216 236 233 / 0.25);
+  --lpm-r: 22px;
+  --lpm-r-s: 14px;
+
+  --lpm-display: 'Inter', var(--font-display), ui-sans-serif, system-ui, sans-serif;
+  --lpm-texto: 'DM Sans', var(--font-text), ui-sans-serif, system-ui, sans-serif;
+  --lpm-detalle: 'Space Grotesk', var(--font-space-grotesk), ui-sans-serif, sans-serif;
+
+  background: var(--lpm-tech);
+  color: var(--lpm-aztec);
+  font-family: var(--lpm-texto);
+}
+
+.lpm-root ::selection {
+  background: var(--lpm-aqua);
+  color: var(--lpm-aztec);
+}
+
+.lpm-root :focus-visible {
+  outline: 2px solid var(--lpm-teal);
+  outline-offset: 3px;
+}
+
+/* ---------- Tipografía ---------- */
+
+.lpm-display,
+.lpm-root .lpc-titulo,
+.lpm-root .lpc-display {
+  font-family: var(--lpm-display);
+  font-weight: 500;
+  letter-spacing: -0.035em;
+  line-height: 1;
+  text-wrap: balance;
+}
+
+.lpm-acento {
+  color: var(--lpm-aqua);
+  font-weight: 600;
+}
+
+.lpm-titulo {
+  font-family: var(--lpm-display);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  text-wrap: balance;
+}
+
+.lpm-subtitulo {
+  font-family: var(--lpm-detalle);
+  font-weight: 600;
+  font-size: 1rem;
+  line-height: 1.35;
+}
+
+.lpm-cifra {
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+.lpm-pie {
+  font-family: var(--lpm-detalle);
+  font-size: 0.875rem;
+  line-height: 1.45;
+}
+
+.lpm-confirmar {
+  color: var(--lpm-teal);
+  font-size: 0.8em;
+  font-weight: 500;
+}
+
+/* ---------- Retícula con nodos (elemento gráfico del manual) ----------
+   Líneas finas y un nodo en cada cruce, al 25 % de #D8ECE9. Se pinta como
+   fondo para no añadir nodos al DOM. */
+.lpm-reticula {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle, rgb(216 236 233 / 0.55) 2.5px, transparent 3px),
+    linear-gradient(to right, var(--lpm-nodo) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--lpm-nodo) 1px, transparent 1px);
+  background-size: 160px 160px, 160px 160px, 160px 160px;
+  background-position: -80px -80px, 0 0, 0 0;
+  mask-image: linear-gradient(to left, #000 0%, rgb(0 0 0 / 0.6) 40%, transparent 85%);
+}
+
+/* ---------- Portada ---------- */
+
+.lpm-portada {
+  background: var(--lpm-aztec);
+}
+
+.lpm-portada-foto {
+  height: max(54svh, 27rem);
+  background: var(--lpm-aztec);
+  overflow: hidden;
+}
+
+/* Móvil: el titular cruza todo el ancho y pasa sobre cielo y muros claros;
+   velo uniforme para que el aqua y el texto mantengan contraste. */
+@media (max-width: 1023px) {
+  .lpm-velo {
+    background:
+      linear-gradient(to bottom, rgb(10 28 30 / 0.55) 0%, rgb(10 28 30 / 0.5) 60%, rgb(10 28 30 / 0.85) 100%) !important;
+  }
+}
+
+/* Velo con el degradado de marca: Aztec desde la izquierda, para que el
+   titular lea sobre cualquier foto del desarrollador. */
+.lpm-velo {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(100deg, rgb(10 28 30 / 0.88) 0%, rgb(10 28 30 / 0.55) 42%, rgb(10 28 30 / 0.05) 78%),
+    linear-gradient(to top, rgb(10 28 30 / 0.7) 0%, rgb(10 28 30 / 0) 30%);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .lpm-asentar {
+    animation: lpm-asentar 1600ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+}
+
+@keyframes lpm-asentar {
+  from {
+    transform: scale(1.045);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+/* ---------- Colofón ---------- */
+
+.lpm-colofon {
+  position: relative;
+  background: var(--lpm-aztec);
+  color: #fff;
+}
+
+.lpm-colofon-opcion {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-height: 48px;
+  padding: 0 1.1rem 0 0.9rem;
+  border: 1px solid rgb(162 249 255 / 0.24);
+  border-radius: 999px;
+  font-family: var(--lpm-detalle);
+  font-size: 0.9375rem;
+  color: rgb(255 255 255 / 0.78);
+  transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease;
+  cursor: pointer;
+}
+
+.lpm-colofon-opcion:hover {
+  border-color: var(--lpm-aqua);
+  color: #fff;
+}
+
+.lpm-colofon-opcion[aria-pressed='true'] {
+  background: var(--lpm-aqua);
+  border-color: var(--lpm-aqua);
+  color: var(--lpm-aztec);
+}
+
+.lpm-colofon-num {
+  font-family: var(--lpm-display);
+  font-weight: 600;
+  font-size: 1.5rem;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+/* ---------- Hoja de solicitud: panel «glassy» de marca ----------
+   `FormCasas` está pintado para superficie oscura; aquí se le da el vidrio
+   Aztec del manual y el CTA en New Aqua, cambiando variables y no el
+   componente. */
+
+.lpc-root .lpm-hoja {
+  --lpc-on-dark: #ffffff;
+  --lpc-on-dark-2: rgb(235 253 255 / 0.76);
+  --lpc-on-dark-3: rgb(204 255 255 / 0.66);
+  --lpc-line-dark: rgb(162 249 255 / 0.28);
+  --lpc-dark-2: rgb(10 28 30 / 0.8);
+  --lpc-signal-on-dark: #ffb4a8;
+  --lpc-ink: #0a1c1e;
+  border-radius: var(--lpm-r);
+  overflow: hidden;
+  border: 1px solid rgb(162 249 255 / 0.24);
+  box-shadow: 0 30px 70px -30px rgb(0 0 0 / 0.6);
+  backdrop-filter: blur(18px) saturate(1.2);
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+}
+
+.lpm-hoja form {
+  background: rgb(10 28 30 / 0.8) !important;
+}
+
+.lpm-hoja button[type='submit'] {
+  background: var(--lpm-aqua);
+  color: var(--lpm-aztec);
+  border-radius: 999px;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.lpm-hoja button[type='submit']:hover {
+  opacity: 1;
+  background: #fff;
+}
+
+.lpm-hoja form a,
+.lpm-hoja form button:not([type='submit']) {
+  border-radius: 999px;
+}
+
+.lpm-hoja .lpc-etiqueta {
+  text-transform: none;
+  letter-spacing: 0;
+  font-family: var(--lpm-detalle);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.lpm-hoja form > p.lpc-etiqueta:first-child {
+  display: none;
+}
+
+.lpm-hoja form > h2 {
+  margin-top: 0;
+}
+
+.lpm-hoja-ancla {
+  position: relative;
+  padding: 0.5rem 1.25rem 3rem;
+  background: var(--lpm-aztec);
+}
+
+@media (min-width: 640px) {
+  .lpm-hoja-ancla {
+    padding: 1.5rem 2rem 3rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .lpm-portada {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .lpm-portada-foto {
+    grid-area: 1 / 1;
+    height: auto;
+    min-height: 88svh;
+  }
+  .lpm-portada > .lpm-colofon {
+    grid-area: 2 / 1;
+  }
+  .lpm-hoja-ancla {
+    grid-area: 1 / 1;
+    justify-self: end;
+    align-self: start;
+    z-index: 1;
+    width: 27rem;
+    margin: 6.5rem max(2rem, calc((100vw - 92rem) / 2 + 2rem)) 3rem 0;
+    padding: 0;
+    background: none;
+  }
+}
+
+/* ---------- Índice y láminas ---------- */
+
+.lpm-indice-opcion {
+  min-height: 44px;
+  padding: 0 1.1rem;
+  border: 1px solid rgb(10 28 30 / 0.16);
+  border-radius: 999px;
+  font-family: var(--lpm-detalle);
+  font-size: 0.9375rem;
+  color: var(--lpm-slate);
+  background: #fff;
+  transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease;
+  cursor: pointer;
+}
+
+.lpm-indice-opcion:hover {
+  border-color: var(--lpm-teal);
+}
+
+.lpm-indice-opcion[aria-pressed='true'] {
+  background: var(--lpm-aztec);
+  border-color: var(--lpm-aztec);
+  color: var(--lpm-aqua);
+}
+
+.lpm-lamina {
+  background: #fff;
+  border-radius: calc(var(--lpm-r) + 6px);
+  padding: 0.75rem;
+  box-shadow: 0 1px 2px rgb(10 28 30 / 0.05), 0 18px 40px -28px rgb(10 28 30 / 0.35);
+}
+
+@media (min-width: 1024px) {
+  .lpm-lamina {
+    padding: 1rem;
+  }
+}
+
+.lpm-galeria > div:first-child {
+  border-radius: var(--lpm-r) !important;
+}
+
+.lpm-root .lpv-galeria-pie,
+.lpm-root .lpv-galeria-pie * {
+  text-transform: none;
+  letter-spacing: 0;
+  font-family: var(--lpm-detalle);
+  font-size: 0.875rem;
+}
+
+/* Tabla de datos con el vidrio claro de marca (Water Dew). */
+.lpm-datos {
+  background: var(--lpm-dew);
+  border: 1px solid rgb(72 115 121 / 0.14);
+  border-radius: var(--lpm-r-s);
+  overflow: hidden;
+}
+
+.lpm-dato-icono {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  flex-shrink: 0;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--lpm-teal);
+  box-shadow: inset 0 0 0 1px rgb(72 115 121 / 0.16);
+}
+
+.lpm-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.8rem;
+  border-radius: 999px;
+  background: var(--lpm-onahau);
+  color: var(--lpm-slate);
+  font-family: var(--lpm-detalle);
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .lpm-lamina {
+      animation: lpm-subir linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 45%;
+    }
+  }
+}
+
+@keyframes lpm-subir {
+  from {
+    transform: translateY(28px);
+    opacity: 0.55;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* ---------- Botones ---------- */
+
+.lpm-boton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 56px;
+  padding: 0 1.5rem;
+  border-radius: 999px;
+  background: var(--lpm-aztec);
+  color: #fff;
+  font-size: 0.9875rem;
+  font-weight: 500;
+  transition: background-color 200ms ease, color 200ms ease;
+  cursor: pointer;
+}
+
+.lpm-boton:hover {
+  background: var(--lpm-slate);
+}
+
+.lpm-boton-elegido {
+  background: var(--lpm-aqua);
+  color: var(--lpm-aztec);
+}
+
+.lpm-boton-elegido:hover {
+  background: var(--lpm-onahau);
+}
+
+/* ---------- Cierre: degradado de marca con retícula ---------- */
+
+.lpm-cierre {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(170deg, var(--lpm-aztec) 0%, var(--lpm-onyx) 45%, var(--lpm-teal) 85%, var(--lpm-cyan) 100%);
+}
+
+.lpm-notas {
+  background: var(--lpm-dew);
+}
+
+/* ---------- Layout compartido de /lp ----------
+   `lpc-theme.css` invierte el logo a negro porque la landing actual abre en
+   blanco. Esta abre sobre foto: logo blanco. */
+
+.lp-root:has(.lpm-root) {
+  background: #0a1c1e;
+}
+
+.lp-root:has(.lpm-root) header img {
+  filter: drop-shadow(0 1px 10px rgb(0 0 0 / 0.35));
+}
+
+.lp-root:has(.lpm-root) header span {
+  color: rgb(235 253 255 / 0.85);
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 0.8125rem;
+}
+
+.lpm-sin-barra {
+  scrollbar-width: none;
+}
+
+.lpm-sin-barra::-webkit-scrollbar {
+  display: none;
+}
