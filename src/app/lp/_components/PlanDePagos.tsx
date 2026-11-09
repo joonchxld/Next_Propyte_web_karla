@@ -1,6 +1,8 @@
 import { DisclaimerCifras, EnlaceGate, TituloSeccion, RULE_LIGHT } from './ui';
 import { mxn } from './format';
 import SelectorPlazo from './SelectorPlazo';
+import { COMUN, PLAN } from '../lotes-playa-del-carmen/_copy';
+import type { LocaleLp } from './v2/i18n';
 import type { LoteLanding } from '@/lib/supabase/lp-lotes';
 
 // ============================================================
@@ -27,20 +29,25 @@ import type { LoteLanding } from '@/lib/supabase/lp-lotes';
 // contraentrega. Dividir entre 60 daría una mensualidad más baja que la real.
 // ============================================================
 
-export default function PlanDePagos({ lote }: { lote: LoteLanding }) {
+export default function PlanDePagos({
+  lote,
+  locale = 'es',
+}: {
+  lote: LoteLanding;
+  locale?: LocaleLp;
+}) {
   const plan = lote.plan;
+  const t = PLAN[locale];
 
   if (!plan) {
     return (
       <section aria-labelledby="plan-titulo">
-        <TituloSeccion id="plan-titulo">Cómo se paga</TituloSeccion>
+        <TituloSeccion id="plan-titulo">{t.titulo}</TituloSeccion>
         <p className="mt-4 max-w-[62ch] text-base leading-relaxed text-[var(--lp-ink-soft)]">
-          El financiamiento es directo con el desarrollador, pero todavía no
-          publicamos las mensualidades porque falta un dato y preferimos decírtelo
-          antes que estimarlo.
+          {t.sinPlan}
         </p>
         <div className="mt-4">
-          <EnlaceGate que="tasa de financiamiento" />
+          <EnlaceGate que={COMUN[locale].gate.tasa} locale={locale} />
         </div>
       </section>
     );
@@ -49,36 +56,34 @@ export default function PlanDePagos({ lote }: { lote: LoteLanding }) {
   return (
     <section aria-labelledby="plan-titulo">
       <TituloSeccion id="plan-titulo">
-        {plan.sinIntereses ? 'Cómo se paga, sin intereses' : 'Cómo se paga'}
+        {plan.sinIntereses ? t.tituloSinIntereses : t.titulo}
       </TituloSeccion>
 
       <p className="mt-4 max-w-[62ch] text-base leading-relaxed text-[var(--lp-ink-soft)]">
-        Financiamiento directo con el desarrollador
-        {plan.sinIntereses && ', sin intereses'}. El esquema que publica es{' '}
-        {plan.enganchePct}% de enganche, {plan.mensualidadesPct}% en mensualidades y{' '}
-        {plan.contraentregaPct}% contra entrega. Estas cifras son ese esquema
-        aplicado al precio de este lote.
+        {t.directo}
+        {plan.sinIntereses && t.sinIntereses}
+        {t.esquema(plan.enganchePct, plan.mensualidadesPct, plan.contraentregaPct)}
       </p>
 
-      <SelectorPlazo opciones={plan.opciones} sinIntereses={plan.sinIntereses} />
+      <SelectorPlazo opciones={plan.opciones} sinIntereses={plan.sinIntereses} locale={locale} />
 
       {/* Desglose completo: lo que entra al inicio, en medio y al final. */}
       <dl className={`mt-6 border-x border-b border-t-2 border-t-[var(--lp-accent)] ${RULE_LIGHT}`}>
         {[
           {
-            k: `Enganche (${plan.enganchePct}%)`,
+            k: t.enganche(plan.enganchePct),
             v: mxn(plan.engancheMxn),
-            nota: 'Al firmar',
+            nota: t.alFirmar,
           },
           {
-            k: `Mensualidades (${plan.mensualidadesPct}%)`,
+            k: t.mensualidades(plan.mensualidadesPct),
             v: mxn(plan.mensualidadesTotalMxn),
-            nota: 'Repartido en los pagos de arriba',
+            nota: t.repartido,
           },
           {
-            k: `Contra entrega (${plan.contraentregaPct}%)`,
+            k: t.contraentrega(plan.contraentregaPct),
             v: mxn(plan.contraentregaMxn),
-            nota: 'El pago final, en el último mes del plazo',
+            nota: t.pagoFinal,
           },
         ].map((f) => (
           <div
@@ -97,7 +102,7 @@ export default function PlanDePagos({ lote }: { lote: LoteLanding }) {
       </dl>
 
       <div className="mt-5">
-        <DisclaimerCifras />
+        <DisclaimerCifras locale={locale} />
       </div>
     </section>
   );

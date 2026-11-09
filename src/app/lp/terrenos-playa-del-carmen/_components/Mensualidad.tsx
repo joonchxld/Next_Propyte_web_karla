@@ -4,6 +4,8 @@ import { animate, useReducedMotion } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
 import type { PlanPago } from '@/lib/supabase/lp-lotes';
 import { EASE_ESTADO } from './motion';
+import { COPY } from '../_copy';
+import type { LocaleLp } from '../../_components/v2/i18n';
 
 // ============================================================
 // El gancho de la página: la mensualidad, grande, y un interruptor de plazo.
@@ -80,10 +82,14 @@ function CifraMorfa({ valor, className }: { valor: number; className?: string })
 export default function Mensualidad({
   plan,
   precioMxn,
+  locale,
 }: {
   plan: PlanPago;
   precioMxn: number;
+  /** Idioma; el diccionario lleva funciones y se resuelve aquí, en el cliente. */
+  locale: LocaleLp;
 }) {
+  const copy = COPY[locale].mensualidad;
   const [idx, setIdx] = useState(plan.opciones.length - 1);
   const opcion = plan.opciones[idx] ?? plan.opciones[0];
 
@@ -97,18 +103,23 @@ export default function Mensualidad({
   const sinInteresesVerificado = plan.sinIntereses && cuadraPorcentaje && cuadraImporte;
 
   const tramos = [
-    { etiqueta: 'Enganche', pct: plan.enganchePct, mxn: plan.engancheMxn, momento: 'al firmar' },
     {
-      etiqueta: 'Mensualidades',
-      pct: plan.mensualidadesPct,
-      mxn: plan.mensualidadesTotalMxn,
-      momento: `en ${opcion.pagos} pagos`,
+      etiqueta: copy.tramos.enganche.etiqueta,
+      pct: plan.enganchePct,
+      mxn: plan.engancheMxn,
+      momento: copy.tramos.enganche.momento,
     },
     {
-      etiqueta: 'Contraentrega',
+      etiqueta: copy.tramos.mensualidades.etiqueta,
+      pct: plan.mensualidadesPct,
+      mxn: plan.mensualidadesTotalMxn,
+      momento: copy.tramos.mensualidades.momento(opcion.pagos),
+    },
+    {
+      etiqueta: copy.tramos.contraentrega.etiqueta,
       pct: plan.contraentregaPct,
       mxn: plan.contraentregaMxn,
-      momento: 'al entregar',
+      momento: copy.tramos.contraentrega.momento,
     },
   ];
 
@@ -118,7 +129,7 @@ export default function Mensualidad({
         {plan.opciones.length > 1 && (
           <div
             role="group"
-            aria-label="Plazo del plan de pagos"
+            aria-label={copy.grupoAria}
             className="inline-flex border border-[var(--lpt-linea-fuerte)]"
           >
             {plan.opciones.map((o, i) => {
@@ -135,7 +146,7 @@ export default function Mensualidad({
                       : 'text-[var(--lpt-claro-2)] hover:text-[var(--lpt-claro)]'
                   }`}
                 >
-                  {o.meses} meses
+                  {copy.plazo(o.meses)}
                 </button>
               );
             })}
@@ -143,7 +154,7 @@ export default function Mensualidad({
         )}
 
         <p className="lpt-cota mt-8 text-xs uppercase tracking-[0.14em] text-[var(--lpt-claro-3)]">
-          Tu mensualidad
+          {copy.tuMensualidad}
         </p>
 
         {/* La cifra. Es el elemento más grande de la página después del H1, y
@@ -154,10 +165,7 @@ export default function Mensualidad({
         </p>
 
         <p className="lpt-cuerpo mt-3 max-w-[44ch] text-[0.9375rem] leading-relaxed text-[var(--lpt-claro-2)]">
-          {opcion.pagos} pagos mensuales
-          {sinInteresesVerificado ? ', sin intereses' : ''}. Le pagas al
-          desarrollador: no hay banco, no hay buró, no hay comprobante de
-          ingresos.
+          {copy.pagos(opcion.pagos, sinInteresesVerificado)}
         </p>
       </div>
 
@@ -167,9 +175,9 @@ export default function Mensualidad({
         <div
           className="flex h-2 w-full overflow-hidden bg-[var(--lpt-linea)]"
           role="img"
-          aria-label={`Reparto del pago: ${tramos
-            .map((t) => `${t.etiqueta} ${t.pct}%`)
-            .join(', ')}`}
+          aria-label={copy.repartoAria(
+            tramos.map((t) => `${t.etiqueta} ${t.pct}%`).join(', '),
+          )}
         >
           {tramos.map((t, i) => (
             <span

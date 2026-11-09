@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import type { Ubicacion } from '@/lib/supabase/lp-inventario';
+import type { LocaleLp } from '../../_components/v2/i18n';
+import { COPY } from '../_copy';
 
 // ============================================================
 // Índice fijo de ciudades, solo escritorio.
@@ -16,7 +18,7 @@ function prefiereMenosMovimiento(): boolean {
   return typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
 
-export default function IndiceCiudades({ ciudades }: { ciudades: Ubicacion[] }) {
+export default function IndiceCiudades({ ciudades, locale = 'es' }: { ciudades: Ubicacion[]; locale?: LocaleLp }) {
   const [activa, setActiva] = useState<string | null>(null);
 
   useEffect(() => {
@@ -47,7 +49,7 @@ export default function IndiceCiudades({ ciudades }: { ciudades: Ubicacion[] }) 
 
   return (
     <nav
-      aria-label="Ir a una ciudad"
+      aria-label={COPY[locale].indice.aria}
       className="lpo-indice fixed right-6 top-1/2 z-30 hidden -translate-y-1/2 flex-col items-end gap-3 lg:flex"
     >
       {ciudades.map((c) => (

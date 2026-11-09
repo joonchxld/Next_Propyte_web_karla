@@ -1,5 +1,7 @@
 import { RULE_DARK } from './ui';
 import type { LoteLanding } from '@/lib/supabase/lp-lotes';
+import { PENDIENTES } from '../lotes-playa-del-carmen/_copy';
+import type { LocaleLp } from './v2/i18n';
 
 // ============================================================
 // Lo que todavía no sabemos. Panel del módulo «Antes de firmar».
@@ -34,15 +36,18 @@ interface Pendiente {
  * derivada del dato divergen el día que el Hub publique la tasa, y el resumen
  * mentiría en un bloque cuyo único propósito es no mentir.
  */
-export function construirPendientes(lote: LoteLanding): Pendiente[] {
+export function construirPendientes(
+  lote: LoteLanding,
+  locale: LocaleLp = 'es',
+): Pendiente[] {
+  const t = PENDIENTES[locale];
   const pendientes: Pendiente[] = [];
 
   // 1 · Etapa. El registro trae fechas de urbanización de UNA etapa y no
   // confirma que sean las de este lote. Es el gate con más consecuencia.
   pendientes.push({
-    titulo: 'A qué etapa pertenece este lote',
-    porQueImporta:
-      'Determina si el plazo de financiamiento es de 48 o de 60 meses, y en qué momento le toca la urbanización. Las fechas que publicamos abajo son de una etapa cuya correspondencia con este lote todavía no está confirmada.',
+    titulo: t.etapaTitulo,
+    porQueImporta: t.etapa,
   });
 
   // 2 · Tasa. Sin ella no se publica mensualidad, y es la cifra de mayor
@@ -51,34 +56,38 @@ export function construirPendientes(lote: LoteLanding): Pendiente[] {
   // exactamente lo que esta página existe para no hacer.
   if (lote.tasaAnual === null) {
     pendientes.push({
-      titulo: 'La tasa del financiamiento, por escrito',
-      porQueImporta:
-        'El desarrollador describe los plazos como meses sin intereses, pero no ha declarado la tasa como dato. Hasta que lo haga no publicamos la mensualidad: preferimos dejar el hueco a que descubras un interés que no anunciamos.',
+      titulo: t.tasaTitulo,
+      porQueImporta: t.tasa,
     });
   }
 
   // 3 · Apartado. No existe como campo en ninguna tabla; es un hueco real.
   pendientes.push({
-    titulo: 'Las condiciones de devolución del apartado',
-    porQueImporta:
-      'Es la pregunta que más conviene resolver antes de entregar dinero, y la estamos pidiendo por escrito.',
+    titulo: t.apartadoTitulo,
+    porQueImporta: t.apartado,
   });
 
   // 4 · Licencia. Obligación legal explícita, art. 69. Se cita AQUÍ y sólo
   // aquí: antes aparecía duplicada en el bloque jurídico y en el pie legal.
   if (!lote.licencia.completa) {
     pendientes.push({
-      titulo: 'Licencia del desarrollo y autorización de venta municipal',
-      porQueImporta:
-        'Son obligatorias en la publicidad de lotes conforme al artículo 69 de la Ley de Asentamientos Urbanos de Quintana Roo. Las estamos recabando.',
+      titulo: t.licenciaTitulo,
+      porQueImporta: t.licencia,
     });
   }
 
   return pendientes;
 }
 
-export default function LoQueFaltaConfirmar({ lote }: { lote: LoteLanding }) {
-  const pendientes = construirPendientes(lote);
+export default function LoQueFaltaConfirmar({
+  lote,
+  locale = 'es',
+}: {
+  lote: LoteLanding;
+  locale?: LocaleLp;
+}) {
+  const t = PENDIENTES[locale];
+  const pendientes = construirPendientes(lote, locale);
   if (pendientes.length === 0) return null;
 
   const plural = pendientes.length > 1;
@@ -86,8 +95,7 @@ export default function LoQueFaltaConfirmar({ lote }: { lote: LoteLanding }) {
   return (
     <div>
       <p className="max-w-[58ch] text-base leading-relaxed text-white/70">
-        Publicamos esto porque la mayoría de los anuncios de esta zona simplemente
-        no lo menciona.
+        {t.intro}
       </p>
 
       <ol className={`mt-6 border-t ${RULE_DARK}`}>
@@ -113,10 +121,7 @@ export default function LoQueFaltaConfirmar({ lote }: { lote: LoteLanding }) {
       </ol>
 
       <p className="mt-6 max-w-[58ch] text-sm leading-relaxed text-white/70">
-        {plural ? 'Las' : 'La'} pedimos por escrito y{' '}
-        {plural ? 'las publicamos' : 'la publicamos'} aquí en cuanto{' '}
-        {plural ? 'lleguen' : 'llegue'}. Si necesitas alguna antes de avanzar,
-        dínoslo y te la mandamos el mismo día en que la tengamos.
+        {t.cierre(plural)}
       </p>
     </div>
   );

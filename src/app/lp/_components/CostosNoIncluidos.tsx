@@ -1,6 +1,8 @@
 import { Campo, BloqueCampos, EnlaceGate } from './ui';
 import { mxn } from './format';
 import type { LoteLanding } from '@/lib/supabase/lp-lotes';
+import { COMUN, COSTOS } from '../lotes-playa-del-carmen/_copy';
+import type { LocaleLp } from './v2/i18n';
 
 // ============================================================
 // Lo que no está en el precio.
@@ -20,43 +22,56 @@ function esIndexado(monto: string): boolean {
   );
 }
 
-export default function CostosNoIncluidos({ lote }: { lote: LoteLanding }) {
+export default function CostosNoIncluidos({
+  lote,
+  locale = 'es',
+}: {
+  lote: LoteLanding;
+  locale?: LocaleLp;
+}) {
   const c = lote.costos;
+  const t = COSTOS[locale];
 
   const cierre =
     c?.cierrePctMin && c?.cierrePctMax
-      ? `${c.cierrePctMin}% a ${c.cierrePctMax}% del valor de venta`
+      ? t.cierre(c.cierrePctMin, c.cierrePctMax)
       : null;
 
   const mantenimiento =
     c?.mantenimientoMxnMin && c?.mantenimientoMxnMax
-      ? `${mxn(c.mantenimientoMxnMin)} a ${mxn(c.mantenimientoMxnMax)} al mes`
+      ? t.mantenimientoRango(mxn(c.mantenimientoMxnMin), mxn(c.mantenimientoMxnMax))
       : null;
 
   return (
     <div>
       <p className="max-w-[62ch] text-base leading-relaxed text-white/75">
-        El precio del lote no es el costo de adquirirlo. Estos son los conceptos
-        adicionales que el desarrollador declara, para que calcules tu presupuesto
-        completo antes de hablar con nosotros y no después.
+        {t.intro}
       </p>
 
       <div className="mt-6">
         <BloqueCampos tono="oscuro">
-          <Campo etiqueta="Escrituración" tono="oscuro">
-            {cierre ?? <EnlaceGate que="% de gastos de escrituración" tono="oscuro" />}
+          <Campo etiqueta={t.escrituracion} tono="oscuro">
+            {cierre ?? <EnlaceGate
+                que={COMUN[locale].gate.gastosEscrituracion}
+                tono="oscuro"
+                locale={locale}
+              />}
             {c?.cierreExcluye && (
               <span className="block text-xs text-white/45">
-                No incluye {c.cierreExcluye}
+                {t.noIncluye} {c.cierreExcluye}
               </span>
             )}
           </Campo>
 
-          <Campo etiqueta="Mantenimiento" tono="oscuro">
-            {mantenimiento ?? <EnlaceGate que="cuota de mantenimiento" tono="oscuro" />}
+          <Campo etiqueta={t.mantenimiento} tono="oscuro">
+            {mantenimiento ?? <EnlaceGate
+                que={COMUN[locale].gate.mantenimiento}
+                tono="oscuro"
+                locale={locale}
+              />}
             {c?.mantenimientoPorDefinir && (
               <span className="block text-xs text-white/45">
-                Monto final por definir, más cerca de la entrega
+                {t.mantenimientoPorDefinir}
               </span>
             )}
           </Campo>
@@ -66,8 +81,8 @@ export default function CostosNoIncluidos({ lote }: { lote: LoteLanding }) {
               {cargo.monto}
               <span className="block text-xs text-white/45">
                 {cargo.momento}
-                {cargo.reembolsable === true && ', reembolsable'}
-                {cargo.reembolsable === false && ', no reembolsable'}
+                {cargo.reembolsable === true && t.reembolsable}
+                {cargo.reembolsable === false && t.noReembolsable}
               </span>
               {/* Un cargo indexado a salarios mínimos no es un monto: es una
                   fórmula. Publicarlo sin decir eso deja al comprador creyendo
@@ -76,10 +91,7 @@ export default function CostosNoIncluidos({ lote }: { lote: LoteLanding }) {
                   lo define el contrato, no nosotros. */}
               {esIndexado(cargo.monto) && (
                 <span className="mt-1.5 block text-xs leading-relaxed text-white/45">
-                  Es un cargo indexado: se calcula con el salario mínimo vigente el
-                  día que inicies obra, no con el de hoy. Te pasamos el equivalente
-                  en pesos y el salario mínimo que aplica en cuanto el desarrollador
-                  lo confirme por escrito.
+                  {t.indexado}
                 </span>
               )}
             </Campo>
@@ -88,9 +100,7 @@ export default function CostosNoIncluidos({ lote }: { lote: LoteLanding }) {
       </div>
 
       <p className="mt-5 max-w-[62ch] text-xs leading-relaxed text-white/45">
-        Condiciones publicadas por el desarrollador, sujetas a cambio y
-        disponibilidad. Conviene confirmar vigencia y lote específico al momento de
-        decidir.
+        {t.pie}
       </p>
     </div>
   );

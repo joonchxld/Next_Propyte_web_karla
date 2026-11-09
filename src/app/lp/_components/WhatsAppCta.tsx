@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import { MessageCircle } from '@/lib/icons';
 import { trackWhatsAppClick } from '@/lib/analytics/track';
 import { getCapturedUTMs } from '@/hooks/useUTMCapture';
+import { WA } from '../lotes-playa-del-carmen/_copy';
+import type { LocaleLp } from './v2/i18n';
 
 // ============================================================
 // CTA de WhatsApp con atribución.
@@ -29,11 +31,13 @@ export default function WhatsAppCta({
   telefono,
   mensaje,
   surface,
+  locale = 'es',
 }: {
   loteSlug: string;
   telefono: string;
   mensaje: string;
   surface: string;
+  locale?: LocaleLp;
 }) {
   // Identificadores de clic de anuncio, leídos DESPUÉS de montar.
   //
@@ -85,7 +89,7 @@ export default function WhatsAppCta({
       className="inline-flex min-h-[52px] cursor-pointer items-center justify-center gap-2 rounded-[var(--lp-r-control)] border border-[var(--lp-on-dark)]/25 px-6 text-sm font-medium text-[var(--lp-on-dark)]/85 transition-colors duration-200 hover:border-[var(--lp-on-dark)]/45 hover:text-[var(--lp-on-dark)]"
     >
       <MessageCircle className="size-4 shrink-0" aria-hidden="true" />
-      Escribir por WhatsApp
+      {WA[locale].escribir}
     </a>
   );
 }

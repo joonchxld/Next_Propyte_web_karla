@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from 'react';
 import { ArrowRight, Check } from '@/lib/icons';
 import { trackGenerateLead } from '@/lib/analytics/track';
 import PhoneInputField, { isValidPhoneNumber } from '@/components/ui/PhoneInput';
+import { FORM } from '../lotes-playa-del-carmen/_copy';
+import type { LocaleLp } from './v2/i18n';
 
 // ============================================================
 // Formulario de UN paso.
@@ -46,12 +48,6 @@ import PhoneInputField, { isValidPhoneNumber } from '@/components/ui/PhoneInput'
 // sessionStorage.
 // ============================================================
 
-const OBJETIVOS = [
-  'Construir mi casa',
-  'Inversión a mediano plazo',
-  'Todavía estoy comparando',
-] as const;
-
 const CLAVES_URL = [
   'utm_source',
   'utm_medium',
@@ -74,10 +70,10 @@ type Atribucion = Partial<Record<(typeof CLAVES_URL)[number], string>>;
  * son específicos de esta landing; gtag hace queue antes de cargar, así que es
  * seguro llamarlo dentro del handler.
  */
-function emitirEvento(evento: string) {
+function emitirEvento(evento: string, formType: string) {
   if (typeof window === 'undefined') return;
   const w = window as Window & { gtag?: (...args: unknown[]) => void };
-  w.gtag?.('event', evento, { form_type: 'lp_lotes_pdc' });
+  w.gtag?.('event', evento, { form_type: formType });
 }
 
 /**
@@ -106,12 +102,13 @@ export default function LeadFormLotes({
    * enviar. El default es el más conservador que sigue siendo un compromiso;
    * cambiarlo es decisión de negocio, no de diseño.
    */
-  tiempoRespuesta = 'el mismo día hábil',
+  tiempoRespuesta,
   /**
    * `hero` = par nombre+WhatsApp, arriba del documento. `principal` = el
    * formulario completo de la columna. Ver el bloque de arriba.
    */
   variante = 'principal',
+  locale = 'es',
 }: {
   loteNombre: string;
   /** Slug del lote, para que el lead llegue al CRM ya referenciado. */
@@ -120,7 +117,10 @@ export default function LeadFormLotes({
   plazosDisponibles: number[];
   tiempoRespuesta?: string;
   variante?: 'principal' | 'hero';
+  locale?: LocaleLp;
 }) {
+  const t = FORM[locale];
+  const tiempo = tiempoRespuesta ?? t.tiempoRespuesta;
   const esHero = variante === 'hero';
   const [objetivo, setObjetivo] = useState<string | null>(null);
   const [plazo, setPlazo] = useState<number | null>(plazosDisponibles.at(-1) ?? null);
@@ -191,17 +191,17 @@ export default function LeadFormLotes({
     setError(null);
 
     if (!nombre.trim() || !email.trim() || !whatsapp) {
-      setError('Necesitamos tu nombre, tu correo y un WhatsApp para enviarte el comparativo.');
+      setError(t.errorFaltan);
       return;
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
-      setError('Revisa el correo: es a donde te mandamos el comparativo.');
+      setError(t.errorCorreo);
       return;
     }
     // La validación por país la hace el selector de lada, no un conteo de
     // dígitos: un comprador extranjero no puede perder el lead por la lada.
     if (!isValidPhoneNumber(whatsapp)) {
-      setError('Revisa el WhatsApp: elige tu país y escribe el número completo.');
+      setError(t.errorTelefono);
       return;
     }
 
@@ -211,8 +211,8 @@ export default function LeadFormLotes({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          source: 'lp_lotes_pdc',
-          locale: 'es',
+          source: t.leadSource,
+          locale,
           name: nombre.trim(),
           phone: whatsapp,
           whatsapp: whatsapp,
@@ -222,9 +222,9 @@ export default function LeadFormLotes({
           // Referencia y plazo en el mensaje: el asesor abre la conversación
           // sabiendo de qué lote y de qué plan se habla, sin preguntarlo.
           message: [
-            `Lote ref. ${loteRef}.`,
-            plazo ? `Pidió el plan a ${plazo} meses.` : 'Pidió el detalle del lote.',
-            objetivo ? `Objetivo declarado: ${objetivo.toLowerCase()}.` : null,
+            t.lead.ref(loteRef),
+            plazo ? t.lead.plan(plazo) : t.lead.sinPlan,
+            objetivo ? t.lead.objetivo(objetivo.toLowerCase()) : null,
           ]
             .filter(Boolean)
             .join(' '),
@@ -234,10 +234,10 @@ export default function LeadFormLotes({
         }),
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      trackGenerateLead({ formType: 'lp_lotes_pdc' });
+      trackGenerateLead({ formType: t.formType });
       setEnviado(true);
     } catch {
-      setError('No pudimos enviar tu solicitud. Vuelve a intentarlo, o escríbenos por WhatsApp.');
+      setError(t.errorEnvio);
     } finally {
       setEnviando(false);
     }
@@ -255,18 +255,16 @@ export default function LeadFormLotes({
       >
         <Check className="size-5 text-[var(--lp-accent)]" aria-hidden="true" />
         <p className="mt-3 lp-display text-lg leading-snug text-[var(--lp-ink)]">
-          Listo, {nombre.trim().split(' ')[0]}.
+          {t.gracias(nombre.trim().split(' ')[0])}
         </p>
         <p className="mt-3 text-sm leading-relaxed text-[var(--lp-ink-soft)]">
-          Te escribimos por WhatsApp al{' '}
-          <span className="font-mono">{whatsapp}</span> {tiempoRespuesta} con el
-          plano, tu tabla de amortización
-          {plazo ? ` a ${plazo} meses` : ''} y el paquete documental.
+          {t.graciasA}{' '}
+          <span className="font-mono">{whatsapp}</span> {tiempo} {t.graciasB}
+          {plazo ? t.graciasPlazo(plazo) : ''} {t.graciasC}
         </p>
         {!esHero && (
           <p className="mt-3 text-sm leading-relaxed text-[var(--lp-ink-soft)]">
-            Si por presupuesto u objetivo este lote no encaja, te lo decimos en el
-            primer mensaje y te ahorramos la llamada.
+            {t.graciasNoEncaja}
           </p>
         )}
       </div>
@@ -280,7 +278,7 @@ export default function LeadFormLotes({
   const camposContacto = (
     <>
       <label className="flex flex-col gap-1.5">
-        <span className={ETIQUETA}>Nombre</span>
+        <span className={ETIQUETA}>{t.nombre}</span>
         <input
           className={INPUT}
           type="text"
@@ -294,7 +292,7 @@ export default function LeadFormLotes({
       </label>
 
       <label className="flex flex-col gap-1.5">
-        <span className={ETIQUETA}>Email</span>
+        <span className={ETIQUETA}>{t.email}</span>
         <input
           className={INPUT}
           type="email"
@@ -308,13 +306,14 @@ export default function LeadFormLotes({
       </label>
 
       <label className="flex flex-col gap-1.5">
-        <span className={ETIQUETA}>WhatsApp</span>
+        <span className={ETIQUETA}>{t.whatsapp}</span>
         <PhoneInputField
           id="lp-lotes-whatsapp"
           name="phone"
           value={whatsapp}
           onChange={setWhatsapp}
-          placeholder="984 123 4567"
+          placeholder={t.placeholderTelefono}
+          defaultCountry={t.paisTelefono}
           required
           className={INPUT}
         />
@@ -353,7 +352,7 @@ export default function LeadFormLotes({
         className="border-t-[3px] border-[var(--lp-accent)] bg-white p-5 shadow-[0_8px_28px_rgb(22_25_28/0.18)] sm:p-6"
       >
         <p className="lp-display text-base leading-snug text-[var(--lp-ink)]">
-          Pide tu plan de pagos por WhatsApp
+          {t.heroTitulo}
         </p>
         <form className="mt-4 flex flex-col gap-3" onSubmit={enviar} noValidate>
           <div className="flex flex-col gap-3 sm:flex-row">
@@ -368,13 +367,12 @@ export default function LeadFormLotes({
             disabled={enviando}
             className="flex min-h-[52px] w-full cursor-pointer items-center justify-center gap-2 bg-[var(--lp-accent)] px-5 text-base font-semibold text-white shadow-[0_2px_10px_rgb(168_64_42/0.28)] transition-colors duration-200 hover:bg-[var(--lp-accent-strong)] disabled:cursor-default disabled:opacity-60"
           >
-            {enviando ? 'Enviando' : 'Enviarme el plan'}
+            {enviando ? t.enviando : t.heroBoton}
             {!enviando && <ArrowRight className="size-4" aria-hidden="true" />}
           </button>
 
           <p className="text-xs leading-relaxed text-[var(--lp-ink-soft)]/70">
-            Te escribimos {tiempoRespuesta} con el plano, la tabla de amortización
-            y el paquete documental. Sin llamadas si no las pides.
+            {t.heroNotaA} {tiempo} {t.heroNotaB}
           </p>
         </form>
       </div>
@@ -393,7 +391,7 @@ export default function LeadFormLotes({
             real de la conversión es el `TituloSeccion` de la columna de al
             lado. Dos h3 compitiendo confunden el índice del documento. */}
         <p className="lp-display text-lg leading-snug text-[var(--lp-ink)]">
-          ¿A dónde te lo enviamos?
+          {t.principalTitulo}
         </p>
 
         <form className="mt-5 flex flex-col gap-4" onSubmit={enviar} noValidate>
@@ -403,7 +401,7 @@ export default function LeadFormLotes({
               cuesta escritura. */}
           {plazosDisponibles.length > 0 && (
             <fieldset className="flex flex-col gap-1.5">
-              <legend className={ETIQUETA}>Plazo que te interesa</legend>
+              <legend className={ETIQUETA}>{t.plazoLegend}</legend>
               <div className="mt-1.5 flex gap-2">
                 {plazosDisponibles.map((m) => (
                   <label
@@ -422,7 +420,7 @@ export default function LeadFormLotes({
                       onChange={() => setPlazo(m)}
                       className="sr-only"
                     />
-                    <span className="lp-num">{m} meses</span>
+                    <span className="lp-num">{m} {t.meses}</span>
                   </label>
                 ))}
               </div>
@@ -434,10 +432,10 @@ export default function LeadFormLotes({
               lead. Un solo tap, y el asesor abre la conversación sabiéndolo. */}
           <fieldset className="flex flex-col gap-1.5">
             <legend className={ETIQUETA}>
-              Qué buscas <span className="lowercase tracking-normal">(opcional)</span>
+              {t.objetivoLegend} <span className="lowercase tracking-normal">{t.opcional}</span>
             </legend>
             <div className="mt-1.5 flex flex-wrap gap-2">
-              {OBJETIVOS.map((o) => (
+              {t.objetivos.map((o) => (
                 <button
                   key={o}
                   type="button"
@@ -446,7 +444,7 @@ export default function LeadFormLotes({
                   onClick={() => {
                     const siguiente = objetivo === o ? null : o;
                     setObjetivo(siguiente);
-                    if (siguiente) emitirEvento('objetivo_elegido');
+                    if (siguiente) emitirEvento('objetivo_elegido', t.formType);
                   }}
                 >
                   {o}
@@ -463,7 +461,7 @@ export default function LeadFormLotes({
             disabled={enviando}
             className="flex min-h-[52px] w-full cursor-pointer items-center justify-center gap-2 bg-[var(--lp-accent)] px-5 text-base font-semibold text-white shadow-[0_2px_10px_rgb(168_64_42/0.28)] transition-colors duration-200 hover:bg-[var(--lp-accent-strong)] disabled:cursor-default disabled:opacity-60"
           >
-            {enviando ? 'Enviando' : 'Enviarme el plan y los documentos'}
+            {enviando ? t.enviando : t.principalBoton}
             {!enviando && <ArrowRight className="size-4" aria-hidden="true" />}
           </button>
 
@@ -472,27 +470,26 @@ export default function LeadFormLotes({
               recibes por haber actuado. La oferta no puede ser lo que la
               página ya publica — son tres cosas que solo existen fuera. */}
           <div className="border-t border-[var(--lp-line)] pt-4">
-            <p className={ETIQUETA}>Qué pasa cuando envías</p>
+            <p className={ETIQUETA}>{t.quePasa}</p>
             <ul className="mt-2 flex flex-col gap-1.5 text-xs leading-relaxed text-[var(--lp-ink-soft)]">
               <li>
-                Te escribimos por WhatsApp{' '}
-                <span className="text-[var(--lp-ink)]">{tiempoRespuesta}</span>.
+                {t.quePasa1A}{' '}
+                <span className="text-[var(--lp-ink)]">{tiempo}</span>.
               </li>
-              <li>El plano con la ubicación exacta del lote dentro de la privada.</li>
+              <li>{t.quePasa2}</li>
               <li>
-                Tu tabla de amortización
-                {plazo ? ` a ${plazo} meses` : ''}, con el pago final por escrito.
+                {t.quePasa3A}
+                {plazo ? t.graciasPlazo(plazo) : ''}
+                {t.quePasa3B}
               </li>
               <li>
-                El paquete documental: licencia, autorización de venta municipal y
-                régimen de propiedad, para que lo revises tú o tu abogado.
+                {t.quePasa4}
               </li>
             </ul>
           </div>
 
           <p className="text-xs leading-relaxed text-[var(--lp-ink-soft)]/60">
-            Al enviar aceptas que te contactemos por WhatsApp sobre este lote.
-            Puedes pedirnos que dejemos de hacerlo en cualquier momento.
+            {t.consentimiento}
           </p>
         </form>
       </div>

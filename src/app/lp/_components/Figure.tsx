@@ -1,5 +1,7 @@
 import Image from 'next/image';
 import type { ImagenLanding } from '@/lib/supabase/lp-lotes';
+import { COMUN } from '../lotes-playa-del-carmen/_copy';
+import type { LocaleLp } from './v2/i18n';
 
 // ============================================================
 // Toda imagen de la landing, rotulada.
@@ -20,10 +22,6 @@ import type { ImagenLanding } from '@/lib/supabase/lp-lotes';
 // dejarlo al copy de cada llamada garantiza que en algún sitio se suavice.
 // ============================================================
 
-const PREFIJO: Record<ImagenLanding['tipo'], string> = {
-  render: 'Render del desarrollador.',
-  foto: 'Fotografía real.',
-};
 
 export default function Figure({
   imagen,
@@ -32,6 +30,7 @@ export default function Figure({
   className = '',
   aspecto = 'aspect-[4/3]',
   tono = 'claro',
+  locale = 'es',
 }: {
   imagen: ImagenLanding;
   sizes: string;
@@ -39,6 +38,7 @@ export default function Figure({
   className?: string;
   aspecto?: string;
   tono?: 'claro' | 'oscuro';
+  locale?: LocaleLp;
 }) {
   const oscuro = tono === 'oscuro';
 
@@ -61,7 +61,7 @@ export default function Figure({
         }`}
       >
         <span className={oscuro ? 'text-[var(--lp-on-dark)]/80' : 'text-[var(--lp-ink-soft)]'}>
-          {PREFIJO[imagen.tipo]}
+          {COMUN[locale].figura[imagen.tipo]}
         </span>{' '}
         {imagen.caption}
       </figcaption>

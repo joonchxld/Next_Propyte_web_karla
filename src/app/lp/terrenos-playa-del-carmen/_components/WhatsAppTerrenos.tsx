@@ -40,7 +40,12 @@ export default function WhatsAppTerrenos({
   telefono,
   mensaje,
   loteSlug,
+  surface = 'lp-terrenos-pdc-cierre',
+  etiqueta = 'O escríbenos por WhatsApp',
 }: {
+  /** `surface` del evento de medición; el inglés pasa el suyo con sufijo `-en`. */
+  surface?: string;
+  etiqueta?: string;
   telefono: string;
   mensaje: string;
   loteSlug: string;
@@ -73,12 +78,12 @@ export default function WhatsAppTerrenos({
       target="_blank"
       rel="noopener noreferrer"
       onClick={() =>
-        trackWhatsAppClick({ surface: 'lp-terrenos-pdc-cierre', propertySlug: loteSlug })
+        trackWhatsAppClick({ surface, propertySlug: loteSlug })
       }
       className="lpt-cuerpo inline-flex min-h-[52px] items-center gap-2 border-b border-[var(--lpt-linea-fuerte)] px-1 text-sm text-[var(--lpt-claro-2)] transition-colors duration-200 hover:border-[var(--lpt-estaca)] hover:text-[var(--lpt-claro)]"
     >
       <MessageCircle className="size-4 shrink-0" aria-hidden="true" />
-      O escríbenos por WhatsApp
+      {etiqueta}
     </a>
   );
 }

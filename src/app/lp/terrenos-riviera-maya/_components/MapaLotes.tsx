@@ -7,7 +7,9 @@ import { APIProvider, AdvancedMarker, Map as MapaGoogle, useMap } from '@vis.gl/
 import type { PropiedadLanding } from '@/lib/supabase/lp-inventario';
 import { Calendar, Ruler } from '@/lib/icons';
 import { dinero, dineroCompacto, m2, mxnExacto } from '../../_components/format';
-import { plural, ubicacionCorta } from '../../_components/v2/util';
+import type { LocaleLp } from '../../_components/v2/i18n';
+import { ubicacionCorta } from '../../_components/v2/util';
+import { COPY } from '../_copy';
 
 // ============================================================
 // Mapa de los lotes (brief de la diseñadora, 30-oct-2026: «mapa interactivo
@@ -74,17 +76,18 @@ export interface PuntoMapa {
   etiqueta: string;
 }
 
-function etiquetaMarcador(lotes: PropiedadLanding[], ubicacion: string): string {
+function etiquetaMarcador(lotes: PropiedadLanding[], ubicacion: string, locale: LocaleLp): string {
+  const t = COPY[locale].mapa;
   const [primero] = lotes;
   if (lotes.length === 1 && primero) {
     const partes = [primero.m2Terreno ? m2(primero.m2Terreno) : null, primero.precio ? dineroCompacto(primero.precio) : null];
     return partes.filter((p): p is string => p !== null).join(' · ') || ubicacion;
   }
-  const desde = primero?.precio ? ` · desde ${dineroCompacto(primero.precio)}` : '';
-  return `${plural(lotes.length, 'lote', 'lotes')}${desde}`;
+  const desde = primero?.precio ? t.marcadorDesde(dineroCompacto(primero.precio)) : '';
+  return `${t.marcadorLotes(lotes.length)}${desde}`;
 }
 
-function agrupar(lotes: PropiedadLanding[]): PuntoMapa[] {
+function agrupar(lotes: PropiedadLanding[], locale: LocaleLp): PuntoMapa[] {
   const porClave = new Map<string, PuntoMapa>();
   for (const lote of lotes) {
     if (!lote.coordenadas) continue;
@@ -97,16 +100,17 @@ function agrupar(lotes: PropiedadLanding[]): PuntoMapa[] {
   for (const punto of porClave.values()) {
     const cortas = new Set(punto.lotes.map(ubicacionCorta));
     punto.ubicacion = cortas.size === 1 ? [...cortas][0] : (punto.lotes[0]?.ciudad ?? '');
-    punto.etiqueta = etiquetaMarcador(punto.lotes, punto.ubicacion);
+    punto.etiqueta = etiquetaMarcador(punto.lotes, punto.ubicacion, locale);
   }
   return [...porClave.values()];
 }
 
-function textoPlazo(lote: PropiedadLanding, plazoFiltro: number | null): string {
+function textoPlazo(lote: PropiedadLanding, plazoFiltro: number | null, locale: LocaleLp): string {
+  const t = COPY[locale].mapa;
   const plazos = lote.mesesOpciones;
-  if (plazos.length === 0) return 'plazo no declarado';
-  if (plazoFiltro && plazos.includes(plazoFiltro)) return `${plazoFiltro} meses`;
-  return `hasta ${Math.max(...plazos)} meses`;
+  if (plazos.length === 0) return t.plazoNoDeclarado;
+  if (plazoFiltro && plazos.includes(plazoFiltro)) return t.meses(plazoFiltro);
+  return t.hastaMeses(Math.max(...plazos));
 }
 
 /** Encuadra los puntos visibles en Google. Solo re-encuadra cuando cambian los puntos. */
@@ -212,6 +216,7 @@ export default function MapaLotes({
   onElegir,
   elegido,
   plazoFiltro,
+  locale = 'es',
 }: {
   /** Inventario completo: decide si el mapa existe. */
   lotes: PropiedadLanding[];
@@ -223,7 +228,9 @@ export default function MapaLotes({
   onElegir: (slug: string) => void;
   elegido: string | null;
   plazoFiltro: number | null;
+  locale?: LocaleLp;
 }) {
+  const t = COPY[locale].mapa;
   const claveGoogle = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
   const [falloGoogle, setFalloGoogle] = useState(false);
 
@@ -237,7 +244,7 @@ export default function MapaLotes({
     };
   }, []);
 
-  const puntos = useMemo(() => agrupar(visibles), [visibles]);
+  const puntos = useMemo(() => agrupar(visibles, locale), [visibles, locale]);
   const hayCoordenadas = useMemo(() => lotes.some((l) => l.coordenadas !== null), [lotes]);
   const sinPunto = visibles.filter((l) => l.coordenadas === null).length;
 
@@ -248,7 +255,7 @@ export default function MapaLotes({
     PROVEEDOR.preferido === 'google' && !!claveGoogle && claveGoogle !== CLAVE_EJEMPLO && !falloGoogle;
 
   return (
-    <section aria-label="Mapa de los terrenos" className="border-b border-[var(--lpv-line)] bg-white">
+    <section aria-label={t.aria} className="border-b border-[var(--lpv-line)] bg-white">
       <div className="mx-auto grid max-w-[96rem] lg:grid-cols-12">
         <div
           className="relative h-[340px] bg-[var(--lpv-bg-2)] sm:h-[440px] lg:col-span-8 lg:h-[560px]"
@@ -272,12 +279,12 @@ export default function MapaLotes({
           {puntoActivo ? (
             <>
               <div className="px-5 pb-4 pt-6 sm:px-8">
-                <p className="text-[0.8125rem] text-[var(--lpv-fg-3)]">Ubicación</p>
+                <p className="text-[0.8125rem] text-[var(--lpv-fg-3)]">{t.ubicacion}</p>
                 <p className="lpt2-display mt-1 text-[clamp(1.5rem,1.2rem+1vw,2rem)] text-[var(--lpv-fg)]">
                   {puntoActivo.ubicacion}
                 </p>
                 <p className="mt-1 text-[0.9375rem] text-[var(--lpv-fg-2)]">
-                  {plural(puntoActivo.lotes.length, 'terreno en este punto', 'terrenos en este punto')}
+                  {t.terrenosEnPunto(puntoActivo.lotes.length)}
                 </p>
               </div>
               <ul className="divide-y divide-[var(--lpv-line)] border-t border-[var(--lpv-line)] lg:max-h-[420px] lg:overflow-y-auto">
@@ -302,21 +309,21 @@ export default function MapaLotes({
                               <span className="ml-1 align-top text-[0.5em] font-normal text-[var(--lpv-fg-3)]">m²</span>
                             </>
                           ) : (
-                            <span className="lpt2-display-ligero text-[0.6em] text-[var(--lpv-fg-3)]">superficie por confirmar</span>
+                            <span className="lpt2-display-ligero text-[0.6em] text-[var(--lpv-fg-3)]">{COPY[locale].catalogo.fila.superficiePorConfirmar}</span>
                           )}
                         </span>
                         <span className="lpt2-display text-[1.25rem] text-[var(--lpv-fg)]">
-                          {lote.precio ? dinero(lote.precio) : 'Precio por confirmar'}
+                          {lote.precio ? dinero(lote.precio) : COPY[locale].catalogo.fila.precioPorConfirmar}
                         </span>
                       </button>
                       <p className="lpt2-mono mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-[0.75rem] text-[var(--lpv-fg-2)]">
                         <span className="inline-flex items-center gap-1.5">
                           <Ruler className={ICONO} aria-hidden />
-                          {lote.precioM2Mxn ? `${mxnExacto(lote.precioM2Mxn)} / m²` : 'precio por m² por confirmar'}
+                          {lote.precioM2Mxn ? `${mxnExacto(lote.precioM2Mxn)} / m²` : COPY[locale].catalogo.fila.precioM2PorConfirmar}
                         </span>
                         <span className="inline-flex items-center gap-1.5">
                           <Calendar className={ICONO} aria-hidden />
-                          {textoPlazo(lote, plazoFiltro)}
+                          {textoPlazo(lote, plazoFiltro, locale)}
                         </span>
                       </p>
                       <button
@@ -325,7 +332,7 @@ export default function MapaLotes({
                         aria-pressed={esElegido}
                         className="lpt2-plazo mt-3 min-h-[36px] px-4 text-[0.8125rem]"
                       >
-                        {esElegido ? 'Elegido' : 'Me interesa'}
+                        {esElegido ? t.elegido : t.meInteresa}
                       </button>
                     </li>
                   );
@@ -335,13 +342,13 @@ export default function MapaLotes({
           ) : (
             <p className="px-5 py-8 text-[0.9375rem] text-[var(--lpv-fg-2)] sm:px-8">
               {visibles.length === 0
-                ? 'Ningún terreno cumple con los filtros elegidos.'
-                : 'Elige un punto del mapa para ver sus terrenos.'}
+                ? t.sinFiltros
+                : t.eligePunto}
             </p>
           )}
           {sinPunto > 0 && (
             <p className="mt-auto border-t border-[var(--lpv-line)] px-5 py-3 text-[0.75rem] text-[var(--lpv-fg-3)] sm:px-8">
-              {plural(sinPunto, 'terreno sin coordenadas publicadas aparece', 'terrenos sin coordenadas publicadas aparecen')} solo en la lista.
+              {t.sinCoordenadas(sinPunto)}
             </p>
           )}
         </div>

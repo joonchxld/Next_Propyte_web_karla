@@ -6,9 +6,9 @@ import { emitirFiltro } from '../../_components/v2/useFiltros';
 // Chips de zona sobre la foto del hero. No filtran aquí: mandan el filtro de
 // ubicación al catálogo y al formulario (mismo estado, por evento) y bajan.
 
-export default function ChipsHeroFiltro({ opciones }: { opciones: OpcionFiltro[] }) {
+export default function ChipsHeroFiltro({ opciones, ariaLabel }: { opciones: OpcionFiltro[]; ariaLabel: string }) {
   return (
-    <div role="group" aria-label="Ver casas por zona" className="flex flex-wrap gap-2">
+    <div role="group" aria-label={ariaLabel} className="flex flex-wrap gap-2">
       {opciones.map((o) => (
         <button
           key={o.valor}

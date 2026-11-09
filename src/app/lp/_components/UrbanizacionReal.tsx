@@ -1,6 +1,7 @@
 import Figure from './Figure';
 import { EnlaceGate, EstadoServicio, RULE_DARK } from './ui';
-import { mesAnio } from './format';
+import { COMUN, URBA, mesAnioL } from '../lotes-playa-del-carmen/_copy';
+import type { LocaleLp } from './v2/i18n';
 import type { LoteLanding } from '@/lib/supabase/lp-lotes';
 
 // ============================================================
@@ -20,30 +21,32 @@ import type { LoteLanding } from '@/lib/supabase/lp-lotes';
 /** Destino de las referencias al estado real de urbanización. */
 export const ANCLA_URBANIZACION = 'urbanizacion';
 
-export default function UrbanizacionReal({ lote }: { lote: LoteLanding }) {
+export default function UrbanizacionReal({
+  lote,
+  locale = 'es',
+}: {
+  lote: LoteLanding;
+  locale?: LocaleLp;
+}) {
+  const t = URBA[locale];
   return (
     <div className="grid gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16">
       <div>
         {lote.ningunServicioHoy && (
               <p className="max-w-[46ch] text-base leading-relaxed text-white/75">
                 <strong className="font-semibold text-[var(--lp-accent-on-dark)]">
-                  Hoy no hay ningún servicio conectado.
+                  {t.hoyNinguno}
                 </strong>{' '}
-                Ninguno. Todos están proyectados. Lo ponemos antes de la tabla, no
-                después, porque es el dato que más cambia la decisión y el que la
-                mayoría de los anuncios de esta zona omite.
+                {t.hoyNingunoCuerpo}
               </p>
             )}
 
             <p className="mt-4 max-w-[46ch] text-sm leading-relaxed text-white/50">
-              Fechas declaradas por el desarrollador, sujetas a su calendario de
-              obra. Corresponden a una etapa cuya correspondencia con este lote
-              todavía no está confirmada. Pídelo por escrito antes de firmar, y si
-              no te lo dan por escrito, eso también es información.
+              {t.fechas}
             </p>
 
             <div className="mt-5">
-              <EnlaceGate que="etapa a la que pertenece este lote" tono="oscuro" />
+              <EnlaceGate que={COMUN[locale].gate.etapa} tono="oscuro" locale={locale} />
             </div>
 
             {/* Aérea REAL del polígono, no render. Es la única imagen de la
@@ -58,6 +61,7 @@ export default function UrbanizacionReal({ lote }: { lote: LoteLanding }) {
                 sizes="(max-width: 1024px) 100vw, 38vw"
                 aspecto="aspect-[16/10]"
                 tono="oscuro"
+                locale={locale}
                 className="mt-8"
               />
             )}
@@ -67,7 +71,7 @@ export default function UrbanizacionReal({ lote }: { lote: LoteLanding }) {
         <div className={`border-t-2 border-[var(--lp-accent-on-dark)]`}>
           <dl className={`border-x border-b ${RULE_DARK}`}>
             {lote.servicios.map((s) => {
-              const fecha = mesAnio(s.fechaEstimada);
+              const fecha = mesAnioL(s.fechaEstimada, locale);
               return (
                 <div
                   key={s.clave}
@@ -80,7 +84,7 @@ export default function UrbanizacionReal({ lote }: { lote: LoteLanding }) {
                     )}
                   </dt>
                   <dd className="text-right lp-num text-xs">
-                    <EstadoServicio estado={s.estado} />
+                    <EstadoServicio estado={s.estado} locale={locale} />
                     {fecha && <span className="block text-white/45">{fecha}</span>}
                   </dd>
                 </div>
@@ -90,7 +94,11 @@ export default function UrbanizacionReal({ lote }: { lote: LoteLanding }) {
         </div>
       ) : (
         <div className="self-start">
-          <EnlaceGate que="estatus de urbanización servicio por servicio" tono="oscuro" />
+          <EnlaceGate
+            que={COMUN[locale].gate.serviciosPorServicio}
+            tono="oscuro"
+            locale={locale}
+          />
         </div>
       )}
     </div>

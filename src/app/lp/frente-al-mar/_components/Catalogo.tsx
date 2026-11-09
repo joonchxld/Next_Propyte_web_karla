@@ -9,9 +9,10 @@ import FormInventario from '../../_components/v2/FormInventario';
 import GaleriaFicha from '../../_components/v2/GaleriaFicha';
 import type { FiltroDef } from '../../_components/v2/filtros';
 import { useFiltros } from '../../_components/v2/useFiltros';
-import { ESTADO_TEXTO, ubicacionCorta } from '../../_components/v2/util';
+import type { LocaleLp } from '../../_components/v2/i18n';
+import { estadoTexto, ubicacionCorta } from '../../_components/v2/util';
 import IndiceCiudades from './IndiceCiudades';
-import { FORM, VISTA_TEXTO } from '../_copy';
+import { COPY, type CopyFrenteMar } from '../_copy';
 
 // ============================================================
 // Las propiedades, una por pantalla, y el formulario como última pantalla.
@@ -46,26 +47,27 @@ interface Caracteristica {
 }
 
 /** Las cifras grandes de una pantalla. Gate por dato: null no se pinta. */
-function caracteristicas(p: PropiedadLanding): Caracteristica[] {
+function caracteristicas(p: PropiedadLanding, locale: LocaleLp, copy: CopyFrenteMar): Caracteristica[] {
+  const t = copy.catalogo.cifras;
   const lista: Caracteristica[] = [];
   if (p.recamaras) {
-    lista.push({ icono: Bed, valor: String(p.recamaras), etiqueta: p.recamaras === 1 ? 'recámara' : 'recámaras' });
+    lista.push({ icono: Bed, valor: String(p.recamaras), etiqueta: t.recamaras(p.recamaras) });
   }
   if (p.banos) {
-    lista.push({ icono: Bath, valor: String(p.banos), etiqueta: p.banos === 1 ? 'baño' : 'baños' });
+    lista.push({ icono: Bath, valor: String(p.banos), etiqueta: t.banos(p.banos) });
   }
   if (p.m2Construidos) {
-    lista.push({ icono: Maximize, valor: m2(p.m2Construidos), etiqueta: 'construidos' });
+    lista.push({ icono: Maximize, valor: m2(p.m2Construidos), etiqueta: t.construidos });
   }
   if (p.vista) {
-    lista.push({ icono: Eye, valor: VISTA_TEXTO[p.vista] ?? p.vista, etiqueta: 'vista declarada' });
+    lista.push({ icono: Eye, valor: copy.vista[p.vista] ?? p.vista, etiqueta: t.vistaDeclarada });
   }
   if (p.estadoComercial === 'entrega_inmediata') {
-    lista.push({ icono: KeySquare, valor: 'Inmediata', etiqueta: p.entrega ? p.entrega.toLowerCase() : 'entrega' });
+    lista.push({ icono: KeySquare, valor: t.inmediata, etiqueta: p.entrega ? p.entrega.toLowerCase() : t.entrega });
   } else if (p.entrega) {
-    lista.push({ icono: KeySquare, valor: p.entrega, etiqueta: ESTADO_TEXTO[p.estadoComercial].toLowerCase() });
+    lista.push({ icono: KeySquare, valor: p.entrega, etiqueta: estadoTexto(locale)[p.estadoComercial].toLowerCase() });
   } else if (p.estadoComercial === 'preventa') {
-    lista.push({ icono: KeySquare, valor: 'Preventa', etiqueta: 'entrega' });
+    lista.push({ icono: KeySquare, valor: t.preventa, etiqueta: t.entrega });
   }
   return lista;
 }
@@ -74,11 +76,15 @@ export default function Catalogo({
   propiedades,
   filtros,
   telefonoWhatsApp,
+  locale = 'es',
 }: {
   propiedades: PropiedadLanding[];
   filtros: FiltroDef[];
   telefonoWhatsApp: string;
+  locale?: LocaleLp;
 }) {
+  const copy = COPY[locale];
+  const t = copy.catalogo;
   const [elegida, setElegida] = useState<string | null>(null);
   const anclaForm = useRef<HTMLElement>(null);
   const { visibles, activos, limpiar } = useFiltros(propiedades, filtros);
@@ -103,16 +109,15 @@ export default function Catalogo({
       {visibles.length === 0 && (
         <section
           id="inventario"
-          aria-label="Sin coincidencias"
+          aria-label={t.sinCoincidenciasAria}
           className="lpo-pantalla relative flex min-h-[100svh] items-center bg-[var(--lpv-bg-2)]"
         >
           <div className="mx-auto w-full max-w-[96rem] px-5 py-20 sm:px-8 lg:pr-48">
             <h2 className="lpo-display max-w-[16ch] text-[clamp(2rem,1.3rem+3vw,4rem)]">
-              Ninguna de las {total} cumple todo lo que elegiste.
+              {t.sinCoincidenciasTitulo(total)}
             </h2>
             <p className="mt-6 max-w-[44ch] text-[1.0625rem] leading-relaxed text-[var(--lpv-fg-2)]">
-              Quita un filtro para ver qué hay cerca, o pide la información y te decimos qué se acerca a lo
-              que buscas.
+              {t.sinCoincidenciasCuerpo}
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <button
@@ -120,7 +125,7 @@ export default function Catalogo({
                 onClick={limpiar}
                 className="inline-flex min-h-[48px] items-center rounded-full bg-[var(--lpv-accent)] px-6 text-[0.9375rem] font-medium text-[var(--lpv-on-accent)] hover:opacity-90 active:translate-y-px"
               >
-                Quitar los filtros
+                {t.quitarFiltros}
               </button>
               <button
                 type="button"
@@ -132,7 +137,7 @@ export default function Catalogo({
                 }
                 className="inline-flex min-h-[48px] items-center rounded-full border border-[var(--lpv-line-2)] px-6 text-[0.9375rem] hover:border-[var(--lpv-fg)] active:translate-y-px"
               >
-                Pedir la información
+                {t.pedirInformacion}
               </button>
             </div>
           </div>
@@ -144,7 +149,7 @@ export default function Catalogo({
         const esPrimeraDeCiudad = !vistas.has(ciudad);
         vistas.add(ciudad);
         const esElegida = elegida === p.slug;
-        const cifras = caracteristicas(p);
+        const cifras = caracteristicas(p, locale, copy);
 
         return (
           <section
@@ -161,6 +166,7 @@ export default function Catalogo({
               aspecto="h-[100svh]"
               sizes="100vw"
               prioridad={i < 1}
+              locale={locale}
               tope={6}
               className="!rounded-none"
             />
@@ -168,8 +174,7 @@ export default function Catalogo({
 
             {/* Contador de pantalla: «3 de 9», arriba a la derecha. */}
             <p className="lpv-cifra lpo-sobre-foto pointer-events-none absolute right-5 top-4 text-[0.8125rem] text-white/75 sm:right-8 lg:right-48">
-              {i + 1} de {visibles.length}
-              {activos > 0 ? ` que coinciden` : ''}
+              {t.contador(i + 1, visibles.length, activos > 0)}
             </p>
 
             <div className="pointer-events-none absolute inset-x-0 bottom-0 flex flex-col gap-6 p-5 pb-24 text-white sm:p-8 sm:pb-10 lg:pr-48">
@@ -180,10 +185,10 @@ export default function Catalogo({
                     {p.titulo}
                   </h2>
                   <p className="lpo-display lpo-sobre-foto mt-3 text-[clamp(1.75rem,1.3rem+1.8vw,3rem)] text-[var(--lpv-accent)]">
-                    {p.precio ? dinero(p.precio) : 'Precio por confirmar'}
+                    {p.precio ? dinero(p.precio) : t.precioPorConfirmar}
                   </p>
                   <p className="lpo-sobre-foto mt-1 text-[0.9375rem] text-white/70">
-                    {p.enganchePct ? `Enganche ${p.enganchePct}%` : 'Enganche por confirmar con el desarrollador'}
+                    {t.enganche(p.enganchePct)}
                   </p>
                 </div>
 
@@ -198,7 +203,7 @@ export default function Catalogo({
                       : 'bg-[var(--lpv-accent)] text-[var(--lpv-on-accent)]'
                   }`}
                 >
-                  {esElegida ? 'Elegida' : 'Me interesa'}
+                  {esElegida ? t.elegida : t.meInteresa}
                 </button>
               </div>
 
@@ -224,7 +229,7 @@ export default function Catalogo({
       })}
 
       {/* Índice fijo de ciudades, solo escritorio. Sigue a las visibles. */}
-      <IndiceCiudades ciudades={ciudadesVisibles} />
+      <IndiceCiudades ciudades={ciudadesVisibles} locale={locale} />
 
       {/* ══ ÚLTIMA PANTALLA: el formulario, directo sobre el fondo ══ */}
       <section
@@ -235,24 +240,24 @@ export default function Catalogo({
         <div className="mx-auto grid min-h-[100svh] max-w-[96rem] gap-12 px-5 py-20 sm:px-8 lg:grid-cols-12 lg:items-center lg:gap-16 lg:pr-48">
           <div className="lg:col-span-5">
             <h2 className="lpo-display text-[clamp(2.25rem,1.4rem+3.4vw,4.5rem)]">
-              Dinos qué buscas y te mandamos solo lo que encaja.
+              {t.cierreTitulo}
             </h2>
             <p className="mt-6 max-w-[40ch] text-[1.0625rem] leading-relaxed text-[var(--lpv-fg-2)]">
-              Ciudad, presupuesto y recámaras. Recibes precio cerrado en su moneda de venta, enganche y
-              esquema de cada desarrollador, qué incluye la entrega y cuáles siguen disponibles hoy.
+              {t.cierreCuerpo}
             </p>
           </div>
           <div className="lg:col-span-6 lg:col-start-7">
             <FormInventario
-              source="lp_frente_mar"
+              source={copy.source}
               variante="cierre"
-              copy={FORM}
+              copy={copy.form}
               opciones={opciones}
               seleccion={elegida}
               onSeleccion={setElegida}
               filtros={filtros}
               propiedades={propiedades}
               telefonoWhatsApp={telefonoWhatsApp}
+              locale={locale}
               className="!p-0"
             />
           </div>

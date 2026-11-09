@@ -68,6 +68,8 @@ export interface CasaLanding {
   id: string;
   slug: string;
   titulo: string;
+  /** `v_units.title_en`; la landing en inglés lo usa vía `enIdioma()`. */
+  tituloEn?: string | null;
   ciudad: string;
   /** Colonia/zona declarada. Es lo más granular que la landing publica. */
   zona: string | null;
@@ -99,6 +101,7 @@ export interface FilaUnidad {
   id: string;
   slug: string | null;
   title: string | null;
+  title_en?: string | null;
   city: string | null;
   zone: string | null;
   bedrooms: number | null;
@@ -184,6 +187,7 @@ function mapear(fila: FilaUnidad): CasaLanding | null {
     id: fila.id,
     slug: fila.slug,
     titulo: fila.title.trim(),
+    tituloEn: fila.title_en?.trim() || null,
     ciudad: fila.city ?? '',
     zona: fila.zone?.trim() || null,
     recamaras: fila.bedrooms ?? null,
@@ -245,7 +249,7 @@ export async function getCasasRivieraMaya(): Promise<CasaLanding[]> {
     .from('v_units')
     .select(
       [
-        'id', 'slug', 'title', 'city', 'zone',
+        'id', 'slug', 'title', 'title_en', 'city', 'zone',
         'bedrooms', 'bathrooms', 'built_area_m2', 'lot_area_m2',
         'price_mxn', 'price_usd', 'currency',
         'down_payment_pct', 'down_payment_mxn', 'fin_enganche_pct',

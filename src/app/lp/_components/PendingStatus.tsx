@@ -1,4 +1,5 @@
-import { fechaLarga } from './format';
+import { fechaLargaL, LICENCIA } from '../lotes-playa-del-carmen/_copy';
+import type { LocaleLp } from './v2/i18n';
 
 // ============================================================
 // Un dato que todavía no tenemos, con dueño y fecha.
@@ -25,6 +26,7 @@ export default function PendingStatus({
   actualizado,
   cta,
   tono = 'claro',
+  locale = 'es',
 }: {
   titulo: string;
   /** El porqué del pendiente. Sin eufemismos y sin disculpas. */
@@ -34,7 +36,9 @@ export default function PendingStatus({
   /** Qué puede hacer el visitante ahora mismo con este pendiente. */
   cta?: React.ReactNode;
   tono?: 'claro' | 'oscuro';
+  locale?: LocaleLp;
 }) {
+  const t = LICENCIA[locale];
   const oscuro = tono === 'oscuro';
 
   return (
@@ -48,7 +52,7 @@ export default function PendingStatus({
           oscuro ? 'text-[var(--lp-accent-on-dark)]' : 'text-[var(--lp-accent)]'
         }`}
       >
-        En trámite
+        {t.enTramite}
       </p>
 
       <p
@@ -83,7 +87,7 @@ export default function PendingStatus({
             oscuro ? 'text-[var(--lp-on-dark-soft)]' : 'text-[var(--lp-muted)]'
           }`}
         >
-          Verificado el {fechaLarga(actualizado)}
+          {t.verificado} {fechaLargaL(actualizado, locale)}
         </p>
       )}
     </div>

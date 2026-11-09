@@ -1,3 +1,5 @@
+import type { LocaleLp } from '../../_components/v2/i18n';
+
 // ============================================================
 // El formateador de dinero de la variante C. UNA definición, dos entornos.
 //
@@ -23,6 +25,14 @@
 // sigue siendo una sola.
 // ============================================================
 
+// ═══ INGLÉS ═══
+//
+// Los pesos NO se convierten a dólares. En inglés se imprimen igual que en
+// español —«$202,176 MXN»—, con la moneda pegada a la cifra: el visitante de
+// EE.UU. o Canadá lee `$` como dólar, que es justo el malentendido que el
+// «MXN» existe para evitar. Cambia solo el locale del separador de miles.
+const MXN_EN = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 });
+
 const MXN = new Intl.NumberFormat('es-MX', {
   style: 'currency',
   currency: 'MXN',
@@ -33,8 +43,14 @@ const MXN = new Intl.NumberFormat('es-MX', {
  * Toda cifra de dinero de la variante C sale por aquí, y por aquí sale SIEMPRE
  * con «MXN» pegada. Ver la regla 3 de la cabecera de `page.tsx`.
  */
-export const mxn = (n: number) => `${MXN.format(Math.round(n))} MXN`;
+export const mxn = (n: number, locale: LocaleLp = 'es') =>
+  locale === 'en'
+    ? `$${MXN_EN.format(Math.round(n))} MXN`
+    : `${MXN.format(Math.round(n))} MXN`;
 
 const M2 = new Intl.NumberFormat('es-MX', { maximumFractionDigits: 1 });
+const M2_EN = new Intl.NumberFormat('en-US', { maximumFractionDigits: 1 });
 
-export const m2 = (n: number) => `${M2.format(n)} m²`;
+/** Superficie en m². No se convierte a pies cuadrados: sería una cifra nueva. */
+export const m2 = (n: number, locale: LocaleLp = 'es') =>
+  `${(locale === 'en' ? M2_EN : M2).format(n)} m²`;

@@ -2,6 +2,7 @@ import type { ImagenesLanding } from '@/lib/supabase/lp-lotes';
 import FiguraTerrenos from './FiguraTerrenos';
 import { Escalon, Escalonado, Reveal } from './motion';
 import { ORDEN_MOSAICO, type IndiceLaminas } from './laminas';
+import { normalizarClave, type CopyTerrenos } from '../_copy';
 
 // ============================================================
 // LA PRIVADA, EN IMÁGENES — y la leyenda que las amarra a un dato.
@@ -64,21 +65,9 @@ const PRUEBA_VISUAL: Record<string, keyof ImagenesLanding> = {
  * parece correcto y no hace nada es exactamente el fallo que no se ve en
  * revisión. La clase Unicode dice lo mismo y se puede leer.
  */
-const normalizar = (s: string) =>
-  s.toLowerCase().normalize('NFD').replace(/\p{M}/gu, '').trim();
+const normalizar = normalizarClave;
 
-/** Rótulo corto de cada lámina. Va en la cartela, encima de la imagen. */
-const ROTULOS: Partial<Record<keyof ImagenesLanding, string>> = {
-  alberca: 'Alberca comunitaria',
-  casaClub: 'Casa club',
-  casaClubComedor: 'Comedor de la casa club',
-  gimnasio: 'Gimnasio',
-  canchasCenital: 'Canchas, a plomo',
-  amenidades: 'Pádel y pickleball',
-  andador: 'Andadores y arbolado',
-  cine: 'Cine al aire libre',
-  domingo: 'Alberca y casa club',
-};
+// Los rótulos cortos de cada lámina viven en el diccionario (`_copy.ts`).
 
 /**
  * Cómo se corta cada lámina y cuánto ocupa. Una hoja de planos mezcla escalas;
@@ -131,7 +120,11 @@ export default function Privada({
   amenidades,
   laminas,
   numeroSeccion,
+  copy,
+  figura,
 }: {
+  copy: CopyTerrenos['privada'];
+  figura: CopyTerrenos['figura'];
   imagenes: ImagenesLanding;
   /** Array derivado de columnas booleanas de `v_developments`. Nunca prosa. */
   amenidades: string[];
@@ -146,7 +139,12 @@ export default function Privada({
 
   const leyenda = amenidades.map((a) => {
     const clave = PRUEBA_VISUAL[normalizar(a)];
-    return { nombre: a, lamina: clave ? (laminas[clave] ?? null) : null };
+    // En inglés el nombre se traduce si se reconoce; si no, sale como el Hub lo
+    // declara. La clave de prueba visual se calcula SIEMPRE sobre el original.
+    return {
+      nombre: copy.amenidades[normalizar(a)] ?? a,
+      lamina: clave ? (laminas[clave] ?? null) : null,
+    };
   });
   const conPrueba = leyenda.filter((l) => l.lamina).length;
 
@@ -154,18 +152,16 @@ export default function Privada({
     <section className="lpt-plano border-t border-[var(--lpt-linea-fuerte)] bg-[var(--lpt-selva)]">
       <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8 lg:py-28">
         <Reveal>
-          <p className="lpt-rotulo text-[var(--lpt-estaca)]">{numeroSeccion} · La privada</p>
+          <p className="lpt-rotulo text-[var(--lpt-estaca)]">{numeroSeccion} · {copy.rotulo}</p>
         </Reveal>
         <Reveal delay={0.06}>
           <h2 className="lpt-titular mt-4 max-w-[24ch] text-[clamp(1.875rem,1.4rem+2.2vw,3rem)] text-[var(--lpt-claro)]">
-            El lote está dentro de esto
+            {copy.titulo}
           </h2>
         </Reveal>
         <Reveal delay={0.12}>
           <p className="lpt-cuerpo mt-6 max-w-[56ch] text-[1.0625rem] leading-relaxed text-[var(--lpt-claro-2)]">
-            Un terreno en privada no se compra por el terreno: se compra por lo
-            que hay al otro lado de la caseta. Estas son las amenidades que el
-            desarrollador tiene declaradas, y las láminas de su proyecto.
+            {copy.intro}
           </p>
         </Reveal>
 
@@ -195,7 +191,7 @@ export default function Privada({
                      se lee como error de maquetación, el guion como dato. */
                   <span
                     className="lpt-cota shrink-0 text-[0.625rem] text-[var(--lpt-claro-3)]"
-                    title="Declarada por el desarrollador, sin render en la galería"
+                    title={copy.sinLamina}
                   >
                     —
                   </span>
@@ -212,10 +208,7 @@ export default function Privada({
                   retirar la lámina de la caseta: de ésa SÍ hay render, y no se
                   publica por otra razón. En una página cuya voz entera depende
                   de que cada frase sea literalmente cierta, eso importa. */}
-              {conPrueba} de las {leyenda.length} tienen lámina del proyecto, y
-              son las que llevan número. Las marcadas con guion están declaradas
-              en la ficha del desarrollador y no las publicamos en imagen: antes
-              de eso te ponemos un guion, no una foto de otra cosa.
+              {copy.leyenda(conPrueba, leyenda.length)}
             </p>
           </Reveal>
         )}
@@ -242,7 +235,8 @@ export default function Privada({
                   <FiguraTerrenos
                     imagen={img}
                     lamina={laminas[m.clave] ?? 'FIG.'}
-                    rotulo={ROTULOS[m.clave] ?? 'La privada'}
+                    rotulo={copy.rotulos[m.clave] ?? copy.rotuloDefecto}
+                    prefijo={figura}
                     aspecto={m.aspecto}
                     // El mosaico ocupa media pantalla en móvil, un tercio en
                     // escritorio. Sin esto el navegador pide el candidato de
@@ -273,12 +267,7 @@ export default function Privada({
         {plates.length > 0 && (
           <Reveal delay={0.08}>
             <p className="lpt-cuerpo mt-8 max-w-[62ch] border-t border-[var(--lpt-linea)] pt-6 text-[0.8125rem] leading-relaxed text-[var(--lpt-claro-3)]">
-              Las {plates.length} láminas de arriba son renders del proyecto del
-              desarrollador, no obra existente: hoy la privada no está
-              construida. Cómo se ve el terreno HOY está en la lámina{' '}
-              {laminas.urbanizacion ?? 'aérea'}, que sí es fotografía. Las
-              amenidades se entregan conforme al calendario de obra del
-              desarrollador, y te lo mandamos junto con el plan de pagos.
+              {copy.aviso(plates.length, laminas.urbanizacion ?? copy.aerea)}
             </p>
           </Reveal>
         )}

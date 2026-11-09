@@ -129,11 +129,15 @@ const TEXTOS_FIJOS: Record<LocaleLp, typeof TEXTOS_FIJOS_ES> = {
  * segun el valor (asi «Ficha de 1 casa» y «Ficha de 10 casas» salen bien).
  */
 function rellenar(plantilla: string, valores: Record<string, string | number>): string {
+  // Primero los valores simples y DESPUÉS el plural: así un plural que lleva
+  // un valor dentro («{total|la casa|las {total} casas}») ya llega sin llaves
+  // anidadas. En el orden inverso el `[^}]*` cortaba en la llave interior y la
+  // página pintaba «las {total casas}» (9-nov-2026).
   return plantilla
+    .replace(/\{(\w+)\}/g, (_, k: string) => String(valores[k] ?? ''))
     .replace(/\{(\w+)\|([^|}]*)\|([^}]*)\}/g, (_, k: string, uno: string, varios: string) =>
       Number(valores[k]) === 1 ? uno : varios,
-    )
-    .replace(/\{(\w+)\}/g, (_, k: string) => String(valores[k] ?? ''));
+    );
 }
 
 function emitirEvento(evento: string, source: LeadSource) {

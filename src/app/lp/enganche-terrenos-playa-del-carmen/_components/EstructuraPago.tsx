@@ -1,5 +1,7 @@
 import type { PlanPago } from '@/lib/supabase/lp-lotes';
 import { mxn } from './formato';
+import { COPY } from '../_copy';
+import type { LocaleLp } from '../../_components/v2/i18n';
 
 // ============================================================
 // EL PAGO COMPLETO, EN PROPORCIÓN — bloque izquierdo del hero.
@@ -37,7 +39,16 @@ type Tramo = {
   relleno: string;
 };
 
-export default function EstructuraPago({ plan }: { plan: PlanPago }) {
+export default function EstructuraPago({
+  plan,
+  locale = 'es',
+}: {
+  plan: PlanPago;
+  /** Idioma. Por defecto español. */
+  locale?: LocaleLp;
+}) {
+  const c = COPY[locale].estructura;
+  const dinero = (n: number) => mxn(n, locale);
   // El plazo más largo: es el que sostiene la mensualidad más baja y el que el
   // formulario trae preseleccionado.
   const largo = plan.opciones.at(-1);
@@ -45,22 +56,20 @@ export default function EstructuraPago({ plan }: { plan: PlanPago }) {
   const tramos: Tramo[] = [
     {
       clave: 'enganche',
-      rotulo: 'Enganche',
+      rotulo: c.tramos.enganche,
       pct: plan.enganchePct,
-      monto: mxn(plan.engancheMxn),
-      cuando: 'Hoy. El lote queda apartado a tu nombre.',
+      monto: dinero(plan.engancheMxn),
+      cuando: c.cuando.enganche,
       relleno: 'bg-[var(--lpe-teal)]',
     },
     {
       clave: 'mensualidades',
-      rotulo: 'Mensualidades',
+      rotulo: c.tramos.mensualidades,
       pct: plan.mensualidadesPct,
       monto: largo
-        ? `${largo.pagos} × ${mxn(largo.mensualidadMxn)}`
-        : mxn(plan.mensualidadesTotalMxn),
-      cuando: plan.sinIntereses
-        ? 'Mes a mes, sin intereses y directo con el desarrollador.'
-        : 'Mes a mes, directo con el desarrollador.',
+        ? `${largo.pagos} × ${dinero(largo.mensualidadMxn)}`
+        : dinero(plan.mensualidadesTotalMxn),
+      cuando: c.cuando.mensualidades(plan.sinIntereses),
       // Rayado: es el único tramo que ocurre A LO LARGO del tiempo, y la
       // textura lo dice sin necesidad de una leyenda.
       relleno:
@@ -68,10 +77,10 @@ export default function EstructuraPago({ plan }: { plan: PlanPago }) {
     },
     {
       clave: 'contraentrega',
-      rotulo: 'Contraentrega',
+      rotulo: c.tramos.contraentrega,
       pct: plan.contraentregaPct,
-      monto: mxn(plan.contraentregaMxn),
-      cuando: 'Al momento de la entrega del lote.',
+      monto: dinero(plan.contraentregaMxn),
+      cuando: c.cuando.contraentrega,
       relleno: 'bg-white/30',
     },
   ];
@@ -79,7 +88,7 @@ export default function EstructuraPago({ plan }: { plan: PlanPago }) {
   return (
     <figure className="mt-9 border-t border-white/15 pt-8">
       <figcaption className="lpe-rotulo text-[var(--lpe-teal)]">
-        El pago completo
+        {c.rotulo}
       </figcaption>
 
       {/* La barra. `flexBasis` en porcentaje = la proporción real del esquema.
@@ -124,8 +133,7 @@ export default function EstructuraPago({ plan }: { plan: PlanPago }) {
           el 40 % daba 3.81:1 y AA pide 4.5 para texto normal. El 55 % da ~8:1 y
           es el mismo tono que usa el resto de los descargos de la página. */}
       <p className="lpe-cuerpo mt-7 max-w-[46ch] text-[0.75rem] leading-relaxed text-white/55">
-        Calculado sobre el esquema de pago y el precio de lista que declara el
-        desarrollador.
+        {c.nota}
       </p>
     </figure>
   );

@@ -3,7 +3,9 @@
 import type { PropiedadLanding } from '@/lib/supabase/lp-inventario';
 import { filtrar, type FiltroDef } from '../../_components/v2/filtros';
 import { useSeleccionFiltros } from '../../_components/v2/useFiltros';
+import type { LocaleLp } from '../../_components/v2/i18n';
 import { plural } from '../../_components/v2/util';
+import { COPY } from '../_copy';
 
 // ============================================================
 // El gancho de la portada (30-oct-2026): «dinos presupuesto y ciudad».
@@ -23,10 +25,13 @@ const TODAS = '__todas__';
 export default function FiltrosPortada({
   defs,
   todos,
+  locale = 'es',
 }: {
   defs: FiltroDef[];
   todos: PropiedadLanding[];
+  locale?: LocaleLp;
 }) {
+  const t = COPY[locale];
   const { seleccion, elegir, alternar } = useSeleccionFiltros();
   const ubicacion = defs.find((d) => d.id === 'ubicacion');
   const presupuesto = defs.find((d) => d.id === 'presupuesto');
@@ -66,15 +71,15 @@ export default function FiltrosPortada({
       )}
 
       {ubicacion && (
-        <nav aria-label="Capítulos por ciudad" className="lpd-indice mt-6">
+        <nav aria-label={t.portada.ciudadesAria} className="lpd-indice mt-6">
           <button
             type="button"
             aria-pressed={ciudadActiva === TODAS}
             onClick={() => elegir('ubicacion', null, true)}
           >
-            <span className="lpd-serif text-[clamp(1.75rem,1.2rem+2vw,2.75rem)]">Todas las ciudades</span>
+            <span className="lpd-serif text-[clamp(1.75rem,1.2rem+2vw,2.75rem)]">{t.portada.todasCiudades}</span>
             <span className="text-[0.9375rem] text-[var(--lpv-fg-2)]">
-              {plural(soloPresupuesto.length, 'departamento', 'departamentos')}
+              {plural(soloPresupuesto.length, ...t.departamento)}
             </span>
           </button>
           {ubicacion.opciones.map((o) => {
@@ -89,7 +94,7 @@ export default function FiltrosPortada({
               >
                 <span className="lpd-serif text-[clamp(1.75rem,1.2rem+2vw,2.75rem)]">{o.etiqueta}</span>
                 <span className="text-[0.9375rem] text-[var(--lpv-fg-2)]">
-                  {n === 0 ? 'ninguno en ese presupuesto' : plural(n, 'departamento', 'departamentos')}
+                  {n === 0 ? t.portada.ningunoEnPresupuesto : plural(n, ...t.departamento)}
                 </span>
               </button>
             );

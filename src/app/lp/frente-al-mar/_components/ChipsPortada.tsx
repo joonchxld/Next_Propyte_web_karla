@@ -2,7 +2,9 @@
 
 import { ArrowDown } from '@/lib/icons';
 import type { FiltroDef } from '../../_components/v2/filtros';
+import type { LocaleLp } from '../../_components/v2/i18n';
 import { emitirFiltro, useSeleccionFiltros } from '../../_components/v2/useFiltros';
+import { COPY } from '../_copy';
 
 // ============================================================
 // Acceso temprano al filtro desde la portada: las ciudades con inventario
@@ -21,11 +23,13 @@ export default function ChipsPortada({
   ubicacion,
   total,
   etiquetaTodas,
+  locale = 'es',
 }: {
   ubicacion: FiltroDef | null;
   total: number;
   /** Texto del botón que baja sin filtrar, p. ej. «Ver las 9». */
   etiquetaTodas: string;
+  locale?: LocaleLp;
 }) {
   const { seleccion } = useSeleccionFiltros();
 
@@ -39,7 +43,7 @@ export default function ChipsPortada({
     'inline-flex min-h-[44px] cursor-pointer items-center gap-2 rounded-full border px-4 text-[0.9375rem] leading-none transition-colors duration-200 active:translate-y-px';
 
   return (
-    <div role="group" aria-label="Elegir ciudad" className="flex flex-wrap items-center gap-2">
+    <div role="group" aria-label={COPY[locale].portada.ariaCiudad} className="flex flex-wrap items-center gap-2">
       <button
         type="button"
         onClick={() => {

@@ -1,5 +1,7 @@
 import { EnlaceGate } from './ui';
 import type { LoteLanding } from '@/lib/supabase/lp-lotes';
+import { COMUN, NOES } from '../lotes-playa-del-carmen/_copy';
+import type { LocaleLp } from './v2/i18n';
 
 // ============================================================
 // Para quién no es este producto. Panel del módulo «Antes de firmar».
@@ -12,33 +14,28 @@ import type { LoteLanding } from '@/lib/supabase/lp-lotes';
 // y el asesor es el cuello de botella de la operación.
 // ============================================================
 
-export default function ParaQuienNoEs({ lote }: { lote: LoteLanding }) {
+export default function ParaQuienNoEs({
+  lote,
+  locale = 'es',
+}: {
+  lote: LoteLanding;
+  locale?: LocaleLp;
+}) {
+  const t = NOES[locale];
   return (
     <div className="flex max-w-[62ch] flex-col gap-4 text-base leading-relaxed text-white/75">
+      <p>{t.p1}</p>
+      <p>{t.p2}</p>
       <p>
-        Comprar el terreno y poder construir no ocurren el mismo día. La
-        escrituración está proyectada para finales de 2026 según el desarrollador, y
-        hoy el título está en fideicomiso: el lote no es escriturable en este
-        momento. La construcción depende de que se entreguen servicios y vialidades,
-        proyectados hacia el último trimestre de 2027.
-      </p>
-      <p>
-        Si necesitas mudarte pronto, este no es tu producto y es mejor decirlo ahora.
-        Si esperas rendimiento por renta desde el primer día, un terreno no lo da: lo
-        da lo que construyas encima.
-      </p>
-      <p>
-        Y si tu presupuesto total no alcanza el precio del lote más los gastos de
-        escrituración{' '}
+        {t.p3A}{' '}
         {lote.costos?.cierrePctMin && lote.costos?.cierrePctMax ? (
           <span className="lp-num text-sm">
-            ({lote.costos.cierrePctMin}% a {lote.costos.cierrePctMax}% adicional)
+            {t.adicional(lote.costos.cierrePctMin, lote.costos.cierrePctMax)}
           </span>
         ) : (
-          <EnlaceGate que="% de gastos de cierre" tono="oscuro" />
+          <EnlaceGate que={COMUN[locale].gate.gastosCierre} tono="oscuro" locale={locale} />
         )}{' '}
-        más los cargos únicos que listamos en este mismo bloque, conviene esperar en
-        lugar de estirarte.
+        {t.p3B}
       </p>
     </div>
   );

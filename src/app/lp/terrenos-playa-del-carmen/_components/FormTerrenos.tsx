@@ -3,6 +3,8 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { trackGenerateLead } from '@/lib/analytics/track';
 import PhoneInputField, { isValidPhoneNumber } from '@/components/ui/PhoneInput';
+import { COPY } from '../_copy';
+import type { LocaleLp } from '../../_components/v2/i18n';
 
 // ============================================================
 // LA CONVERSIÓN. Todo lo demás en esta página existe para traer a alguien aquí.
@@ -14,7 +16,7 @@ import PhoneInputField, { isValidPhoneNumber } from '@/components/ui/PhoneInput'
 // Ads). Este componente los usa TAL CUAL, y esa es la decisión de diseño más
 // importante del archivo:
 //
-//   · Zoho ← POST a `/api/leads` con `source: 'lp_lotes_pdc'`. Ese literal está
+//   · Zoho ← POST a `/api/leads` con `source: 'lp_lotes_pdc'` (`_en` en inglés, vía `copy.leadSource`). Ese literal está
 //     en `KNOWN_SOURCES` del endpoint y es lo que engancha el mapa de campos de
 //     Zoho. Inventar un `source` nuevo aquí no daría un error visible: daría un
 //     lead que entra a Supabase y NO llega al CRM.
@@ -63,9 +65,6 @@ const CLAVES_URL = [
 
 type Atribucion = Partial<Record<(typeof CLAVES_URL)[number], string>>;
 
-/** Segmenta el A/B en GA4 sin tocar la acción de conversión de Ads. */
-const FORM_TYPE = 'lp_terrenos_pdc';
-
 /** El número que se rotula en la cartela, en orden de documento. */
 const ORDINAL: Record<'hero' | 'medio' | 'cierre', string> = {
   hero: '01',
@@ -100,6 +99,14 @@ export interface FormTerrenosProps {
    * Cambiarlo es decisión de negocio.
    */
   tiempoRespuesta?: string;
+  /**
+   * Idioma. El diccionario se resuelve AQUÍ y no llega por prop: lleva
+   * funciones (`desdeAlMes`, `libres`…) y Next no deja pasar funciones de un
+   * Server Component a uno de cliente — tumbaba el build de la versión EN.
+   * Del diccionario salen también el `source` del lead, el `form_type` de GA4
+   * (`lp_terrenos_pdc` / `_en`) y el país por defecto del teléfono.
+   */
+  locale: LocaleLp;
 }
 
 export default function FormTerrenos({
@@ -107,8 +114,12 @@ export default function FormTerrenos({
   plazos,
   loteRef,
   loteTitulo,
-  tiempoRespuesta = 'el mismo día hábil',
+  tiempoRespuesta: tiempoProp,
+  locale,
 }: FormTerrenosProps) {
+  const copy = COPY[locale];
+  const f = copy.form;
+  const tiempoRespuesta = tiempoProp ?? f.tiempoRespuesta;
   const esHero = variante === 'hero';
   const uid = useId();
   // Por defecto el plazo MÁS LARGO: es la mensualidad más baja, que es la razón
@@ -178,17 +189,17 @@ export default function FormTerrenos({
     setError(null);
 
     if (!nombre.trim() || !email.trim() || !whatsapp) {
-      setError('Faltan datos: pedimos tu nombre, tu correo y tu WhatsApp.');
+      setError(f.errFaltan);
       return;
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
-      setError('Revisa el correo: es a donde te mandamos el plan de pagos.');
+      setError(f.errCorreo);
       return;
     }
     // La validación por país la hace el selector de lada: quien escribe desde
     // fuera de México ya no pierde el lead por no tener 10 dígitos.
     if (!isValidPhoneNumber(whatsapp)) {
-      setError('Revisa el WhatsApp: elige tu país y escribe el número completo.');
+      setError(f.errTelefono);
       return;
     }
 
@@ -199,19 +210,17 @@ export default function FormTerrenos({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           // ⚠️ Literal de `KNOWN_SOURCES`. Cambiarlo rompe el mapa de Zoho.
-          source: 'lp_lotes_pdc',
-          locale: 'es',
+          source: copy.leadSource,
+          locale: copy.locale,
           name: nombre.trim(),
           email: email.trim(),
           phone: whatsapp,
           whatsapp: whatsapp,
           propertyName: loteTitulo,
           message: [
-            `Lote ref. ${loteRef}.`,
-            plazo
-              ? `Pidió el plan de pagos a ${plazo} meses.`
-              : 'Pidió el plan de pagos completo.',
-            `Origen: landing corta de terrenos, bloque «${variante}».`,
+            f.lead.lote(loteRef),
+            f.lead.plazo(plazo),
+            f.lead.origen(variante),
           ].join(' '),
           // `page` se mapea a Nombre_anuncio en Zoho: es lo que permite separar
           // los leads de esta variante de los de la larga dentro del CRM.
@@ -224,10 +233,10 @@ export default function FormTerrenos({
 
       // ═══ El disparo a Google Ads. Va DESPUÉS del 200: una conversión
       // reportada sobre un lead que no se guardó es peor que ninguna. ═══
-      trackGenerateLead({ formType: FORM_TYPE });
+      trackGenerateLead({ formType: copy.formType });
       setEnviado(true);
     } catch {
-      setError('No pudimos enviarlo. Inténtalo otra vez o escríbenos por WhatsApp.');
+      setError(f.errEnvio);
     } finally {
       setEnviando(false);
     }
@@ -241,14 +250,12 @@ export default function FormTerrenos({
         data-lpt-form={variante}
         className="lpt-vertice border border-[var(--lpt-caliza-2)] bg-[var(--lpt-caliza)] p-7 sm:p-8"
       >
-        <p className="lpt-rotulo text-[var(--lpt-estaca-2)]">Solicitud recibida</p>
+        <p className="lpt-rotulo text-[var(--lpt-estaca-2)]">{f.gracias.rotulo}</p>
         <p className="lpt-titular mt-3 text-[clamp(1.5rem,1.2rem+1.4vw,2rem)] text-[var(--lpt-tinta)]">
-          Listo, {nombre.trim().split(' ')[0]}.
+          {f.gracias.listo(nombre.trim().split(' ')[0])}
         </p>
         <p className="lpt-cuerpo mt-4 max-w-[46ch] text-[0.9375rem] leading-relaxed text-[var(--lpt-tinta-2)]">
-          Te escribimos por WhatsApp {tiempoRespuesta} con el plan completo
-          {plazo ? ` a ${plazo} meses` : ''}: precio, enganche, mensualidad y qué
-          incluye la escritura. Una persona, no un robot.
+          {f.gracias.cuerpo(tiempoRespuesta, plazo)}
         </p>
       </div>
     );
@@ -263,9 +270,9 @@ export default function FormTerrenos({
     >
       <div className="flex items-baseline justify-between gap-4">
         <p className="lpt-rotulo text-[var(--lpt-estaca-2)]">
-          Solicitud · {ORDINAL[variante]}
+          {f.solicitud} · {ORDINAL[variante]}
         </p>
-        <p className="lpt-cota text-[0.6875rem] text-[var(--lpt-tinta-2)]">3 campos</p>
+        <p className="lpt-cota text-[0.6875rem] text-[var(--lpt-tinta-2)]">{f.campos}</p>
       </div>
 
       {/* Una sola promesa en las tres instancias, a propósito: tres titulares
@@ -280,13 +287,13 @@ export default function FormTerrenos({
               : 'text-[clamp(1.75rem,1.4rem+1.6vw,2.5rem)]'
         }`}
       >
-        Recibe el plan de pagos completo
+        {f.titulo}
       </h2>
 
       {plazos.length > 0 && (
         <fieldset className="mt-6">
           <legend className="lpt-cota text-[0.6875rem] uppercase tracking-[0.1em] text-[var(--lpt-tinta-2)]">
-            ¿A cuántos meses?
+            {f.plazoPregunta}
           </legend>
           <div className="mt-2.5 flex gap-2">
             {plazos.map((m) => {
@@ -303,7 +310,7 @@ export default function FormTerrenos({
                       : 'border-[var(--lpt-caliza-2)] bg-transparent text-[var(--lpt-tinta-2)] hover:border-[var(--lpt-tinta-2)]'
                   }`}
                 >
-                  {m} meses
+                  {f.meses(m)}
                 </button>
               );
             })}
@@ -314,7 +321,7 @@ export default function FormTerrenos({
       <div className="mt-4 space-y-3">
         <div>
           <label htmlFor={`${uid}-nombre`} className="sr-only">
-            Tu nombre
+            {f.nombre}
           </label>
           <input
             id={`${uid}-nombre`}
@@ -322,7 +329,7 @@ export default function FormTerrenos({
             name="name"
             type="text"
             autoComplete="name"
-            placeholder="Tu nombre"
+            placeholder={f.nombre}
             value={nombre}
             onChange={(e) => setNombre(e.target.value)}
             className="lpt-cuerpo min-h-[52px] w-full rounded-[var(--lpt-r)] border border-[var(--lpt-caliza-2)] bg-white px-4 text-[0.9375rem] text-[var(--lpt-tinta)] transition-colors duration-200 placeholder:text-[var(--lpt-tinta-2)]/55 focus:border-[var(--lpt-tinta)]"
@@ -330,7 +337,7 @@ export default function FormTerrenos({
         </div>
         <div>
           <label htmlFor={`${uid}-email`} className="sr-only">
-            Tu correo
+            {f.correo}
           </label>
           <input
             id={`${uid}-email`}
@@ -338,7 +345,7 @@ export default function FormTerrenos({
             name="email"
             type="email"
             autoComplete="email"
-            placeholder="Tu correo"
+            placeholder={f.correo}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className="lpt-cuerpo min-h-[52px] w-full rounded-[var(--lpt-r)] border border-[var(--lpt-caliza-2)] bg-white px-4 text-[0.9375rem] text-[var(--lpt-tinta)] transition-colors duration-200 placeholder:text-[var(--lpt-tinta-2)]/55 focus:border-[var(--lpt-tinta)]"
@@ -346,14 +353,15 @@ export default function FormTerrenos({
         </div>
         <div>
           <label htmlFor={`${uid}-wa`} className="sr-only">
-            Tu WhatsApp
+            {f.whatsapp}
           </label>
           <PhoneInputField
             id={`${uid}-wa`}
             name="phone"
             value={whatsapp}
             onChange={setWhatsapp}
-            placeholder="Tu WhatsApp"
+            placeholder={f.whatsapp}
+            defaultCountry={copy.paisTelefono}
             required
             className="lpt-cota min-h-[52px] w-full rounded-[var(--lpt-r)] border border-[var(--lpt-caliza-2)] bg-white px-4 text-[0.9375rem] text-[var(--lpt-tinta)] transition-colors duration-200 focus-within:border-[var(--lpt-tinta)]"
           />
@@ -382,12 +390,11 @@ export default function FormTerrenos({
         disabled={enviando}
         className="lpt-titular mt-5 min-h-[56px] w-full rounded-[var(--lpt-r)] bg-[var(--lpt-estaca)] px-5 text-[1.0625rem] text-[var(--lpt-tinta)] transition-[background-color,transform] duration-200 hover:bg-[var(--lpt-estaca-2)] hover:text-[var(--lpt-caliza)] active:translate-y-px disabled:opacity-60"
       >
-        {enviando ? 'Enviando…' : 'Ver mi plan de pagos'}
+        {enviando ? f.enviando : f.enviar}
       </button>
 
       <p className="lpt-cuerpo mt-3.5 text-[0.8125rem] leading-relaxed text-[var(--lpt-tinta-2)]">
-        Te contesta un asesor por WhatsApp {tiempoRespuesta}. Sin llamadas
-        automáticas y sin compartir tu número con terceros.
+        {f.pie(tiempoRespuesta)}
       </p>
     </form>
   );

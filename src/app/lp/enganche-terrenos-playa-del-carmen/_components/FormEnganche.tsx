@@ -3,6 +3,9 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import PhoneInputField, { isValidPhoneNumber } from '@/components/ui/PhoneInput';
 import { trackGenerateLead } from '@/lib/analytics/track';
+import { COPY } from '../_copy';
+import { rich } from './rich';
+import type { LocaleLp } from '../../_components/v2/i18n';
 
 // ============================================================
 // LA CONVERSIÓN de la variante C.
@@ -69,6 +72,13 @@ type Atribucion = Partial<Record<(typeof CLAVES_URL)[number], string>>;
 /** Segmenta la variante C en GA4 sin tocar la acción de conversión de Ads. */
 const FORM_TYPE = 'lp_enganche_pdc';
 
+/**
+ * La variante en inglés se separa en GA4 con su propio `form_type` y en Zoho con
+ * su propio `source` (`lp_lotes_pdc_en`, ya registrado en `KNOWN_SOURCES`). El
+ * español conserva los literales de siempre.
+ */
+const FORM_TYPE_EN = 'lp_enganche_pdc_en';
+
 type Variante = 'hero' | 'medio' | 'cierre';
 
 /**
@@ -111,29 +121,22 @@ interface Opcion {
   ayuda?: string;
 }
 
+// ⚠️ LOS `valor` SON LOS MISMOS EN LOS DOS IDIOMAS, Y ESTÁN EN ESPAÑOL.
+//
+// Lo que se traduce es la `etiqueta` (y la `ayuda`), que salen de
+// `_copy.ts` por `clave`. El `valor` es lo que el asesor lee en Zoho y lo que
+// los reportes agrupan: si el inglés mandara «Up to $150,000 MXN», el mismo
+// rango aparecería como dos segmentos distintos y el reporte por enganche
+// disponible dejaría de sumar. El asesor ya sabe que el lead es de la landing
+// en inglés por el `source` (`lp_lotes_pdc_en`) y por `locale: 'en'`.
+
 /** → `investmentType`, que en `field-maps.ts` sale como «Objetivo:». */
-const USOS: Opcion[] = [
-  {
-    etiqueta: 'Plusvalía',
-    valor: 'Plusvalía — comprar y vender más adelante',
-    ayuda: 'Comprar hoy y vender cuando suba',
-  },
-  {
-    etiqueta: 'Rentas',
-    valor: 'Rentas — Airbnb o renta a largo plazo',
-    ayuda: 'Airbnb o renta a largo plazo',
-  },
-  {
-    etiqueta: 'Construir mi casa',
-    valor: 'Construir casa propia',
-    ayuda: 'Para vivir o para vacacionar',
-  },
-  {
-    etiqueta: 'Aún estoy explorando',
-    valor: 'Aún explorando — quiere entender los números',
-    ayuda: 'Todavía comparando opciones',
-  },
-];
+const USOS = [
+  { clave: 'plusvalia', valor: 'Plusvalía — comprar y vender más adelante' },
+  { clave: 'rentas', valor: 'Rentas — Airbnb o renta a largo plazo' },
+  { clave: 'construir', valor: 'Construir casa propia' },
+  { clave: 'explorando', valor: 'Aún explorando — quiere entender los números' },
+] as const;
 
 /**
  * → `budget`, que en `field-maps.ts` sale como «Enganche disponible:».
@@ -143,14 +146,15 @@ const USOS: Opcion[] = [
  * tenga «MXN» a menos de 12 caracteres, y un rango tipo «$150,000 – $300,000
  * MXN» deja la primera cifra justo en el límite. La moneda se dice UNA vez, en
  * la pregunta; las cifras completas y con MXN viven en `valor`, que va al CRM y
- * no al DOM.
+ * no al DOM. En inglés rige lo mismo («Up to 150K», nota «in thousands of
+ * Mexican pesos (MXN)»).
  */
-const ENGANCHES: Opcion[] = [
-  { etiqueta: 'Hasta 150 mil', valor: 'Hasta $150,000 MXN' },
-  { etiqueta: '150 a 300 mil', valor: 'De $150,000 MXN a $300,000 MXN' },
-  { etiqueta: '300 a 600 mil', valor: 'De $300,000 MXN a $600,000 MXN' },
-  { etiqueta: 'Más de 600 mil', valor: 'Más de $600,000 MXN' },
-];
+const ENGANCHES = [
+  { clave: 'hasta150', valor: 'Hasta $150,000 MXN' },
+  { clave: 'r150a300', valor: 'De $150,000 MXN a $300,000 MXN' },
+  { clave: 'r300a600', valor: 'De $300,000 MXN a $600,000 MXN' },
+  { clave: 'mas600', valor: 'Más de $600,000 MXN' },
+] as const;
 
 /**
  * → `location`, que en `field-maps.ts` cae en `City` de Zoho cuando no vino
@@ -161,16 +165,16 @@ const ENGANCHES: Opcion[] = [
  * segmentar. La respuesta no se pierde — va completa en el `message`, que Zoho
  * recibe como `Mensaje`.
  */
-const ZONAS: (Opcion & { ciudad: string | null })[] = [
-  { etiqueta: 'Playa del Carmen', valor: 'Playa del Carmen', ciudad: 'Playa del Carmen' },
-  { etiqueta: 'Tulum', valor: 'Tulum', ciudad: 'Tulum' },
-  { etiqueta: 'Puerto Aventuras', valor: 'Puerto Aventuras', ciudad: 'Puerto Aventuras' },
+const ZONAS = [
+  { clave: 'pdc', valor: 'Playa del Carmen', ciudad: 'Playa del Carmen' },
+  { clave: 'tulum', valor: 'Tulum', ciudad: 'Tulum' },
+  { clave: 'puertoAventuras', valor: 'Puerto Aventuras', ciudad: 'Puerto Aventuras' },
   {
-    etiqueta: 'Abierto a la mejor opción',
+    clave: 'abierto',
     valor: 'Abierto — quiere la mejor opción de la Riviera Maya',
     ciudad: null,
   },
-];
+] as const;
 
 // Aquí vivía un `ORDINAL` que rotulaba el panel como «Solicitud · 01 / 02 / 03».
 // Se quitó: era numeración INTERNA —la posición de la instancia en el
@@ -188,6 +192,8 @@ export interface FormEngancheProps {
   loteTitulo: string;
   /** El enganche ya formateado con «MXN». Se rotula en la cabecera del panel. */
   engancheTexto: string | null;
+  /** Idioma de la interfaz. Por defecto español: la landing española no pasa nada. */
+  locale?: LocaleLp;
   /**
    * ⚠️ COMPROMISO OPERATIVO, no copy: define qué promete la marca al enviar.
    * Cambiarlo es decisión de negocio.
@@ -292,10 +298,34 @@ export default function FormEnganche({
   loteRef,
   loteTitulo,
   engancheTexto,
-  tiempoRespuesta = 'el mismo día hábil',
+  locale = 'es',
+  tiempoRespuesta = COPY[locale].form.tiempoRespuesta,
 }: FormEngancheProps) {
   const uid = useId();
   const perfil = PERFIL[variante];
+  const t = COPY[locale].form;
+  const en = locale === 'en';
+
+  // En inglés TODOS los bloques llevan el selector de país, también el `medio`.
+  // El campo simple de 10 dígitos manda el número sin lada y, desde EE.UU. o
+  // Canadá, un 10 dígitos es ambiguo (¿+1 o +52?): el asesor llamaría a México.
+  // El `medio` sigue siendo el control del experimento EN ESPAÑOL; en inglés es
+  // una página nueva y no hay punto de comparación que proteger.
+  const conLada = perfil.lada || en;
+
+  // Opciones del diagnóstico: etiqueta traducida + valor fijo en español.
+  const usos: Opcion[] = USOS.map((u) => ({
+    valor: u.valor,
+    ...t.diagnostico.uso.opciones[u.clave],
+  }));
+  const enganches: Opcion[] = ENGANCHES.map((e) => ({
+    valor: e.valor,
+    etiqueta: t.diagnostico.enganche.opciones[e.clave],
+  }));
+  const zonas: Opcion[] = ZONAS.map((z) => ({
+    valor: z.valor,
+    etiqueta: t.diagnostico.zona.opciones[z.clave],
+  }));
 
   // El plazo solo arranca contestado donde SE PREGUNTA. En el hero, que no lo
   // pregunta, queda en null y el `message` dice «plan de pagos completo»: es
@@ -386,14 +416,16 @@ export default function FormEnganche({
     if (digitos.length >= 10) {
       const e164 = telDom.trim().startsWith('+')
         ? `+${digitos}`
-        : // Sin lada explícita se asume México, que es el `defaultCountry` del
-          // selector y de dónde viene el tráfico de esta campaña.
-          `+52${digitos.slice(-10)}`;
+        : // Sin lada explícita se asume el `defaultCountry` del selector: México
+          // en español y EE.UU./Canadá (+1) en inglés, que es de donde viene el
+          // tráfico de cada campaña.
+          `${locale === 'en' ? '+1' : '+52'}${digitos.slice(-10)}`;
       setTelefono((actual) =>
         (actual ?? '').replace(/\D/g, '').length >= 10 ? actual : e164,
       );
     }
-  }, []);
+    // `locale` lo fija la ruta y no cambia: el efecto sigue corriendo una sola vez.
+  }, [locale]);
 
   // Atribución leída una vez, al montar. Deliberadamente sin sessionStorage: el
   // POST sale de esta misma vista, no hay navegación que sobrevivir.
@@ -424,7 +456,7 @@ export default function FormEnganche({
      */
     const nuevos: Partial<Record<ClaveError, string>> = {};
 
-    if (!nombre.trim()) nuevos.nombre = 'Escribe tu nombre para que sepamos cómo llamarte.';
+    if (!nombre.trim()) nuevos.nombre = t.nombre.error;
 
     if (perfil.correo) {
       // Regex laxa a propósito. El zod de `/api/leads` sí valida `.email()`, y
@@ -432,19 +464,19 @@ export default function FormEnganche({
       // perdido. Filtrar aquí lo evidente es lo que impide que eso pase; pasar
       // de laxo a estricto sería inventar reglas que ningún RFC exige.
       if (!correo.trim()) {
-        nuevos.correo = 'Necesitamos tu correo para mandarte el plan en PDF.';
+        nuevos.correo = t.correo.vacio;
       } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo.trim())) {
-        nuevos.correo = 'Revisa el correo: parece que le falta algo.';
+        nuevos.correo = t.correo.invalido;
       }
     }
 
-    if (perfil.lada) {
+    if (conLada) {
       // La validación por país la hace el selector: quien escribe desde fuera
       // de México ya no pierde el lead por no tener 10 dígitos.
       if (!telefono) {
-        nuevos.telefono = 'Necesitamos tu teléfono para mandarte el plan.';
+        nuevos.telefono = t.telefono.vacioLada;
       } else if (!isValidPhoneNumber(telefono)) {
-        nuevos.telefono = 'Revisa el número: elige tu país y escríbelo completo.';
+        nuevos.telefono = t.telefono.invalidoLada;
       }
     } else {
       // 10 dígitos es el largo de un móvil en México. Se cuentan DÍGITOS, no se
@@ -452,16 +484,16 @@ export default function FormEnganche({
       // perder el lead por un espacio.
       const digitos = whatsapp.replace(/\D/g, '').length;
       if (!whatsapp.trim()) {
-        nuevos.telefono = 'Necesitamos tu WhatsApp para mandarte el plan.';
+        nuevos.telefono = t.telefono.vacioSimple;
       } else if (digitos < 10) {
-        nuevos.telefono = `Van ${digitos} de 10 dígitos.`;
+        nuevos.telefono = t.telefono.faltan(digitos);
       }
     }
 
     if (perfil.diagnostico && DIAGNOSTICO_OBLIGATORIO) {
-      if (!uso) nuevos.uso = 'Elige para qué lo quieres.';
-      if (!enganche) nuevos.enganche = 'Elige un rango. Es aproximado, no un compromiso.';
-      if (!zona) nuevos.zona = 'Elige una zona o marca que estás abierto.';
+      if (!uso) nuevos.uso = t.diagnostico.uso.error;
+      if (!enganche) nuevos.enganche = t.diagnostico.enganche.error;
+      if (!zona) nuevos.zona = t.diagnostico.zona.error;
     }
 
     setErrores(nuevos);
@@ -478,7 +510,7 @@ export default function FormEnganche({
           : primero === 'correo'
             ? refCorreo.current
             : primero === 'telefono'
-              ? (perfil.lada
+              ? (conLada
                   ? cajaTelefono.current?.querySelector<HTMLInputElement>('input[name="phone"]')
                   : refWhatsapp.current) ?? null
               : // Los grupos del diagnóstico no son un `<input>`: el foco va al
@@ -491,7 +523,7 @@ export default function FormEnganche({
       return;
     }
 
-    const telefonoEnviado = perfil.lada ? (telefono ?? '') : whatsapp.trim();
+    const telefonoEnviado = conLada ? (telefono ?? '') : whatsapp.trim();
     const zonaElegida = ZONAS.find((z) => z.valor === zona);
 
     setEnviando(true);
@@ -501,8 +533,8 @@ export default function FormEnganche({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           // ⚠️ Literal de `KNOWN_SOURCES`. Cambiarlo rompe el mapa de Zoho.
-          source: 'lp_lotes_pdc',
-          locale: 'es',
+          source: en ? 'lp_lotes_pdc_en' : 'lp_lotes_pdc',
+          locale,
           name: nombre.trim(),
           ...(perfil.correo ? { email: correo.trim() } : {}),
           phone: telefonoEnviado,
@@ -546,10 +578,10 @@ export default function FormEnganche({
 
       // El disparo a Ads va DESPUÉS del 200: una conversión reportada sobre un
       // lead que no se guardó es peor que ninguna.
-      trackGenerateLead({ formType: FORM_TYPE });
+      trackGenerateLead({ formType: en ? FORM_TYPE_EN : FORM_TYPE });
       setEnviado(true);
     } catch {
-      setError('No pudimos enviarlo. Inténtalo otra vez o escríbenos por WhatsApp.');
+      setError(t.errorEnvio);
     } finally {
       setEnviando(false);
     }
@@ -563,17 +595,12 @@ export default function FormEnganche({
         data-lpe-form={variante}
         className="rounded-[var(--lpe-r)] border border-[var(--lpe-linea)] bg-[var(--lpe-aqua-suave)] p-7 sm:p-9"
       >
-        <p className="lpe-rotulo text-[var(--lpe-teal-texto)]">Solicitud recibida</p>
+        <p className="lpe-rotulo text-[var(--lpe-teal-texto)]">{t.gracias.rotulo}</p>
         <p className="lpe-titular mt-3 text-[clamp(1.5rem,1.2rem+1.4vw,2rem)]">
-          Listo, {nombre.trim().split(' ')[0]}.
+          {t.gracias.saludo(nombre.trim().split(' ')[0])}
         </p>
         <p className="lpe-cuerpo mt-4 max-w-[46ch] text-[0.9375rem] leading-relaxed text-[var(--lpe-tinta-2)]">
-          Te escribimos por WhatsApp {tiempoRespuesta} con el plan completo
-          {plazo ? ` a ${plazo} meses` : ''}: enganche, mensualidad, contraentrega
-          y qué cubre la escritura. Una persona, no un robot.
-          {perfil.diagnostico
-            ? ' Y con la opción que cuadra con lo que nos dijiste, no con el catálogo entero.'
-            : ''}
+          {t.gracias.cuerpo(tiempoRespuesta, plazo, perfil.diagnostico)}
         </p>
       </div>
     );
@@ -618,17 +645,13 @@ export default function FormEnganche({
           Ahora el titular y el botón dicen LO MISMO, que es la regla más básica
           de un formulario que se entiende sin pensarlo. */}
       <h2 className="lpe-titular text-[clamp(1.5rem,1.3rem+1.1vw,2rem)]">
-        Recibe el <span className="lpe-italica">plan de pagos</span> completo
+        {rich(t.titulo)}
       </h2>
 
       {/* Qué trae, ANTES de pedir los datos. Es la respuesta a «¿para qué te doy
           mi teléfono?», y estaba enterrada debajo del botón. */}
       <ul className="mt-5 space-y-2">
-        {[
-          engancheTexto ? `Enganche de ${engancheTexto}` : 'El enganche exacto',
-          'La mensualidad de cada plazo',
-          'Contraentrega y gastos de escrituración',
-        ].map((linea) => (
+        {t.trae(engancheTexto).map((linea) => (
           <li key={linea} className="flex items-start gap-2.5">
             <svg
               className="mt-[3px] shrink-0 text-[var(--lpe-teal-texto)]"
@@ -670,7 +693,7 @@ export default function FormEnganche({
             htmlFor={`${uid}-nombre`}
             className="lpe-cuerpo mb-2 block text-[0.875rem] font-medium text-[var(--lpe-tinta)]"
           >
-            Tu nombre
+            {t.nombre.label}
           </label>
           <input
             id={`${uid}-nombre`}
@@ -678,7 +701,7 @@ export default function FormEnganche({
             name="name"
             type="text"
             autoComplete="name"
-            placeholder="Como quieres que te llamemos"
+            placeholder={t.nombre.placeholder}
             value={nombre}
             onChange={(e) => {
               setNombre(e.target.value);
@@ -707,7 +730,7 @@ export default function FormEnganche({
               htmlFor={`${uid}-correo`}
               className="lpe-cuerpo mb-2 block text-[0.875rem] font-medium text-[var(--lpe-tinta)]"
             >
-              Tu correo
+              {t.correo.label}
             </label>
             <input
               id={`${uid}-correo`}
@@ -716,7 +739,7 @@ export default function FormEnganche({
               type="email"
               inputMode="email"
               autoComplete="email"
-              placeholder="tu@correo.com"
+              placeholder={t.correo.placeholder}
               value={correo}
               onChange={(e) => {
                 setCorreo(e.target.value);
@@ -741,7 +764,7 @@ export default function FormEnganche({
                 id={`${uid}-correo-ayuda`}
                 className="lpe-cuerpo mt-2 text-[0.8125rem] text-[var(--lpe-tinta-3-texto)]"
               >
-                Ahí te llega el plan en PDF.
+                {t.correo.ayuda}
               </p>
             )}
           </div>
@@ -752,7 +775,7 @@ export default function FormEnganche({
             htmlFor={`${uid}-tel`}
             className="lpe-cuerpo mb-2 block text-[0.875rem] font-medium text-[var(--lpe-tinta)]"
           >
-            {perfil.lada ? 'Tu teléfono o WhatsApp' : 'Tu WhatsApp'}
+            {conLada ? t.telefono.labelLada : t.telefono.labelSimple}
           </label>
 
           {/* ⚠️ EL SELECTOR DE LADA, no un campo de 10 dígitos.
@@ -762,17 +785,18 @@ export default function FormEnganche({
               que llega a Zoho — cualquier aserción sobre `phone` debe esperar
               ese formato, no lo tecleado. El `medio` conserva el campo simple:
               es el control del experimento. */}
-          {perfil.lada ? (
+          {conLada ? (
             <div ref={cajaTelefono}>
               <PhoneInputField
                 id={`${uid}-tel`}
                 name="phone"
+                defaultCountry={en ? 'US' : 'MX'}
                 value={telefono}
                 onChange={(v) => {
                   setTelefono(v);
                   limpiar('telefono');
                 }}
-                placeholder="984 123 4567"
+                placeholder={t.telefono.placeholder}
                 required
                 invalid={Boolean(errores.telefono)}
                 describedBy={
@@ -793,7 +817,7 @@ export default function FormEnganche({
               type="tel"
               inputMode="tel"
               autoComplete="tel"
-              placeholder="984 123 4567"
+              placeholder={t.telefono.placeholder}
               value={whatsapp}
               onChange={(e) => {
                 setWhatsapp(e.target.value);
@@ -822,9 +846,9 @@ export default function FormEnganche({
               id={`${uid}-tel-ayuda`}
               className="lpe-cuerpo mt-2 text-[0.8125rem] text-[var(--lpe-tinta-3-texto)]"
             >
-              {perfil.lada
-                ? 'Elige tu país y escribe el número. Es donde te llega el plan.'
-                : '10 dígitos. Es donde te llega el plan.'}
+              {conLada
+                ? t.telefono.ayudaLada
+                : t.telefono.ayudaSimple}
             </p>
           )}
         </div>
@@ -843,19 +867,18 @@ export default function FormEnganche({
         <div className="mt-8 space-y-7 border-t border-[var(--lpe-linea)] pt-7">
           <div>
             <p className="lpe-rotulo text-[var(--lpe-teal-texto)]">
-              Tres toques y llegamos con una opción
+              {t.diagnostico.rotulo}
             </p>
             <p className="lpe-cuerpo mt-2 text-[0.875rem] leading-relaxed text-[var(--lpe-tinta-2)]">
-              Con esto el asesor te escribe con el lote y el plan que cuadran con
-              tu caso, no con el catálogo entero. Nada de esto es un compromiso.
+              {t.diagnostico.intro}
             </p>
           </div>
 
           <GrupoOpciones
             idBase={uid}
             clave="uso"
-            pregunta="¿Para qué lo quieres?"
-            opciones={USOS}
+            pregunta={t.diagnostico.uso.pregunta}
+            opciones={usos}
             valor={uso}
             error={errores.uso}
             elegir={(v) => {
@@ -868,9 +891,9 @@ export default function FormEnganche({
           <GrupoOpciones
             idBase={uid}
             clave="enganche"
-            pregunta="¿Cuánto puedes poner de enganche?"
-            nota="En miles de pesos mexicanos (MXN). Aproximado."
-            opciones={ENGANCHES}
+            pregunta={t.diagnostico.enganche.pregunta}
+            nota={t.diagnostico.enganche.nota}
+            opciones={enganches}
             valor={enganche}
             error={errores.enganche}
             elegir={(v) => {
@@ -882,8 +905,8 @@ export default function FormEnganche({
           <GrupoOpciones
             idBase={uid}
             clave="zona"
-            pregunta="¿Dónde te interesa?"
-            opciones={ZONAS}
+            pregunta={t.diagnostico.zona.pregunta}
+            opciones={zonas}
             valor={zona}
             error={errores.zona}
             elegir={(v) => {
@@ -914,14 +937,14 @@ export default function FormEnganche({
           decisión en el primer viewport. */}
       {perfil.plazo && plazos.length > 0 && (
         <fieldset className="mt-7 border-t border-[var(--lpe-linea)] pt-6">
-          <legend className="sr-only">Plazo para calcular las mensualidades</legend>
+          <legend className="sr-only">{t.plazo.legend}</legend>
           <p
             aria-hidden="true"
             className="lpe-cuerpo text-[0.875rem] font-medium text-[var(--lpe-tinta)]"
           >
-            ¿A cuántos meses te lo calculamos?{' '}
+            {t.plazo.pregunta}{' '}
             <span className="font-normal text-[var(--lpe-tinta-3-texto)]">
-              Puedes cambiarlo después.
+              {t.plazo.aclaracion}
             </span>
           </p>
           <div className="mt-3 flex flex-wrap gap-2.5">
@@ -939,7 +962,7 @@ export default function FormEnganche({
                       : 'border-[var(--lpe-linea)] bg-transparent text-[var(--lpe-tinta-2)] hover:border-[var(--lpe-tinta-3)]'
                   }`}
                 >
-                  {m} meses
+                  {t.plazo.meses(m)}
                 </button>
               );
             })}
@@ -973,7 +996,7 @@ export default function FormEnganche({
         className="group mt-7 flex min-h-[60px] w-full items-center justify-between gap-3 rounded-[var(--lpe-r-pill)] bg-[var(--lpe-teal)] pl-7 pr-2.5 text-[1.0625rem] font-medium text-[var(--lpe-tinta)] transition-[background-color,transform] duration-200 hover:bg-[var(--lpe-teal-hover)] active:translate-y-px disabled:opacity-60"
       >
         <span className="lpe-cuerpo font-medium">
-          {enviando ? 'Enviando…' : 'Recibe el plan de pagos'}
+          {enviando ? t.enviando : t.boton}
         </span>
         <span
           aria-hidden="true"
@@ -1005,8 +1028,7 @@ export default function FormEnganche({
           <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2Zm0 18.15a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.11.82.83-3.04-.19-.31a8.17 8.17 0 0 1-1.25-4.38c0-4.54 3.7-8.23 8.24-8.23 2.2 0 4.26.86 5.82 2.41a8.18 8.18 0 0 1 2.41 5.83c0 4.54-3.7 8.23-8.26 8.23Z" />
         </svg>
         <span>
-          Te escribe un asesor por WhatsApp {tiempoRespuesta}. Sin llamadas
-          automáticas y sin compartir tu número con terceros.
+          {t.nota(tiempoRespuesta)}
         </span>
       </p>
     </form>

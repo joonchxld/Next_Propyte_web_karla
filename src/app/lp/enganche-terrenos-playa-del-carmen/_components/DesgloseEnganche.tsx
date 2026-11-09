@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import type { PlanPago } from '@/lib/supabase/lp-lotes';
 import { mxn } from './formato';
+import { COPY } from '../_copy';
+import type { LocaleLp } from '../../_components/v2/i18n';
 
 // ============================================================
 // EL DESGLOSE. Es la razón de existir de esta variante.
@@ -36,10 +38,15 @@ import { mxn } from './formato';
 export default function DesgloseEnganche({
   plan,
   precioMxn,
+  locale = 'es',
 }: {
   plan: PlanPago;
   precioMxn: number;
+  /** Idioma. Por defecto español: la landing española no pasa nada. */
+  locale?: LocaleLp;
 }) {
+  const c = COPY[locale].tramos;
+  const dinero = (n: number) => mxn(n, locale);
   // ⚠️ `mxn` se IMPORTA, no llega como prop. Pasarlo como prop desde el
   // servidor rompe el build en la fase de prerender —las funciones no cruzan la
   // frontera server/client— y el motivo largo, con la salida equivocada que se
@@ -52,28 +59,28 @@ export default function DesgloseEnganche({
   const tramos = [
     {
       n: '01',
-      titulo: 'Enganche',
+      titulo: c.enganche.titulo,
       pct: plan.enganchePct,
-      cifra: mxn(plan.engancheMxn),
-      pie: 'Un solo pago. Con esto el lote queda apartado a tu nombre.',
+      cifra: dinero(plan.engancheMxn),
+      pie: c.enganche.pie,
       destacado: true,
     },
     {
       n: '02',
-      titulo: 'Mensualidades',
+      titulo: c.mensualidades.titulo,
       pct: plan.mensualidadesPct,
-      cifra: opcion ? mxn(opcion.mensualidadMxn) : null,
+      cifra: opcion ? dinero(opcion.mensualidadMxn) : null,
       pie: opcion
-        ? `${opcion.pagos} pagos mensuales${plan.sinIntereses ? ', sin intereses' : ''}. Directo con el desarrollador: sin banco, sin buró y sin comprobante de ingresos.`
+        ? c.mensualidades.pie(opcion.pagos, plan.sinIntereses)
         : null,
       destacado: false,
     },
     {
       n: '03',
-      titulo: 'Contraentrega',
+      titulo: c.contraentrega.titulo,
       pct: plan.contraentregaPct,
-      cifra: mxn(plan.contraentregaMxn),
-      pie: 'El último pago, al entregarte el lote. Va aquí y no en letra chica porque es un pago fuerte y tienes que contar con él.',
+      cifra: dinero(plan.contraentregaMxn),
+      pie: c.contraentrega.pie,
       destacado: false,
     },
   ];
@@ -87,7 +94,7 @@ export default function DesgloseEnganche({
       {plan.opciones.length > 1 && (
         <div className="flex flex-wrap items-center gap-3">
           <span className="lpe-cuerpo text-[0.9375rem] text-[var(--lpe-tinta-2)]">
-            El resto, en
+            {c.selectorRotulo}
           </span>
           {/* Fondo BLANCO, no `--lpe-hueso`: esta sección ya vive sobre hueso,
               así que un grupo hueso sobre hueso desaparece y la opción inactiva
@@ -95,7 +102,7 @@ export default function DesgloseEnganche({
               pantalla. */}
           <div
             role="group"
-            aria-label="Plazo de las mensualidades"
+            aria-label={c.selectorAria}
             className="flex gap-2 rounded-[var(--lpe-r-pill)] border border-[var(--lpe-linea)] bg-[var(--lpe-blanco)] p-1.5"
           >
             {plan.opciones.map((o) => {
@@ -112,7 +119,7 @@ export default function DesgloseEnganche({
                       : 'text-[var(--lpe-tinta-2)] hover:text-[var(--lpe-tinta)]'
                   }`}
                 >
-                  {o.meses} meses
+                  {c.meses(o.meses)}
                 </button>
               );
             })}
@@ -129,7 +136,7 @@ export default function DesgloseEnganche({
         <div
           className="flex h-3 w-full gap-1 overflow-hidden rounded-[var(--lpe-r-pill)]"
           role="img"
-          aria-label={`Proporción del precio: ${plan.enganchePct}% de enganche, ${plan.mensualidadesPct}% en mensualidades y ${plan.contraentregaPct}% de contraentrega`}
+          aria-label={c.proporcionAria(plan)}
         >
           <div
             className="rounded-[var(--lpe-r-pill)] bg-[var(--lpe-teal)]"
@@ -151,9 +158,9 @@ export default function DesgloseEnganche({
             desincronizarse de la barra. */}
         <ul className="mt-4 flex flex-wrap gap-x-6 gap-y-2">
           {[
-            { c: 'var(--lpe-teal)', t: 'Enganche', p: plan.enganchePct },
-            { c: 'var(--lpe-aqua)', t: 'Mensualidades', p: plan.mensualidadesPct },
-            { c: 'var(--lpe-tinta-3)', t: 'Contraentrega', p: plan.contraentregaPct },
+            { c: 'var(--lpe-teal)', t: c.enganche.titulo, p: plan.enganchePct },
+            { c: 'var(--lpe-aqua)', t: c.mensualidades.titulo, p: plan.mensualidadesPct },
+            { c: 'var(--lpe-tinta-3)', t: c.contraentrega.titulo, p: plan.contraentregaPct },
           ].map((l) => (
             <li key={l.t} className="flex items-center gap-2">
               <span
@@ -169,7 +176,7 @@ export default function DesgloseEnganche({
         </ul>
 
         <p className="lpe-cuerpo mt-4 text-[0.8125rem] text-[var(--lpe-tinta-3-texto)]">
-          Sobre un precio de lista de {mxn(precioMxn)}.
+          {c.precioLista(dinero(precioMxn))}
         </p>
       </div>
 
@@ -215,13 +222,13 @@ export default function DesgloseEnganche({
                 /* Sin dato no se rellena el hueco con una frase de relleno: se
                    dice que falta y se remite al plan que sí lo trae. */
                 <p className="lpe-cuerpo mt-4 text-[0.9375rem] text-[var(--lpe-tinta-2)]">
-                  Te lo desglosamos en el plan.
+                  {c.sinDato}
                 </p>
               )}
 
-              {t.titulo === 'Mensualidades' && opcion && (
+              {t.n === '02' && opcion && (
                 <p className="lpe-cuerpo mt-1.5 text-[0.9375rem] text-[var(--lpe-tinta-2)]">
-                  × {opcion.pagos} pagos
+                  {c.pagos(opcion.pagos)}
                 </p>
               )}
             </div>

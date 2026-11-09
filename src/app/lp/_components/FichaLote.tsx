@@ -1,6 +1,8 @@
 import { Campo, BloqueCampos, EnlaceGate, TituloSeccion } from './ui';
 import { mxn, mxnExacto, m2 } from './format';
 import type { LoteLanding } from '@/lib/supabase/lp-lotes';
+import { COMUN, FICHA } from '../lotes-playa-del-carmen/_copy';
+import type { LocaleLp } from './v2/i18n';
 
 // ============================================================
 // Ficha del lote.
@@ -15,58 +17,66 @@ import type { LoteLanding } from '@/lib/supabase/lp-lotes';
 // lectura de documento depende de que la reja se mantenga.
 // ============================================================
 
-export default function FichaLote({ lote }: { lote: LoteLanding }) {
+export default function FichaLote({
+  lote,
+  locale = 'es',
+}: {
+  lote: LoteLanding;
+  locale?: LocaleLp;
+}) {
+  const t = FICHA[locale];
+  const g = COMUN[locale].gate;
   const plazoMax = lote.plan?.opciones.at(-1) ?? null;
 
   return (
     <section aria-labelledby="ficha-titulo">
-      <TituloSeccion id="ficha-titulo">El lote, con todos sus números</TituloSeccion>
+      <TituloSeccion id="ficha-titulo">{t.titulo}</TituloSeccion>
 
       <div className="mt-6 border-t-2 border-[var(--lp-accent)]">
         <BloqueCampos>
-          <Campo etiqueta="Superficie">
-            {lote.superficieM2 ? m2(lote.superficieM2) : <EnlaceGate que="superficie" />}
+          <Campo etiqueta={t.superficie}>
+            {lote.superficieM2 ? m2(lote.superficieM2) : <EnlaceGate que={g.superficie} locale={locale} />}
           </Campo>
 
-          <Campo etiqueta="Precio">
-            {lote.precioMxn ? `${mxn(lote.precioMxn)}` : <EnlaceGate que="precio" />}
+          <Campo etiqueta={t.precio}>
+            {lote.precioMxn ? `${mxn(lote.precioMxn)}` : <EnlaceGate que={g.precio} locale={locale} />}
           </Campo>
 
-          <Campo etiqueta="Precio por m²" destacado>
+          <Campo etiqueta={t.precioM2} destacado>
             {lote.precioM2Mxn ? (
               `${mxnExacto(lote.precioM2Mxn)}`
             ) : (
-              <EnlaceGate que="superficie para calcular el precio por m²" />
+              <EnlaceGate que={g.precioM2} locale={locale} />
             )}
           </Campo>
 
           {/* Consecuencia del uso de suelo. Va junto al precio a propósito: es
               el denominador que cambia cómo se lee el precio por m². */}
-          <Campo etiqueta="Construible" destacado>
+          <Campo etiqueta={t.construible} destacado>
             {lote.aprovechamiento ? (
               <>
                 {m2(lote.aprovechamiento.construibleM2)}
                 <span className="block text-xs text-[var(--lp-muted)]">
-                  COS {lote.aprovechamiento.cos} · CUS {lote.aprovechamiento.cus}, hasta{' '}
-                  {m2(lote.aprovechamiento.huellaM2)} en planta
+                  {t.cos} {lote.aprovechamiento.cos} · {t.cus} {lote.aprovechamiento.cus},{' '}
+                  {t.hasta} {m2(lote.aprovechamiento.huellaM2)} {t.enPlanta}
                 </span>
               </>
             ) : (
-              <EnlaceGate que="superficie para calcular lo construible" />
+              <EnlaceGate que={g.construible} locale={locale} />
             )}
           </Campo>
 
-          <Campo etiqueta="Enganche">
+          <Campo etiqueta={t.enganche}>
             {lote.enganchePct && lote.engancheMxn !== null ? (
               <>
-                Desde {lote.enganchePct}%
+                {t.desde} {lote.enganchePct}%
                 <span className="text-[var(--lp-muted)]">
                   {'  '}
                   {mxn(lote.engancheMxn)}
                 </span>
               </>
             ) : (
-              <EnlaceGate que="enganche" />
+              <EnlaceGate que={g.enganche} locale={locale} />
             )}
           </Campo>
 
@@ -75,39 +85,39 @@ export default function FichaLote({ lote }: { lote: LoteLanding }) {
               descubrir después que hay tasa convertiría la página en publicidad
               engañosa. Se publica sólo cuando `construirPlan` devuelve plan, y
               eso exige que la tasa esté declarada como dato. */}
-          <Campo etiqueta="Mensualidad" destacado>
+          <Campo etiqueta={t.mensualidad} destacado>
             {plazoMax ? (
               <>
                 {mxn(plazoMax.mensualidadMxn)}
                 <span className="block text-xs text-[var(--lp-muted)]">
-                  {plazoMax.pagos} pagos a {plazoMax.meses} meses, sin intereses
+                  {t.pagosA(plazoMax.pagos, plazoMax.meses)}
                 </span>
               </>
             ) : (
-              <EnlaceGate que="tasa de financiamiento" />
+              <EnlaceGate que={g.tasa} locale={locale} />
             )}
           </Campo>
 
-          <Campo etiqueta="Plazos">
+          <Campo etiqueta={t.plazos}>
             {lote.mesesOpciones.length > 0 ? (
-              `Hasta ${Math.max(...lote.mesesOpciones)} meses`
+              t.hastaMeses(Math.max(...lote.mesesOpciones))
             ) : lote.mesesNota ? (
               lote.mesesNota
             ) : (
-              <EnlaceGate que="plazos de financiamiento" />
+              <EnlaceGate que={g.plazos} locale={locale} />
             )}
           </Campo>
 
-          <Campo etiqueta="Urbanización" destacado>
+          <Campo etiqueta={t.urbanizacion} destacado>
             {lote.ningunServicioHoy
-              ? 'Ningún servicio conectado hoy'
-              : lote.subtipoLiteral ?? <EnlaceGate que="estatus de urbanización" />}
+              ? t.ningunServicio
+              : lote.subtipoLiteral ?? <EnlaceGate que={g.urbanizacion} locale={locale} />}
           </Campo>
 
-          <Campo etiqueta="Escrituración">
+          <Campo etiqueta={t.escrituracion}>
             {lote.escrituraDisponibleHoy
-              ? 'Inmediata, cumplido el calendario de pagos del contrato'
-              : 'Proyectada. Hoy el lote no es escriturable'}
+              ? t.escrituraInmediata
+              : t.escrituraProyectada}
           </Campo>
         </BloqueCampos>
       </div>
@@ -128,19 +138,15 @@ export default function FichaLote({ lote }: { lote: LoteLanding }) {
           <>
             <p>
               <strong className="font-semibold text-[var(--lp-ink)]">
-                Cómo leer este precio.
+                {t.comoLeer}
               </strong>{' '}
-              Son {mxnExacto(lote.precioM2Mxn)} por metro cuadrado sobre{' '}
-              {m2(lote.superficieM2)}. Vas a encontrar terrenos en Playa del Carmen
-              a la mitad de ese precio por metro, y conviene que los veas. Antes de
-              comparar, revisa cuatro cosas en el otro terreno:
+              {t.sonA} {mxnExacto(lote.precioM2Mxn)} {t.sonB}{' '}
+              {m2(lote.superficieM2)}
+              {t.sonC}
             </p>
             <ol className="mt-3 flex flex-col gap-2">
               {[
-                'Si está en régimen de condominio o es un lote suelto.',
-                'Si la urbanización corre por cuenta del desarrollador o por la tuya.',
-                'Si tiene amenidades entregables por contrato.',
-                'Si te lo financian a 48 o 60 meses o hay que pagarlo de contado.',
+                ...t.criterios,
               ].map((criterio, i) => (
                 <li key={criterio} className="grid grid-cols-[1.5rem_1fr] gap-x-2">
                   <span
@@ -154,16 +160,13 @@ export default function FichaLote({ lote }: { lote: LoteLanding }) {
               ))}
             </ol>
             <p className="mt-3">
-              Cuando esos cuatro renglones estén en la mesa, la comparación por metro
-              cuadrado significa algo. Antes, no.
+              {t.cierre}
             </p>
           </>
         ) : (
           <p>
-            <strong className="font-semibold text-[var(--lp-ink)]">Cómo leer este precio.</strong>{' '}
-            El precio por metro cuadrado es lo que permite comparar este lote contra
-            cualquier otro. Todavía no lo publicamos porque falta confirmar la
-            superficie exacta, y preferimos decírtelo antes que estimarlo.
+            <strong className="font-semibold text-[var(--lp-ink)]">{t.comoLeer}</strong>{' '}
+            {t.sinPrecio}
           </p>
         )}
       </div>

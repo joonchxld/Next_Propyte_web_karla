@@ -2,6 +2,7 @@ import type { ImagenesLanding } from '@/lib/supabase/lp-lotes';
 import FiguraTerrenos from './FiguraTerrenos';
 import { Reveal } from './motion';
 import type { IndiceLaminas } from './laminas';
+import type { CopyTerrenos } from '../_copy';
 
 // ============================================================
 // HOY, AL LADO DE PROYECTADO.
@@ -37,7 +38,11 @@ export default function EstadoDelSitio({
   superficieTexto,
   disponibles,
   totales,
+  copy,
+  figura,
 }: {
+  copy: CopyTerrenos['sitio'];
+  figura: CopyTerrenos['figura'];
   imagenes: ImagenesLanding;
   laminas: IndiceLaminas;
   numeroSeccion: string;
@@ -62,11 +67,11 @@ export default function EstadoDelSitio({
     <section className="border-t border-[var(--lpt-linea-fuerte)] bg-[var(--lpt-abismo)]">
       <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8 lg:py-28">
         <Reveal>
-          <p className="lpt-rotulo text-[var(--lpt-estaca)]">{numeroSeccion} · El sitio</p>
+          <p className="lpt-rotulo text-[var(--lpt-estaca)]">{numeroSeccion} · {copy.rotulo}</p>
         </Reveal>
         <Reveal delay={0.06}>
           <h2 className="lpt-titular mt-4 max-w-[26ch] text-[clamp(1.875rem,1.4rem+2.2vw,3rem)] text-[var(--lpt-claro)]">
-            Así está hoy y así está proyectado
+            {copy.titulo}
           </h2>
         </Reveal>
 
@@ -78,7 +83,8 @@ export default function EstadoDelSitio({
               <FiguraTerrenos
                 imagen={hoy}
                 lamina={laminas.urbanizacion ?? 'FIG.'}
-                rotulo="Hoy · fotografía"
+                rotulo={copy.hoy}
+                prefijo={figura}
                 aspecto="aspect-[4/3]"
                 sizes="(min-width: 1024px) 540px, (min-width: 640px) 50vw, 100vw"
               />
@@ -89,7 +95,8 @@ export default function EstadoDelSitio({
               <FiguraTerrenos
                 imagen={proyectado}
                 lamina={laminas.casasCenital ?? 'FIG.'}
-                rotulo="Proyectado · render"
+                rotulo={copy.proyectado}
+                prefijo={figura}
                 aspecto="aspect-[4/3]"
                 sizes="(min-width: 1024px) 540px, (min-width: 640px) 50vw, 100vw"
               />
@@ -100,13 +107,7 @@ export default function EstadoDelSitio({
         <Reveal delay={0.08}>
           <div className="mt-12 grid gap-8 border-t border-[var(--lpt-linea-fuerte)] pt-8 lg:grid-cols-12 lg:gap-12">
             <p className="lpt-cuerpo max-w-[58ch] text-[1.0625rem] leading-relaxed text-[var(--lpt-claro-2)] lg:col-span-7">
-              Lo que se compra es el terreno
-              {superficieTexto ? ` de ${superficieTexto}` : ''}, no la casa. La
-              casa la construyes tú, cuando quieras y con quien quieras, dentro
-              de lo que permite el reglamento del fraccionamiento. La segunda
-              lámina es el proyecto del desarrollador para lotes ya
-              construidos: sirve para ver qué cabe, no para prometer que viene
-              incluido.
+              {copy.texto(superficieTexto)}
             </p>
 
             {vendidos !== null && (
@@ -115,11 +116,10 @@ export default function EstadoDelSitio({
                   {vendidos}
                 </p>
                 <p className="lpt-cota mt-1 text-[0.6875rem] uppercase tracking-[0.12em] text-[var(--lpt-claro-3)]">
-                  lotes ya vendidos de {totales}
+                  {copy.vendidos(totales ?? 0)}
                 </p>
                 <p className="lpt-cuerpo mt-3 max-w-[34ch] text-[0.8125rem] leading-relaxed text-[var(--lpt-claro-3)] lg:ml-auto">
-                  Cifras declaradas por el desarrollador, no un contador que
-                  baja solo.
+                  {copy.aviso}
                 </p>
               </div>
             )}
