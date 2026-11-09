@@ -11,6 +11,7 @@ import { filtroEntrega, filtroPresupuesto, filtroRecamaras, filtroUbicacion, fil
 import type { LocaleLp } from '../_components/v2/i18n';
 import { plural, ubicacionCorta } from '../_components/v2/util';
 import Catalogo from './_components/Catalogo';
+import FormInventario from '../_components/v2/FormInventario';
 import FiltrosPortada from './_components/FiltrosPortada';
 import { COPY } from './_copy';
 import '../_components/v2/tokens.css';
@@ -112,22 +113,58 @@ export default async function PaginaDepartamentos({ locale = 'es' }: { locale?: 
     <div className="lpv marca lpd-root">
       {/* ══ PORTADA: banda Aztec con la reticula de nodos ══ */}
       <section id="hero" className="marca-oscura relative overflow-hidden">
+        {/* Foto de portada a sangre, apagada bajo el velo Aztec: la lámina
+            vertical de la columna derecha cede su lugar a la hoja de
+            solicitud, que tiene que verse en el primer pliegue. */}
+        {portada?.imagen && (
+          <div className="absolute inset-0" aria-hidden>
+            <Image
+              src={portada.imagen}
+              alt=""
+              fill
+              priority
+              sizes="100vw"
+              className="object-cover opacity-45"
+            />
+            <div className="marca-velo" />
+          </div>
+        )}
         <div className="marca-reticula" aria-hidden />
-        <div className="relative mx-auto grid min-h-[100svh] max-w-[92rem] content-center gap-10 px-5 pb-12 pt-24 sm:px-8 lg:grid-cols-12 lg:gap-14 lg:pb-14">
+        <div className="relative mx-auto grid min-h-[100svh] max-w-[92rem] content-center gap-x-14 gap-y-8 px-5 pb-12 pt-24 sm:px-8 lg:grid-cols-12 lg:pb-14">
           <div className="lg:col-span-7">
             <h1 className="marca-titular text-white">
-              <span className="block text-[clamp(2.5rem,1.3rem+5vw,5.5rem)]">{t.hero.tituloLinea1}</span>
-              <span className="marca-acento block pb-1 text-[clamp(1.75rem,1.1rem+3.2vw,4rem)]">
+              <span className="block text-[clamp(2.25rem,1.3rem+4.4vw,5.25rem)]">{t.hero.tituloLinea1}</span>
+              <span className="marca-acento block pb-1 text-[clamp(1.625rem,1.1rem+2.8vw,3.75rem)]">
                 {t.hero.tituloLinea2}
               </span>
             </h1>
-            <p className="mt-5 max-w-[46ch] text-[1.0625rem] leading-relaxed text-white/80">
+            <p className="mt-4 max-w-[46ch] text-[1rem] leading-relaxed text-white/85 sm:mt-5 sm:text-[1.0625rem]">
               {t.hero.subtitulo(
                 resumen.ciudades,
                 resumen.desde ? dineroCompacto(resumen.desde) : null,
                 resumen.engancheMinimoPct,
               )}
             </p>
+          </div>
+
+          {/* Hoja de solicitud: a la derecha en escritorio (ocupa las dos
+              filas), justo después del subtítulo en móvil. Solo ciudad y
+              presupuesto; el formulario del cierre conserva los cuatro filtros. */}
+          <div className="lpd-hoja lpd-hoja-portada marca-vidrio self-start p-6 sm:p-8 lg:col-span-5 lg:col-start-8 lg:row-span-2 lg:row-start-1">
+            <FormInventario
+              source={t.fuente}
+              variante="hero"
+              copy={t.form}
+              locale={locale}
+              opciones={departamentos.map((p) => ({ slug: p.slug, titulo: p.titulo }))}
+              filtros={defs.filter((f) => f.id === 'ubicacion' || f.id === 'presupuesto')}
+              propiedades={departamentos}
+              telefonoWhatsApp={FALLBACK_WHATSAPP}
+              className="!p-0"
+            />
+          </div>
+
+          <div className="lg:col-span-7">
 
             {badges.length > 0 && (
               <ul className="lpd-badges mt-5 flex flex-wrap gap-2" aria-label={t.hero.badgesAria}>
@@ -150,29 +187,13 @@ export default async function PaginaDepartamentos({ locale = 'es' }: { locale?: 
             {/* Presupuesto + indice de ciudades como filtro. */}
             <FiltrosPortada defs={defs} todos={departamentos} locale={locale} />
 
-            <a href="#solicitar" className="marca-boton mt-6">
-              {t.hero.cta}
-            </a>
+            {portada && (
+              <p className="lpd-pie mt-6 text-white/75">
+                {ubicacionCorta(portada)}
+                {portada.precio ? ` · ${dinero(portada.precio)}` : ''}
+              </p>
+            )}
           </div>
-
-          {portada?.imagen && (
-            <figure className="lg:col-span-5 lg:self-center">
-              <div className="relative aspect-[3/4] w-full overflow-hidden rounded-[var(--marca-r-l)] bg-[var(--marca-night)]">
-                <Image
-                  src={portada.imagen}
-                  alt={`${portada.titulo}, ${ubicacionCorta(portada)}`}
-                  fill
-                  priority
-                  sizes="(min-width: 1024px) 38vw, 100vw"
-                  className="object-cover"
-                />
-              </div>
-              <figcaption className="lpd-pie mt-3 flex items-baseline justify-between gap-4 px-1 text-white/80">
-                <span>{ubicacionCorta(portada)}</span>
-                <span className="marca-cifra text-[var(--marca-aqua)]">{portada.precio ? dinero(portada.precio) : ''}</span>
-              </figcaption>
-            </figure>
-          )}
         </div>
       </section>
 

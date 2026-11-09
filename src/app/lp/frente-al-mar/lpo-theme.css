@@ -296,3 +296,12 @@ html:has(.lpo-root) {
 .lp-root:has(.lpo-root) header span {
   display: none;
 }
+
+/* Hoja de la portada (9-nov-2026): en móvil se oculta su párrafo de
+   presentación para que el campo Nombre quede en el primer pliegue; el
+   titular ya dice qué pasa. */
+@media (max-width: 639px) {
+  .lpo-root .lpo-hoja-portada [data-lpv-form] > p:nth-of-type(2) {
+    display: none;
+  }
+}
