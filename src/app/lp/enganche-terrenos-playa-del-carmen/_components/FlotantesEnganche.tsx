@@ -92,7 +92,7 @@ export default function FlotantesEnganche({
             propertySlug: loteSlug,
           })
         }
-        className={`fixed bottom-7 right-7 z-40 hidden h-14 w-14 place-items-center rounded-full bg-[var(--lpe-wa)] text-white shadow-[0_10px_30px_-8px_rgb(15_25_35/0.45)] transition-[transform,opacity] duration-300 hover:scale-105 lg:grid ${
+        className={`fixed bottom-7 right-7 z-40 hidden h-14 w-14 place-items-center rounded-full bg-[var(--lpe-aztec)] text-[var(--lpe-aqua)] shadow-[0_10px_30px_-8px_rgb(10_28_30/0.45)] transition-[transform,opacity] duration-300 hover:scale-105 lg:grid ${
           decidido ? 'scale-100 opacity-100' : 'scale-90 opacity-0'
         }`}
       >
@@ -116,7 +116,7 @@ export default function FlotantesEnganche({
         <div className="flex items-center gap-3">
           {engancheTexto && (
             <p className="min-w-0 flex-1">
-              <span className="lpe-cuerpo block text-[0.6875rem] uppercase tracking-[0.1em] text-[var(--lpe-tinta-3-texto)]">
+              <span className="lpe-rotulo block text-[0.8125rem] text-[var(--lpe-tinta-3-texto)]">
                 {c.flotante.enganche}
               </span>
               <span className="lpe-cifra block truncate text-[1.0625rem] text-[var(--lpe-tinta)]">
@@ -132,7 +132,7 @@ export default function FlotantesEnganche({
             // Era el único control de la página sin transición ni estado
             // pulsado, y es el CTA que la barra fija enseña durante todo el
             // scroll en móvil — el más tocado de los tres.
-            className="lpe-cuerpo shrink-0 rounded-[var(--lpe-r-pill)] bg-[var(--lpe-teal)] px-6 py-3.5 text-[0.9375rem] font-medium text-[var(--lpe-tinta)] transition-[background-color,transform] duration-200 hover:bg-[var(--lpe-teal-hover)] active:translate-y-px"
+            className="lpe-cuerpo shrink-0 rounded-[var(--lpe-r-pill)] bg-[var(--lpe-cta)] px-6 py-3.5 text-[0.9375rem] font-medium text-[var(--lpe-cta-texto)] transition-[background-color,transform] duration-200 hover:bg-[var(--lpe-cta-hover)] active:translate-y-px"
           >
             {c.flotante.verPlan}
           </a>

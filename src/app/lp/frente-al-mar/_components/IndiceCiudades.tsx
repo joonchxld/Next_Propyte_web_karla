@@ -11,7 +11,8 @@ import { COPY } from '../_copy';
 // Una lista vertical en el borde derecho con las ciudades que tienen
 // inventario. Pulsar una baja a la primera pantalla de esa ciudad. La ciudad
 // activa se sigue con IntersectionObserver sobre las pantallas (atributo
-// `data-ciudad`), nunca con un listener de scroll.
+// `data-ciudad`), nunca con un listener de scroll. Cada ciudad es una
+// pastilla de vidrio; la activa, New Aqua (ver `lpo-theme.css`).
 // ============================================================
 
 function prefiereMenosMovimiento(): boolean {
@@ -50,7 +51,7 @@ export default function IndiceCiudades({ ciudades, locale = 'es' }: { ciudades: 
   return (
     <nav
       aria-label={COPY[locale].indice.aria}
-      className="lpo-indice fixed right-6 top-1/2 z-30 hidden -translate-y-1/2 flex-col items-end gap-3 lg:flex"
+      className="lpo-indice fixed right-6 top-1/2 z-30 hidden -translate-y-1/2 flex-col items-end gap-2 lg:flex"
     >
       {ciudades.map((c) => (
         <button
@@ -58,13 +59,9 @@ export default function IndiceCiudades({ ciudades, locale = 'es' }: { ciudades: 
           type="button"
           onClick={() => ir(c.clave)}
           aria-current={activa === c.clave ? 'true' : undefined}
-          className="flex items-center gap-3 text-[0.8125rem]"
         >
-          <span>
-            {c.nombre}
-            <span className="ml-1.5 opacity-60">{c.total}</span>
-          </span>
-          <span className="lpo-indice-marca" aria-hidden="true" />
+          {c.nombre}
+          <span className="marca-cifra opacity-70">{c.total}</span>
         </button>
       ))}
     </nav>

@@ -14,10 +14,10 @@ export default function ChipsHeroFiltro({ opciones, ariaLabel }: { opciones: Opc
           key={o.valor}
           type="button"
           onClick={() => emitirFiltro('ubicacion', o.valor, true)}
-          className="inline-flex min-h-[40px] cursor-pointer items-center gap-2 border px-3.5 text-[0.8125rem] leading-none transition-colors duration-200 active:translate-y-px"
+          className="lpx-chip-foto marca-detalle inline-flex min-h-[44px] cursor-pointer items-center gap-2 rounded-full border px-4 text-[0.9375rem] leading-none active:translate-y-px"
         >
           {o.etiqueta}
-          <span className="lpv-cifra opacity-60">{o.total}</span>
+          <span className="lpv-cifra text-[var(--marca-onahau)]">{o.total}</span>
         </button>
       ))}
     </div>

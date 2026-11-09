@@ -82,7 +82,7 @@ export function Campo({
       }`}
     >
       <dt
-        className={`text-[0.6875rem] uppercase tracking-[0.1em] ${
+        className={`lp-rotulo ${
           oscuro ? 'text-[var(--lp-on-dark-soft)]' : 'text-[var(--lp-muted)]'
         }`}
       >
@@ -119,10 +119,10 @@ export function BloqueCampos({
 }) {
   return (
     <dl
-      className={`border-t-2 ${
+      className={`overflow-hidden rounded-[var(--lp-r-panel)] px-4 sm:px-5 [&>div:last-child]:border-b-0 ${
         tono === 'oscuro'
-          ? 'border-[var(--lp-accent-on-dark)]'
-          : 'border-[var(--lp-accent)]'
+          ? 'border border-[var(--lp-line-dark)] bg-white/[0.04]'
+          : 'border border-[var(--lp-line-soft)] bg-[var(--lp-panel)]'
       }`}
     >
       {children}
@@ -133,14 +133,14 @@ export function BloqueCampos({
 type Estado = 'disponible' | 'en_proceso' | 'proyectado';
 
 const ESTADO_META: Record<Estado, { etiqueta: string; Icono: typeof Check; clase: string }> = {
-  disponible: { etiqueta: 'Disponible', Icono: Check, clase: 'text-[#3F8F5C]' },
-  en_proceso: { etiqueta: 'En proceso', Icono: Clock, clase: 'text-[var(--lp-accent-on-dark)]' },
+  disponible: { etiqueta: 'Disponible', Icono: Check, clase: 'text-[var(--lp-accent-on-dark)]' },
+  en_proceso: { etiqueta: 'En proceso', Icono: Clock, clase: 'text-[var(--lp-on-dark)]' },
   proyectado: { etiqueta: 'Proyectado', Icono: Minus, clase: 'text-[var(--lp-on-dark-soft)]' },
 };
 
 /**
  * Estado de un servicio. El icono acompaña al texto: el color nunca es el único
- * indicador, porque quien no distingue verde de terracota también necesita saberlo.
+ * indicador, porque quien no distingue los tonos también necesita saberlo.
  */
 export function EstadoServicio({
   estado,
@@ -220,7 +220,8 @@ export function DisclaimerCifras({
 }
 
 /**
- * CTA primario. Terracota sólido, texto blanco: 6.1:1, AA holgado.
+ * CTA primario de marca: pastilla Aztec con texto blanco sobre claro y New
+ * Aqua con texto Aztec sobre oscuro (`.lpl-oscuro`), vía `--lp-accent`.
  * El `active:translate-y` es el único gesto físico de la página.
  */
 export function BotonPrimario({
@@ -233,7 +234,7 @@ export function BotonPrimario({
   return (
     <a
       href={href}
-      className="inline-flex min-h-[56px] cursor-pointer items-center justify-center whitespace-nowrap rounded-[var(--lp-r-control)] bg-[var(--lp-accent)] px-7 text-base font-semibold text-white shadow-[0_2px_10px_rgb(168_64_42/0.28)] transition-all duration-200 hover:bg-[var(--lp-accent-strong)] hover:shadow-[0_4px_16px_rgb(168_64_42/0.38)] active:translate-y-px"
+      className="inline-flex min-h-[56px] cursor-pointer items-center justify-center whitespace-nowrap rounded-full bg-[var(--lp-accent)] px-7 text-base font-semibold text-[var(--lp-on-accent)] transition-colors duration-200 hover:bg-[var(--lp-accent-strong)] active:translate-y-px"
     >
       {children}
     </a>

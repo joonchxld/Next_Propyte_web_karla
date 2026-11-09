@@ -56,7 +56,7 @@ export default function AvailabilityBadge({
         className="size-1.5 shrink-0 rounded-full bg-[var(--lp-accent-on-dark)] ring-4 ring-[var(--lp-accent-on-dark)]/20"
       />
       {estado && (
-        <span className="text-[0.8125rem] font-medium uppercase tracking-[0.1em] text-[var(--lp-accent-on-dark)]">
+        <span className="lp-rotulo font-medium text-[var(--lp-accent-on-dark)]">
           {estado}
         </span>
       )}

@@ -34,6 +34,11 @@ import { normalizarClave, type CopyTerrenos } from '../_copy';
 // Doce de las trece láminas son renders del desarrollador y la privada no está
 // construida. `FiguraTerrenos` lo rotula una por una, y el rótulo va DENTRO de
 // la lámina. Ver también el pie de la sección.
+//
+// MARCA (9-nov-2026): banda Water Dew. La leyenda pasa de filas con filete a
+// pastillas (Onahau con la referencia de figura; la que no tiene lámina, en
+// blanco con guion), y el mosaico usa las placas redondeadas de
+// `FiguraTerrenos`. Sin número de sección.
 // ============================================================
 
 /**
@@ -149,18 +154,18 @@ export default function Privada({
   const conPrueba = leyenda.filter((l) => l.lamina).length;
 
   return (
-    <section className="lpt-plano border-t border-[var(--lpt-linea-fuerte)] bg-[var(--lpt-selva)]">
+    <section className="bg-[var(--marca-dew)]" data-seccion={numeroSeccion}>
       <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8 lg:py-28">
         <Reveal>
-          <p className="lpt-rotulo text-[var(--lpt-estaca)]">{numeroSeccion} · {copy.rotulo}</p>
+          <p className="lpt-rotulo">{copy.rotulo}</p>
         </Reveal>
         <Reveal delay={0.06}>
-          <h2 className="lpt-titular mt-4 max-w-[24ch] text-[clamp(1.875rem,1.4rem+2.2vw,3rem)] text-[var(--lpt-claro)]">
+          <h2 className="lpt-titular mt-4 max-w-[24ch] text-[clamp(1.875rem,1.4rem+2.2vw,3rem)] text-[var(--marca-aztec)]">
             {copy.titulo}
           </h2>
         </Reveal>
         <Reveal delay={0.12}>
-          <p className="lpt-cuerpo mt-6 max-w-[56ch] text-[1.0625rem] leading-relaxed text-[var(--lpt-claro-2)]">
+          <p className="lpt-cuerpo mt-6 max-w-[56ch] text-[1.0625rem] leading-relaxed text-[var(--marca-slate)]">
             {copy.intro}
           </p>
         </Reveal>
@@ -171,26 +176,30 @@ export default function Privada({
             imágenes harían la promesa y la lista llegaría a matizarla. */}
         {leyenda.length > 0 && (
           <Escalonado
-            className="mt-14 grid gap-x-8 gap-y-0 border-t border-[var(--lpt-linea-fuerte)] sm:grid-cols-2 lg:grid-cols-3"
+            className="mt-10 flex flex-wrap gap-2"
             delay={0.05}
           >
             {leyenda.map((l) => (
               <Escalon
                 key={l.nombre}
-                className="flex items-baseline justify-between gap-4 border-b border-[var(--lpt-linea)] py-4"
+                className={`inline-flex min-h-[44px] items-center gap-2.5 rounded-full py-1.5 pl-4 pr-2 ${
+                  l.lamina
+                    ? 'bg-[var(--marca-onahau)]'
+                    : 'bg-white shadow-[inset_0_0_0_1px_rgb(72_115_121/0.18)]'
+                }`}
               >
-                <span className="lpt-cuerpo text-[0.9375rem] text-[var(--lpt-claro)]">
+                <span className="lpt-cuerpo text-[0.9375rem] text-[var(--marca-aztec)]">
                   {l.nombre}
                 </span>
                 {l.lamina ? (
-                  <span className="lpt-cota shrink-0 text-[0.625rem] tracking-[0.12em] text-[var(--lpt-estaca)]">
+                  <span className="lpt-cota shrink-0 rounded-full bg-[var(--marca-aztec)] px-2.5 py-1 text-[0.75rem] text-[var(--marca-aqua)]">
                     {l.lamina}
                   </span>
                 ) : (
                   /* Sin lámina y se dice. Un guion largo, no un hueco: el hueco
                      se lee como error de maquetación, el guion como dato. */
                   <span
-                    className="lpt-cota shrink-0 text-[0.625rem] text-[var(--lpt-claro-3)]"
+                    className="lpt-cota shrink-0 px-2 text-[0.875rem] text-[var(--marca-teal)]"
                     title={copy.sinLamina}
                   >
                     —
@@ -203,7 +212,7 @@ export default function Privada({
 
         {leyenda.length > 0 && (
           <Reveal delay={0.1}>
-            <p className="lpt-cuerpo mt-5 max-w-[62ch] text-[0.8125rem] leading-relaxed text-[var(--lpt-claro-3)]">
+            <p className="lpt-cuerpo mt-5 max-w-[62ch] text-[0.8125rem] leading-relaxed text-[var(--marca-slate)]">
               {/* ⚠️ Decía «no tenemos render de ellas». Dejó de ser verdad al
                   retirar la lámina de la caseta: de ésa SÍ hay render, y no se
                   publica por otra razón. En una página cuya voz entera depende
@@ -227,14 +236,14 @@ export default function Privada({
             y donde el navegador no lo soporta la lámina simplemente se ve.
             Ver `lpt-theme.css`. */}
         {plates.length > 0 && (
-          <div className="mt-16 grid grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-3 lg:gap-6">
+          <div className="mt-14 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3 lg:gap-5">
             {plates.map((m) => {
               const img = imagenes[m.clave]!;
               return (
                 <div key={m.clave} className={`lpt-lamina-entra ${m.span}`}>
                   <FiguraTerrenos
                     imagen={img}
-                    lamina={laminas[m.clave] ?? 'FIG.'}
+                    lamina={laminas[m.clave] ?? 'Fig.'}
                     rotulo={copy.rotulos[m.clave] ?? copy.rotuloDefecto}
                     prefijo={figura}
                     aspecto={m.aspecto}
@@ -266,7 +275,7 @@ export default function Privada({
         {/* El aviso, una vez y en serio. Sustituye a los pies individuales. */}
         {plates.length > 0 && (
           <Reveal delay={0.08}>
-            <p className="lpt-cuerpo mt-8 max-w-[62ch] border-t border-[var(--lpt-linea)] pt-6 text-[0.8125rem] leading-relaxed text-[var(--lpt-claro-3)]">
+            <p className="lpt-cuerpo mt-8 max-w-[62ch] text-[0.8125rem] leading-relaxed text-[var(--marca-slate)]">
               {copy.aviso(plates.length, laminas.urbanizacion ?? copy.aerea)}
             </p>
           </Reveal>

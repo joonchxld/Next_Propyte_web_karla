@@ -1,5 +1,4 @@
 import Image from 'next/image';
-import localFont from 'next/font/local';
 import {
   TIPOS_TERRENO,
   getInventario,
@@ -21,6 +20,7 @@ import Catalogo from './_components/Catalogo';
 import ChipsHero from './_components/ChipsHero';
 import { COPY } from './_copy';
 import '../_components/v2/tokens.css';
+import '../_components/v2/marca.css';
 import './lpt2-theme.css';
 
 // ============================================================
@@ -45,25 +45,20 @@ import './lpt2-theme.css';
 //      brief) y filas de ancho completo con la superficie como cifra
 //      principal; cada una se abre con fotos y plan por plazo.
 //   3. La línea de comercializadora, sola y grande.
-//   4. El formulario sobre un bloque cobalto, y las preguntas.
+//   4. El formulario sobre el degradado de marca, y las preguntas.
+//
+// MARCA (9-nov-2026, «misma marca, otra composición»): la composición de
+// arriba se conserva; lo visual pasa al manual de Propyte (DESIGN.md,
+// `_components/v2/marca.css`). El hero tipográfico es una banda Aztec con
+// retícula y la cifra «desde» en New Aqua; el formulario es vidrio; filtros y
+// plazos son pastillas; el mapa va en tarjeta; cada fila es una tarjeta. En
+// móvil la foto aérea pasa DETRÁS del formulario (antes iba delante), así el
+// formulario sube en el primer pliegue sin perder la foto.
 //
 // Reglas heredadas: toda cifra sale del inventario; ningún nombre de
 // desarrollo llega al DOM; la mensualidad se calcula y se rotula como
 // orientativa; cero urgencia inventada.
 // ============================================================
-
-// Archivo con eje de ancho: la misma familia de la v3 del home.
-const display = localFont({
-  src: '../../../fonts/archivo-latin.woff2',
-  weight: '100 900',
-  style: 'normal',
-  declarations: [
-    { prop: 'font-family', value: 'Archivo' },
-    { prop: 'font-stretch', value: '62% 125%' },
-  ],
-  variable: '--font-lpt2-display',
-  display: 'swap',
-});
 
 /**
  * Cortes de presupuesto que caen DENTRO del rango real de precios: así cada
@@ -132,16 +127,16 @@ export default async function PaginaTerrenos({ locale = 'es' }: { locale?: Local
 
   if (lotes.length === 0) {
     return (
-      <div className={`lpv lpt2-root ${display.variable} min-h-[70vh]`}>
+      <div className={`lpv marca lpt2-root min-h-[70vh]`}>
         <CorrigeLang locale={locale} />
         <div className="mx-auto max-w-2xl px-5 py-32 sm:px-8">
-          <h1 className="lpt2-display text-[clamp(2rem,1.3rem+2.5vw,3.25rem)]">{copy.vacio.titulo}</h1>
+          <h1 className="marca-titular text-[clamp(2rem,1.3rem+2.5vw,3.25rem)]">{copy.vacio.titulo}</h1>
           <p className="mt-6 max-w-[54ch] text-base leading-relaxed text-[var(--lpv-fg-2)]">{copy.vacio.cuerpo}</p>
           <a
             href={`https://wa.me/${FALLBACK_WHATSAPP}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-9 inline-flex min-h-[52px] items-center rounded-full bg-[var(--lpv-fg)] px-7 text-sm font-medium text-white"
+            className="marca-boton mt-9"
           >
             {copy.vacio.cta}
           </a>
@@ -155,21 +150,27 @@ export default async function PaginaTerrenos({ locale = 'es' }: { locale?: Local
   const banda = [...lotes].filter((l) => l.imagen).sort((a, b) => b.imagenes.length - a.imagenes.length)[0] ?? null;
 
   return (
-    <div className={`lpv lpt2-root ${display.variable}`}>
+    <div className="lpv marca lpt2-root">
       <CorrigeLang locale={locale} />
-      {/* ══ 1 · HERO tipográfico con el formulario fijo a la derecha ══ */}
-      <section id="hero" className="bg-white">
+      {/* ══ 1 · HERO tipográfico con el formulario fijo a la derecha ══
+          Banda Aztec con la retícula de nodos de marca. La cifra «desde» va en
+          New Aqua (Aqua solo sobre oscuro). Orden del documento: texto →
+          FORMULARIO → foto; en escritorio el formulario ocupa la columna
+          derecha a la altura del titular y la foto queda bajo el texto. */}
+      <section id="hero" className="marca-oscura lpt2-hero">
+        <div className="marca-reticula" aria-hidden />
         {/* `minmax(0,1fr)` + `min-w-0`: la fila de chips desplazable no puede
             ensanchar la columna en móvil (desbordaba 230 px a 375). */}
-        <div className="mx-auto grid max-w-[96rem] grid-cols-[minmax(0,1fr)] gap-10 px-5 pb-10 pt-24 sm:px-8 sm:pt-28 lg:grid-cols-12 lg:gap-12 lg:items-start">
-          <div className="min-w-0 lg:col-span-7">
-            <h1 className="lpt2-display text-[var(--lpv-fg)]">
+        <div className="mx-auto grid max-w-[96rem] grid-cols-[minmax(0,1fr)] gap-8 px-5 pb-12 pt-24 sm:px-8 sm:pt-28 lg:grid-cols-12 lg:grid-rows-[auto_1fr] lg:gap-x-12 lg:gap-y-10 lg:items-start lg:pb-16">
+          <div className="min-w-0 lg:col-span-7 lg:row-start-1">
+            <h1 className="marca-titular text-white">
               <span className="block text-[clamp(2.5rem,1.4rem+3.6vw,4.75rem)]">
                 {copy.hero.titulo}
                 {resumen.desde && (
                   <>
                     {' '}
-                    {copy.hero.desde} <span className="whitespace-nowrap">{dinero(resumen.desde)}</span>
+                    {copy.hero.desde}{' '}
+                    <span className="marca-acento marca-cifra whitespace-nowrap">{dinero(resumen.desde)}</span>
                   </>
                 )}
               </span>
@@ -186,38 +187,26 @@ export default async function PaginaTerrenos({ locale = 'es' }: { locale?: Local
               })}
             </p>
 
-            {/* Tres datos con filete, no tres tarjetas. */}
-            <ul className="mt-8 flex flex-col divide-y divide-[var(--lpv-line)] border-y border-[var(--lpv-line)] sm:flex-row sm:divide-x sm:divide-y-0">
+            {/* Tres datos con su icono en círculo, no tres tarjetas. */}
+            <ul className="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-x-7">
               {datos.map(({ Icono, texto }) => (
-                <li key={texto} className="flex items-center gap-3 py-3 sm:flex-1 sm:px-5 sm:first:pl-0 sm:last:pr-0">
-                  <Icono className="h-5 w-5 shrink-0 text-[var(--lpv-accent)]" aria-hidden />
-                  <span className="text-[0.9375rem] leading-snug text-[var(--lpv-fg)]">{texto}</span>
+                <li key={texto} className="flex items-center gap-3">
+                  <span className="lpt2-dato-icono" aria-hidden>
+                    <Icono className="h-[18px] w-[18px]" />
+                  </span>
+                  <span className="marca-detalle text-[0.9375rem] leading-snug text-white">{texto}</span>
                 </li>
               ))}
             </ul>
 
-            <div className="mt-8">
+            <div className="mt-7">
               <ChipsHero defs={defsHero} />
             </div>
-
-            {/* Foto aérea, sin texto encima. */}
-            {banda?.imagen && (
-              <figure className="relative mt-10 aspect-[4/3] w-full overflow-hidden bg-[var(--lpv-bg-2)] sm:aspect-[16/9]">
-                <Image
-                  src={banda.imagen}
-                  alt={`${banda.titulo}, ${ubicacionCorta(banda)}`}
-                  fill
-                  priority
-                  sizes="(min-width: 1024px) 58vw, 100vw"
-                  className="object-cover"
-                />
-              </figure>
-            )}
           </div>
 
           {/* El formulario acompaña al titular y se queda fijo mientras la
               columna izquierda baja hasta la foto. */}
-          <div className="min-w-0 lg:col-span-5 lg:sticky lg:top-6 lg:self-start">
+          <div className="min-w-0 lg:col-span-5 lg:col-start-8 lg:row-span-2 lg:row-start-1 lg:sticky lg:top-6 lg:self-start">
             <FormInventario
               source={copy.source}
               variante="hero"
@@ -229,16 +218,29 @@ export default async function PaginaTerrenos({ locale = 'es' }: { locale?: Local
               locale={locale}
             />
           </div>
+
+          {/* Foto aérea, sin texto encima, en esquina de marca. */}
+          {banda?.imagen && (
+            <figure className="lpt2-foto relative aspect-[4/3] w-full min-w-0 sm:aspect-[16/9] lg:col-span-7 lg:col-start-1 lg:row-start-2">
+              <Image
+                src={banda.imagen}
+                alt={`${banda.titulo}, ${ubicacionCorta(banda)}`}
+                fill
+                priority
+                sizes="(min-width: 1024px) 58vw, 100vw"
+                className="object-cover"
+              />
+            </figure>
+          )}
         </div>
       </section>
-
       {/* ══ 2 · CATÁLOGO + 3 · COMERCIALIZADORA + 4 · FORMULARIO ══ */}
       <Catalogo lotes={lotes} defs={defs} telefonoWhatsApp={FALLBACK_WHATSAPP} locale={locale} />
 
       {/* ══ 5 · PREGUNTAS ══ */}
       <div className="mx-auto max-w-[96rem] px-5 py-16 sm:px-8 sm:py-24">
         <div className="grid gap-10 lg:grid-cols-12">
-          <h2 className="lpt2-display text-[clamp(1.75rem,1.2rem+2vw,3rem)] lg:col-span-4">{copy.preguntas.titulo}</h2>
+          <h2 className="marca-titular text-[clamp(1.75rem,1.2rem+2vw,3rem)] lg:col-span-4">{copy.preguntas.titulo}</h2>
           <div className="lg:col-span-8 lg:col-start-5">
             <FaqAcordeon
               faqs={copy.preguntas.faqs}

@@ -25,6 +25,8 @@ import { rutaLegal, type LocaleLp } from '../_components/v2/i18n';
 import FaqCategorias from '../_components/v2/FaqCategorias';
 import { claveUbicacion } from '@/lib/supabase/lp-inventario';
 import '../_components/v2/tokens.css';
+import '../_components/v2/marca.css';
+import './lpl-marca.css';
 import { TituloSeccion, BotonPrimario } from '../_components/ui';
 import { mxn, mxnExacto, m2 } from '../_components/format';
 import { PAGINA } from './_copy';
@@ -69,9 +71,10 @@ export default async function PaginaLotes({ locale }: { locale: LocaleLp }) {
   // no un caso borde. La página lo trata como estado, no como error.
   if (!lote) {
     return (
-      <div className="bg-[var(--lp-dark)]">
-        <div className="mx-auto max-w-2xl px-5 py-24">
-          <h1 className="lp-display text-[clamp(1.75rem,1.3rem+2vw,2.5rem)] font-semibold leading-[1.1] tracking-[-0.02em] text-white">
+      <div className="lpl-root lpv marca marca-oscura lpl-oscuro relative isolate overflow-hidden">
+        <div aria-hidden="true" className="marca-reticula" />
+        <div className="relative mx-auto max-w-2xl px-5 py-24">
+          <h1 className="lp-display text-[clamp(1.75rem,1.3rem+2vw,2.5rem)] leading-[1.05] text-white">
             {c.agotado.titulo}
           </h1>
           <p className="mt-5 max-w-[52ch] text-base leading-relaxed text-white/70">
@@ -132,7 +135,7 @@ export default async function PaginaLotes({ locale }: { locale: LocaleLp }) {
     .join(' ');
 
   return (
-    <>
+    <div className="lpl-root lpv marca">
       {/* ═══════════ 1 · Hero ═══════════
           Antes: dos columnas, texto a la izquierda sobre aztec plano, foto
           arrinconada a la derecha. La foto no hacía trabajo y el bloque de
@@ -142,7 +145,7 @@ export default async function PaginaLotes({ locale }: { locale: LocaleLp }) {
           (cintillo, titular, subtítulo, CTAs). Las cifras y la línea de
           honestidad bajan a su propia banda: son la segunda respiración, no
           parte del primer golpe. */}
-      <section className="relative isolate min-h-[92svh] overflow-hidden bg-[var(--lp-dark)] lg:min-h-[100svh]">
+      <section className="lpl-oscuro relative isolate min-h-[92svh] overflow-hidden bg-[var(--lp-dark)] lg:min-h-[100svh]">
         {heroImg && (
           <Image
             src={heroImg.url}
@@ -163,12 +166,11 @@ export default async function PaginaLotes({ locale }: { locale: LocaleLp }) {
             className="object-cover"
           />
         )}
-        {/* Degradado, no capa plana: la foto conserva su hora dorada arriba y
-            cede legibilidad abajo, que es donde vive el texto. */}
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 bg-gradient-to-t from-[var(--lp-dark)] via-[var(--lp-dark)]/72 to-[var(--lp-dark)]/15"
-        />
+        {/* Velo Aztec de marca, no capa plana: oscurece el lado del texto y
+            deja limpia la foto bajo el formulario de vidrio. Encima, la
+            retícula de líneas y nodos del manual. */}
+        <div aria-hidden="true" className="marca-velo" />
+        <div aria-hidden="true" className="marca-reticula" />
 
         <div className="relative mx-auto grid min-h-[92svh] max-w-6xl content-end gap-10 px-5 pb-14 pt-28 sm:px-8 lg:min-h-[100svh] lg:grid-cols-[1.1fr_minmax(0,26rem)] lg:items-end lg:gap-16 lg:pb-20">
           <div>
@@ -196,7 +198,7 @@ export default async function PaginaLotes({ locale }: { locale: LocaleLp }) {
               relevancia sin perder el gancho. */}
           {/* Brief de octubre-2026: solo la categoría y la región. La
               aritmética de niveles construibles sigue en la ficha. */}
-          <h1 className="lp-display mt-5 max-w-[18ch] text-[clamp(2.25rem,1.5rem+3.6vw,4.25rem)] leading-[1.06] text-balance text-[var(--lp-on-dark)]">
+          <h1 className="lp-display mt-5 max-w-[18ch] text-[clamp(2.25rem,1.5rem+3.6vw,4.5rem)] leading-[1.02] text-balance text-[var(--lp-on-dark)]">
             {c.hero.h1}
           </h1>
 
@@ -232,7 +234,7 @@ export default async function PaginaLotes({ locale }: { locale: LocaleLp }) {
               se lee si lo buscas y no compite con el titular. Sin él, la página
               abre contradiciendo su propia tesis. */}
           {heroImg && (
-            <p className="mt-8 text-[0.6875rem] leading-relaxed text-[var(--lp-on-dark)]/45">
+            <p className="lp-rotulo mt-8 text-[0.75rem] font-normal leading-relaxed text-[var(--lp-on-dark)]/65">
               {c.hero.renderDe} {heroImg.caption}
             </p>
           )}
@@ -267,9 +269,9 @@ export default async function PaginaLotes({ locale }: { locale: LocaleLp }) {
           El enganche NO se lee de `plan`: se lee de `lote.engancheMxn`, que no
           depende de la tasa. Antes esta celda decía «sin dato» mientras la
           ficha, cuatro bloques abajo, publicaba la cifra. */}
-      <section className="border-b border-[var(--lp-line)] bg-[var(--lp-paper)]">
+      <section className="bg-[var(--lp-paper-2)]">
         <div className="mx-auto max-w-6xl px-5 py-10 sm:px-8 lg:py-12">
-          <dl className="grid grid-cols-2 gap-x-8 gap-y-8 sm:grid-cols-4">
+          <dl className="marca-tarjeta grid grid-cols-2 gap-x-6 gap-y-7 p-6 sm:grid-cols-4 sm:p-8">
             {[
               {
                 k: c.cifras.enganche,
@@ -285,14 +287,14 @@ export default async function PaginaLotes({ locale }: { locale: LocaleLp }) {
               { k: c.cifras.precioTotal, v: lote.precioMxn ? mxn(lote.precioMxn) : null },
             ].map((cifra) => (
               <div key={cifra.k}>
-                <dt className="text-[0.625rem] uppercase tracking-[0.14em] text-[var(--lp-muted)]">
+                <dt className="lp-rotulo text-[var(--lp-muted)]">
                   {cifra.k}
                 </dt>
                 <dd
                   className={`lp-display lp-num mt-2 text-[clamp(1.5rem,1.1rem+1.4vw,2.125rem)] leading-none ${
                     cifra.destacado
-                      ? 'text-[var(--lp-accent)]'
-                      : 'text-[var(--lp-ink)]'
+                      ? 'font-semibold text-[var(--lp-ink)]'
+                      : 'text-[var(--lp-ink-soft)]'
                   }`}
                 >
                   {cifra.v ?? (
@@ -305,7 +307,7 @@ export default async function PaginaLotes({ locale }: { locale: LocaleLp }) {
             ))}
           </dl>
 
-          <div className="mt-9 grid gap-x-12 gap-y-4 border-t border-[var(--lp-line-soft)] pt-6 md:grid-cols-2">
+          <div className="mt-7 grid gap-x-12 gap-y-4 px-1 md:grid-cols-2">
             {/* La contraentrega no es letra chica: es parte del número de arriba. */}
             {plan ? (
               <p className="max-w-[54ch] text-sm leading-relaxed text-[var(--lp-muted)]">
@@ -423,7 +425,7 @@ export default async function PaginaLotes({ locale }: { locale: LocaleLp }) {
           Va DESPUÉS de la tabla de servicios a propósito: primero el visitante
           ve que hoy no hay nada conectado, y sólo entonces lee por qué eso es
           el precio de la ventana de cinco años. Al revés sería suavizar. */}
-      <section aria-labelledby="ventana-titulo" className="border-b border-[var(--lp-line)] bg-[var(--lp-paper-2)]">
+      <section aria-labelledby="ventana-titulo" className="bg-[var(--lp-panel)]">
         <div className="mx-auto max-w-6xl px-5 py-14 lg:py-20">
           <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
             <TituloSeccion id="ventana-titulo">
@@ -481,8 +483,9 @@ export default async function PaginaLotes({ locale }: { locale: LocaleLp }) {
       {/* ═══════════ 12 · Cierre ═══════════
           Un solo formulario en la página, arriba. Aquí sólo el ancla de vuelta,
           para no duplicar componente ni eventos de medición. */}
-      <section className="bg-[var(--lp-dark)]">
-        <div className="mx-auto max-w-6xl px-5 py-14">
+      <section className="lpl-oscuro marca-degradado relative isolate overflow-hidden">
+        <div aria-hidden="true" className="marca-reticula" />
+        <div className="relative mx-auto max-w-6xl px-5 py-16 lg:py-20">
           {/* Segunda y última instancia. Quien llega hasta aquí leyó los cinco
               bloques de riesgo: recordarle en qué estado está el lote y a qué
               fecha lo verificamos es información, no presión. */}
@@ -494,7 +497,7 @@ export default async function PaginaLotes({ locale }: { locale: LocaleLp }) {
               locale={locale}
             />
           </div>
-          <p className="max-w-[46ch] lp-display text-[clamp(1.25rem,1.1rem+0.8vw,1.75rem)] font-semibold leading-tight tracking-[-0.02em] text-balance text-white">
+          <p className="max-w-[40ch] lp-display text-[clamp(1.5rem,1.2rem+1.4vw,2.5rem)] leading-[1.08] text-balance text-white">
             {plan ? c.cierre.conPlan : c.cierre.sinPlan}
           </p>
           <div className="mt-7 flex flex-col gap-3 sm:flex-row">
@@ -565,6 +568,6 @@ export default async function PaginaLotes({ locale }: { locale: LocaleLp }) {
         mensualidad={plazoMax ? mxn(plazoMax.mensualidadMxn) : null}
         locale={locale}
       />
-    </>
+    </div>
   );
 }

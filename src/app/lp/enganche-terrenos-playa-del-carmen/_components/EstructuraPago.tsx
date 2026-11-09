@@ -115,7 +115,7 @@ export default function EstructuraPago({
               className={`mt-1.5 h-2.5 w-2.5 shrink-0 self-start rounded-full ${t.relleno}`}
             />
             <div className="min-w-0 flex-1">
-              <dt className="lpe-cuerpo text-[0.6875rem] uppercase tracking-[0.1em] text-white/50">
+              <dt className="lpe-rotulo text-[0.8125rem] text-white/70">
                 {t.rotulo} · {t.pct}%
               </dt>
               <dd className="lpe-cifra mt-1 text-[1.375rem] tabular-nums text-[var(--lpe-teal)]">

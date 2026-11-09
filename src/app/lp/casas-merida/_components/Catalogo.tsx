@@ -28,8 +28,14 @@ import type { CopyCatalogoMerida } from '../_copy';
 // evento. El dossier es siempre la primera casa visible; el resto va abajo.
 //
 // LA PÁGINA ES LA FICHA. Izquierda: la galería, fija al hacer scroll en
-// escritorio. Derecha: precio enorme, título, características con icono y
-// el formulario en línea, sin panel.
+// escritorio. Derecha: el gancho, la hoja de solicitud y la ficha (precio
+// enorme, título, características con icono).
+//
+// MARCA (9-nov-2026): el gancho entra en la columna derecha y la hoja sube
+// tras él, en vidrio Aztec, para que el formulario quede en el primer pliegue
+// (también en móvil, con la galería más baja). Características en tabla
+// Water Dew con iconos en círculo, créditos en pastillas Onahau, galería y
+// mosaico redondeados, todo lo pulsable en pastilla.
 // ============================================================
 
 interface Spec {
@@ -66,14 +72,9 @@ function Creditos({ casa, t, tamano = 'md' }: { casa: PropiedadLanding; t: CopyC
   const lista = creditosDe(casa, t);
   if (lista.length === 0) return null;
   return (
-    <ul className={`flex flex-wrap ${tamano === 'md' ? 'gap-x-5 gap-y-2' : 'gap-x-4 gap-y-1.5'}`}>
+    <ul className="flex flex-wrap gap-2">
       {lista.map((texto) => (
-        <li
-          key={texto}
-          className={`inline-flex items-center gap-1.5 text-[var(--lpv-accent)] ${
-            tamano === 'md' ? 'text-[0.9375rem]' : 'text-[0.875rem]'
-          }`}
-        >
+        <li key={texto} className={`marca-pastilla ${tamano === 'md' ? 'lpme-pastilla-md' : ''}`}>
           <BadgeCheck className={tamano === 'md' ? 'h-4 w-4' : 'h-3.5 w-3.5'} aria-hidden />
           {texto}
         </li>
@@ -82,11 +83,10 @@ function Creditos({ casa, t, tamano = 'md' }: { casa: PropiedadLanding; t: CopyC
   );
 }
 
+/** Pastilla de índice: blanca con filete; pulsada, Aztec con texto New Aqua. */
 function chipHook(activo: boolean) {
-  return `inline-flex min-h-[44px] cursor-pointer items-center gap-2 rounded-full border px-4 text-[0.9375rem] leading-none transition-colors duration-200 active:translate-y-px ${
-    activo
-      ? 'border-[var(--lpv-accent)] bg-[var(--lpv-accent)] text-white'
-      : 'border-[var(--lpv-line-2)] text-[var(--lpv-fg)] hover:border-[var(--lpv-fg)]'
+  return `lpme-chip marca-detalle inline-flex min-h-[44px] cursor-pointer items-center gap-2 rounded-full border px-4 text-[0.9375rem] leading-none active:translate-y-px ${
+    activo ? 'lpme-chip-activo' : ''
   }`;
 }
 
@@ -148,115 +148,65 @@ export default function Catalogo({
 
   return (
     <>
-      {/* ══ EL GANCHO: titular de crédito y cómo quieres pagar ══ */}
-      <header className="mx-auto max-w-[96rem] px-5 pb-10 pt-24 sm:px-8 sm:pt-28 lg:pb-14">
-        <h1 className="lpm-display max-w-[22ch] text-[clamp(2rem,1.2rem+2.6vw,3.75rem)] text-[var(--lpv-fg)]">
-          {conCredito ? t.tituloCredito : t.tituloBase}
-        </h1>
-        {apoyo && (
-          <p className="lpm-display-ligero mt-5 max-w-[40ch] text-[clamp(1.125rem,1rem+0.7vw,1.5rem)] text-[var(--lpv-fg-2)]">
-            {apoyo}.
-          </p>
-        )}
-
-        {filtroCredito && t.mostrarCreditos && (
-          <div className="mt-8">
-            <p className="text-[0.9375rem] text-[var(--lpv-fg-3)]">{t.comoPagar}</p>
-            <div role="group" aria-label={t.comoPagar} className="mt-3 flex flex-wrap gap-2">
-              {filtroCredito.opciones.map((o) => {
-                const activo = seleccion.credito === o.valor;
-                return (
-                  <button
-                    key={o.valor}
-                    type="button"
-                    aria-pressed={activo}
-                    onClick={() => {
-                      alternar('credito', o.valor);
-                      irAlFormulario();
-                    }}
-                    className={chipHook(activo)}
-                  >
-                    <BadgeCheck className="h-4 w-4" aria-hidden />
-                    {o.etiqueta}
-                    {casas.length > 1 && <span className="lpv-cifra opacity-60">{o.total}</span>}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        )}
-      </header>
-
-      {/* ══ EL DOSSIER: galería fija a la izquierda, ficha a la derecha ══ */}
-      <section id="hero" className="grid border-t border-[var(--lpv-line)] lg:min-h-[100svh] lg:grid-cols-2">
-        <div className="lpm-galeria lg:sticky lg:top-0 lg:h-[100svh]">
+      {/* ══ EL DOSSIER: galería fija a la izquierda; a la derecha el gancho, la
+          hoja de solicitud y la ficha completa ══ */}
+      <section id="hero" className="grid lg:min-h-[100svh] lg:grid-cols-2">
+        <div className="lpme-galeria lg:sticky lg:top-0 lg:h-[100svh] lg:p-3">
           <GaleriaFicha
             key={principal.id}
             imagenes={fotos}
             alt={`${principal.titulo}, ${ubicacionCorta(principal)}`}
             locale={locale}
-            aspecto="h-[60svh] lg:h-[100svh]"
+            aspecto="h-[max(38svh,17rem)] lg:h-[calc(100svh-1.5rem)]"
             sizes="(min-width: 1024px) 50vw, 100vw"
             prioridad
             tope={10}
-            className="!rounded-none"
           />
         </div>
 
-        <div className="px-5 pb-16 pt-10 sm:px-10 lg:px-14 lg:pb-24 lg:pt-20 xl:px-20">
-          <p className="text-[0.9375rem] text-[var(--lpv-fg-2)]">
-            {t.casaEnVenta.replace('{ubicacion}', ubicacionCorta(principal))}
-          </p>
-          <p className="lpm-display mt-4 whitespace-nowrap text-[clamp(2.25rem,1.2rem+2.6vw,3.75rem)] text-[var(--lpv-fg)]">
-            {principal.precio ? dinero(principal.precio) : t.precioPorConfirmar}
-          </p>
-          <h2 className="lpm-display-ligero mt-4 max-w-[28ch] text-[clamp(1.25rem,1.05rem+0.9vw,1.75rem)] text-[var(--lpv-fg)]">
-            {principal.titulo}
-          </h2>
-
-          {listaSpecs.length > 0 && (
-            <ul className="mt-8 grid grid-cols-2 gap-x-6 gap-y-7 border-t border-[var(--lpv-line-2)] pt-7 sm:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4">
-              {listaSpecs.map((s) => (
-                <li key={s.etiqueta}>
-                  <s.icono className="h-6 w-6 text-[var(--lpv-fg-3)]" strokeWidth={1.5} aria-hidden />
-                  <p className="lpm-display mt-3 text-[1.75rem] text-[var(--lpv-fg)]">{s.valor}</p>
-                  <p className="mt-1 text-[0.875rem] text-[var(--lpv-fg-3)]">{s.etiqueta}</p>
-                </li>
-              ))}
-            </ul>
+        <div className="px-5 pb-16 pt-7 sm:px-10 lg:px-12 lg:pb-24 lg:pt-24 xl:px-16">
+          {/* El gancho: titular de crédito (o neutro) y el dato de apoyo. */}
+          <h1 className="marca-titular max-w-[22ch] text-[clamp(1.75rem,1.2rem+1.8vw,3rem)] text-[var(--lpv-fg)]">
+            {conCredito ? t.tituloCredito : t.tituloBase}
+          </h1>
+          {apoyo && (
+            <p className="marca-cifra mt-3 max-w-[44ch] text-[clamp(1.0625rem,1rem+0.4vw,1.3125rem)] leading-snug text-[var(--lpv-fg-2)]">
+              {apoyo}.
+            </p>
           )}
 
-          <dl className="mt-7 border-t border-[var(--lpv-line)]">
-            {principal.estacionamientos ? (
-              <div className="grid grid-cols-[9rem_1fr] items-baseline gap-4 border-b border-[var(--lpv-line)] py-3">
-                <dt className="text-[0.9375rem] text-[var(--lpv-fg-3)]">{t.estacionamiento}</dt>
-                <dd className="lpm-display text-[1.125rem] text-[var(--lpv-fg)]">
-                  {principal.estacionamientos} {principal.estacionamientos === 1 ? t.auto[0] : t.auto[1]}
-                </dd>
+          {/* Cómo pagar: en móvil se omite porque el mismo filtro va dentro
+              de la hoja, justo debajo, y así el formulario entra en el
+              primer pliegue. */}
+          {filtroCredito && t.mostrarCreditos && (
+            <div className="mt-6 hidden sm:block">
+              <p className="marca-detalle text-[0.9375rem] text-[var(--lpv-fg-3)]">{t.comoPagar}</p>
+              <div role="group" aria-label={t.comoPagar} className="mt-3 flex flex-wrap gap-2">
+                {filtroCredito.opciones.map((o) => {
+                  const activo = seleccion.credito === o.valor;
+                  return (
+                    <button
+                      key={o.valor}
+                      type="button"
+                      aria-pressed={activo}
+                      onClick={() => {
+                        alternar('credito', o.valor);
+                        irAlFormulario();
+                      }}
+                      className={chipHook(activo)}
+                    >
+                      <BadgeCheck className="h-4 w-4" aria-hidden />
+                      {o.etiqueta}
+                      {casas.length > 1 && <span className="lpv-cifra opacity-70">{o.total}</span>}
+                    </button>
+                  );
+                })}
               </div>
-            ) : null}
-            {principal.enganchePct ? (
-              <div className="grid grid-cols-[9rem_1fr] items-baseline gap-4 border-b border-[var(--lpv-line)] py-3">
-                <dt className="text-[0.9375rem] text-[var(--lpv-fg-3)]">{t.engancheEtiqueta}</dt>
-                <dd className="lpm-display text-[1.125rem] text-[var(--lpv-fg)]">
-                  {principal.enganchePct}%{principal.engancheMxn ? ` · ${mxn(principal.engancheMxn)}` : ''}
-                </dd>
-              </div>
-            ) : null}
-            <div className="grid grid-cols-[9rem_1fr] items-baseline gap-4 border-b border-[var(--lpv-line)] py-3">
-              <dt className="text-[0.9375rem] text-[var(--lpv-fg-3)]">{t.estado}</dt>
-              <dd className="lpm-display inline-flex items-center gap-2 text-[1.125rem] text-[var(--lpv-fg)]">
-                <Key className="h-4 w-4 text-[var(--lpv-fg-3)]" aria-hidden />
-                {estados[principal.estadoComercial]}
-              </dd>
             </div>
-          </dl>
+          )}
 
-          <div className="mt-6">
-            <Creditos casa={principal} t={t} />
-          </div>
-
-          <div id="solicitar" className="mt-12 scroll-mt-6 lg:mt-14">
+          {/* La hoja: vidrio Aztec, en el primer pliegue. */}
+          <div id="solicitar" className="lpme-hoja marca-vidrio mt-6 scroll-mt-6 overflow-hidden sm:mt-8">
             <FormInventario
               source={source}
               variante="hero"
@@ -268,24 +218,85 @@ export default function Catalogo({
               filtros={defs}
               propiedades={casas}
               telefonoWhatsApp={telefonoWhatsApp}
-              className="!p-0"
             />
+          </div>
+
+          {/* La ficha de la casa. */}
+          <div className="mt-12 lg:mt-16">
+            <p className="marca-detalle text-[0.9375rem] text-[var(--lpv-fg-2)]">
+              {t.casaEnVenta.replace('{ubicacion}', ubicacionCorta(principal))}
+            </p>
+            <p className="marca-titular marca-cifra mt-3 whitespace-nowrap text-[clamp(2.25rem,1.2rem+2.6vw,3.75rem)] text-[var(--lpv-fg)]">
+              {principal.precio ? dinero(principal.precio) : t.precioPorConfirmar}
+            </p>
+            <h2 className="lpme-titulo mt-3 max-w-[28ch] text-[clamp(1.25rem,1.05rem+0.9vw,1.75rem)] text-[var(--lpv-fg)]">
+              {principal.titulo}
+            </h2>
+
+            {listaSpecs.length > 0 && (
+              <dl className="marca-vidrio-claro mt-7 grid grid-cols-2 overflow-hidden">
+                {listaSpecs.map((s) => (
+                  <div key={s.etiqueta} className="flex items-center gap-3 border-b border-[rgb(72_115_121/0.12)] px-3.5 py-3.5">
+                    <span className="marca-icono">
+                      <s.icono className="h-6 w-6" strokeWidth={1.5} aria-hidden />
+                    </span>
+                    <div className="min-w-0">
+                      <dt className="sr-only">{s.etiqueta}</dt>
+                      <dd className="marca-cifra text-[1.0625rem] font-semibold leading-tight text-[var(--lpv-fg)]">{s.valor}</dd>
+                      <dd aria-hidden className="text-[0.8125rem] leading-tight text-[var(--lpv-fg-3)]">
+                        {s.etiqueta}
+                      </dd>
+                    </div>
+                  </div>
+                ))}
+              </dl>
+            )}
+
+            <dl className="marca-tarjeta mt-4 px-5 py-1">
+              {principal.estacionamientos ? (
+                <div className="grid grid-cols-[9rem_1fr] items-baseline gap-4 border-b border-[var(--lpv-line)] py-3.5">
+                  <dt className="marca-detalle text-[0.9375rem] text-[var(--lpv-fg-3)]">{t.estacionamiento}</dt>
+                  <dd className="marca-cifra text-[1.0625rem] font-semibold text-[var(--lpv-fg)]">
+                    {principal.estacionamientos} {principal.estacionamientos === 1 ? t.auto[0] : t.auto[1]}
+                  </dd>
+                </div>
+              ) : null}
+              {principal.enganchePct ? (
+                <div className="grid grid-cols-[9rem_1fr] items-baseline gap-4 border-b border-[var(--lpv-line)] py-3.5">
+                  <dt className="marca-detalle text-[0.9375rem] text-[var(--lpv-fg-3)]">{t.engancheEtiqueta}</dt>
+                  <dd className="marca-cifra text-[1.0625rem] font-semibold text-[var(--lpv-fg)]">
+                    {principal.enganchePct}%{principal.engancheMxn ? ` · ${mxn(principal.engancheMxn)}` : ''}
+                  </dd>
+                </div>
+              ) : null}
+              <div className="grid grid-cols-[9rem_1fr] items-baseline gap-4 py-3.5">
+                <dt className="marca-detalle text-[0.9375rem] text-[var(--lpv-fg-3)]">{t.estado}</dt>
+                <dd className="inline-flex items-center gap-2 text-[1.0625rem] font-semibold text-[var(--lpv-fg)]">
+                  <Key className="h-4 w-4 text-[var(--lpv-fg-3)]" aria-hidden />
+                  {estados[principal.estadoComercial]}
+                </dd>
+              </div>
+            </dl>
+
+            <div className="mt-5">
+              <Creditos casa={principal} t={t} />
+            </div>
           </div>
         </div>
       </section>
 
       {/* ══ MOSAICO: todas las fotos de la casa principal, sin rótulos ══ */}
       {fotos.length > 1 && (
-        <section className="lpm-mosaico border-t border-[var(--lpv-line)] bg-[var(--lpv-bg-2)]">
+        <section className="lpme-mosaico bg-[var(--lpv-bg-2)]">
           <div className="mx-auto max-w-[96rem] px-5 py-16 sm:px-8 sm:py-24">
-            <h2 className="lpm-display text-[clamp(1.75rem,1.2rem+2vw,3rem)] text-[var(--lpv-fg)]">
+            <h2 className="marca-titular text-[clamp(1.75rem,1.2rem+2vw,2.75rem)] text-[var(--lpv-fg)]">
               {t.fotos.replace('{n}', String(fotos.length))}
             </h2>
-            <div className="mt-10 grid grid-cols-2 gap-1 md:grid-cols-3">
+            <div className="mt-10 grid grid-cols-2 gap-2 sm:gap-3 md:grid-cols-3">
               {fotos.map((src, i) => (
                 <figure
                   key={src}
-                  className={`relative overflow-hidden bg-[var(--lpv-bg)] ${
+                  className={`relative overflow-hidden rounded-[var(--marca-r-s)] bg-[var(--lpv-bg)] sm:rounded-[var(--marca-r)] ${
                     i === 0 ? 'col-span-2 row-span-2 aspect-square md:aspect-[4/3]' : 'aspect-[4/3]'
                   }`}
                 >
@@ -307,32 +318,41 @@ export default function Catalogo({
       {/* ══ OTRAS CASAS, el aviso de filtro vacío, o la línea de comercializadora ══ */}
       {visibles.length === 0 ? (
         <section className="mx-auto max-w-[60rem] px-5 py-20 text-center sm:px-8 sm:py-28">
-          <p className="lpm-display-ligero text-[clamp(1.375rem,1.1rem+1.4vw,2.25rem)] text-[var(--lpv-fg)]">
+          <p className="lpme-titulo text-[clamp(1.375rem,1.1rem+1.4vw,2.25rem)] text-[var(--lpv-fg)]">
             {t.sinCoincidencias}
           </p>
-          <button type="button" onClick={limpiar} className="lpm-enlace mt-7 inline-block text-[1.0625rem]">
+          <button
+            type="button"
+            onClick={limpiar}
+            className="lpme-chip marca-detalle mt-7 inline-flex min-h-[48px] cursor-pointer items-center rounded-full border px-6 text-[1rem]"
+          >
             {t.quitarFiltros}
           </button>
         </section>
       ) : otras.length > 0 || activos > 0 ? (
         <section className="mx-auto max-w-[96rem] px-5 py-16 sm:px-8 sm:py-24">
-          <div className="flex flex-wrap items-baseline justify-between gap-4">
-            <h2 className="lpm-display text-[clamp(1.75rem,1.2rem+2vw,3rem)] text-[var(--lpv-fg)]">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <h2 className="marca-titular text-[clamp(1.75rem,1.2rem+2vw,2.75rem)] text-[var(--lpv-fg)]">
               {otras.length > 0 ? t.otras : t.unaCoincide}
             </h2>
             {activos > 0 && (
-              <button type="button" onClick={limpiar} className="lpm-enlace text-[0.9375rem]">
+              <button
+                type="button"
+                onClick={limpiar}
+                className="lpme-chip marca-detalle inline-flex min-h-[44px] cursor-pointer items-center rounded-full border px-5 text-[0.9375rem]"
+              >
                 {t.quitarFiltros}
               </button>
             )}
           </div>
           {otras.length > 0 && (
-            <ul className="mt-10 border-t border-[var(--lpv-line-2)]">
+            <ul className="mt-10 grid gap-4">
               {otras.map((casa) => {
                 const lista = specs(casa, t);
+                const esElegida = elegida === casa.slug;
                 return (
-                  <li key={casa.id} className="grid gap-6 border-b border-[var(--lpv-line)] py-8 lg:grid-cols-12">
-                    <figure className="relative aspect-[4/3] bg-[var(--lpv-bg-2)] lg:col-span-4">
+                  <li key={casa.id} className="marca-tarjeta grid gap-6 p-3 lg:grid-cols-12 lg:p-4">
+                    <figure className="relative aspect-[4/3] overflow-hidden rounded-[var(--marca-r)] bg-[var(--lpv-bg-2)] lg:col-span-4">
                       {casa.imagen && (
                         <Image
                           src={casa.imagen}
@@ -343,28 +363,35 @@ export default function Catalogo({
                         />
                       )}
                     </figure>
-                    <div className="lg:col-span-8">
-                      <p className="lpm-display text-[clamp(1.5rem,1.2rem+1.2vw,2.25rem)] text-[var(--lpv-fg)]">
+                    <div className="px-2 pb-3 lg:col-span-8 lg:px-0 lg:py-2">
+                      <p className="marca-titular marca-cifra text-[clamp(1.5rem,1.2rem+1.2vw,2.25rem)] text-[var(--lpv-fg)]">
                         {casa.precio ? dinero(casa.precio) : t.precioPorConfirmar}
                       </p>
-                      <p className="mt-3 text-[1.0625rem] text-[var(--lpv-fg)]">{casa.titulo}</p>
-                      <p className="mt-1 text-[0.9375rem] text-[var(--lpv-fg-3)]">{ubicacionCorta(casa)}</p>
+                      <p className="lpme-titulo mt-3 text-[1.125rem] text-[var(--lpv-fg)]">{casa.titulo}</p>
+                      <p className="marca-detalle mt-1 text-[0.9375rem] text-[var(--lpv-fg-3)]">{ubicacionCorta(casa)}</p>
                       {lista.length > 0 && (
                         <ul className="mt-4 flex flex-wrap gap-x-6 gap-y-3">
                           {lista.map((s) => (
                             <li key={s.etiqueta} className="inline-flex items-center gap-2 text-[var(--lpv-fg-2)]">
-                              <s.icono className="h-5 w-5 text-[var(--lpv-fg-3)]" strokeWidth={1.5} aria-hidden />
-                              <span className="lpm-display text-[1.125rem] text-[var(--lpv-fg)]">{s.valor}</span>
+                              <span className="marca-icono lpme-icono-s">
+                                <s.icono className="h-5 w-5" strokeWidth={1.5} aria-hidden />
+                              </span>
+                              <span className="marca-cifra text-[1.0625rem] font-semibold text-[var(--lpv-fg)]">{s.valor}</span>
                               <span className="text-[0.875rem] text-[var(--lpv-fg-3)]">{s.etiqueta}</span>
                             </li>
                           ))}
                         </ul>
                       )}
-                      <div className="mt-3">
+                      <div className="mt-4">
                         <Creditos casa={casa} t={t} tamano="sm" />
                       </div>
-                      <button type="button" onClick={() => elegir(casa.slug)} className="lpm-enlace mt-5 text-[0.9375rem]">
-                        {elegida === casa.slug ? t.elegida : t.meInteresa}
+                      <button
+                        type="button"
+                        onClick={() => elegir(casa.slug)}
+                        aria-pressed={esElegida}
+                        className={`marca-boton mt-6 cursor-pointer ${esElegida ? 'lpme-boton-elegido' : ''}`}
+                      >
+                        {esElegida ? t.elegida : t.meInteresa}
                       </button>
                     </div>
                   </li>
@@ -374,13 +401,14 @@ export default function Catalogo({
           )}
         </section>
       ) : (
-        <section className="mx-auto max-w-[60rem] px-5 py-20 text-center sm:px-8 sm:py-28">
-          <p className="lpm-display-ligero text-[clamp(1.375rem,1.1rem+1.4vw,2.25rem)] text-[var(--lpv-fg)]">
-            {t.otraOpcion}
-          </p>
-          <a href="#solicitar" className="lpm-enlace mt-7 inline-block text-[1.0625rem]">
-            {t.pedirOtra}
-          </a>
+        <section className="marca-degradado relative overflow-hidden">
+          <div className="marca-reticula" aria-hidden="true" />
+          <div className="relative mx-auto max-w-[60rem] px-5 py-20 text-center sm:px-8 sm:py-28">
+            <p className="lpme-titulo text-[clamp(1.375rem,1.1rem+1.4vw,2.25rem)] text-white">{t.otraOpcion}</p>
+            <a href="#solicitar" className="marca-boton lpme-boton-claro mt-8">
+              {t.pedirOtra}
+            </a>
+          </div>
         </section>
       )}
     </>

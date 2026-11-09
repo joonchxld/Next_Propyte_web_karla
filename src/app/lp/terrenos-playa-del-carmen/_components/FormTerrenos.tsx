@@ -45,6 +45,13 @@ import type { LocaleLp } from '../../_components/v2/i18n';
 // el coste de entrada sigue siendo cero y el asesor abre la conversación
 // sabiendo de qué plan se habla. `tests/lp-terrenos-form.mjs` fija el contrato
 // de marcado que impide que esto vuelva a taparse.
+//
+// ═══ MARCA (9-nov-2026) ═══
+//
+// Solo cambia la piel: vidrio Aztec de marca (`marca-vidrio`), campos de 14 px
+// con filete Aqua, plazos y envío en pastilla (el envío, Aqua con texto
+// Aztec), rótulo en caja normal y sin el ordinal «01/02/03». Fuente del lead,
+// campos, validación, atribución y el disparo a Ads no se tocan.
 // ============================================================
 
 /** Claves de atribución que se leen de la URL. Sin storage: viven en un ref. */
@@ -64,13 +71,6 @@ const CLAVES_URL = [
 ] as const;
 
 type Atribucion = Partial<Record<(typeof CLAVES_URL)[number], string>>;
-
-/** El número que se rotula en la cartela, en orden de documento. */
-const ORDINAL: Record<'hero' | 'medio' | 'cierre', string> = {
-  hero: '01',
-  medio: '02',
-  cierre: '03',
-};
 
 export interface FormTerrenosProps {
   /**
@@ -248,13 +248,13 @@ export default function FormTerrenos({
     return (
       <div
         data-lpt-form={variante}
-        className="lpt-vertice border border-[var(--lpt-caliza-2)] bg-[var(--lpt-caliza)] p-7 sm:p-8"
+        className="lpt-form marca-vidrio p-7 sm:p-8"
       >
-        <p className="lpt-rotulo text-[var(--lpt-estaca-2)]">{f.gracias.rotulo}</p>
-        <p className="lpt-titular mt-3 text-[clamp(1.5rem,1.2rem+1.4vw,2rem)] text-[var(--lpt-tinta)]">
+        <p className="lpt-rotulo">{f.gracias.rotulo}</p>
+        <p className="lpt-titular mt-3 text-[clamp(1.5rem,1.2rem+1.4vw,2rem)] text-white">
           {f.gracias.listo(nombre.trim().split(' ')[0])}
         </p>
-        <p className="lpt-cuerpo mt-4 max-w-[46ch] text-[0.9375rem] leading-relaxed text-[var(--lpt-tinta-2)]">
+        <p className="lpt-cuerpo mt-4 max-w-[46ch] text-[0.9375rem] leading-relaxed text-[rgb(235_253_255/0.8)]">
           {f.gracias.cuerpo(tiempoRespuesta, plazo)}
         </p>
       </div>
@@ -266,20 +266,18 @@ export default function FormTerrenos({
       onSubmit={enviar}
       data-lpt-form={variante}
       noValidate
-      className="lpt-vertice border border-[var(--lpt-caliza-2)] bg-[var(--lpt-caliza)] p-6 shadow-[0_24px_60px_-24px_rgb(0_0_0/0.55)] sm:p-8"
+      className="lpt-form marca-vidrio p-6 sm:p-8"
     >
-      <div className="flex items-baseline justify-between gap-4">
-        <p className="lpt-rotulo text-[var(--lpt-estaca-2)]">
-          {f.solicitud} · {ORDINAL[variante]}
-        </p>
-        <p className="lpt-cota text-[0.6875rem] text-[var(--lpt-tinta-2)]">{f.campos}</p>
+      <div className="flex items-center justify-between gap-4">
+        <p className="lpt-rotulo">{f.solicitud}</p>
+        <p className="marca-pastilla">{f.campos}</p>
       </div>
 
       {/* Una sola promesa en las tres instancias, a propósito: tres titulares
           distintos se leerían como tres ofertas distintas. Lo único que cambia
           es el cuerpo de letra, que sigue al peso del bloque donde vive. */}
       <h2
-        className={`lpt-titular mt-3 text-[var(--lpt-tinta)] ${
+        className={`lpt-titular mt-4 text-white ${
           esHero
             ? 'text-[clamp(1.5rem,1.25rem+1.1vw,1.875rem)]'
             : variante === 'medio'
@@ -292,7 +290,7 @@ export default function FormTerrenos({
 
       {plazos.length > 0 && (
         <fieldset className="mt-6">
-          <legend className="lpt-cota text-[0.6875rem] uppercase tracking-[0.1em] text-[var(--lpt-tinta-2)]">
+          <legend className="lpt-cota text-[0.875rem] text-[rgb(235_253_255/0.8)]">
             {f.plazoPregunta}
           </legend>
           <div className="mt-2.5 flex gap-2">
@@ -304,11 +302,7 @@ export default function FormTerrenos({
                   type="button"
                   onClick={() => setPlazo(m)}
                   aria-pressed={activo}
-                  className={`lpt-cota min-h-11 flex-1 rounded-[var(--lpt-r)] border px-3 text-sm transition-[background-color,border-color,color] duration-200 ${
-                    activo
-                      ? 'border-[var(--lpt-tinta)] bg-[var(--lpt-tinta)] text-[var(--lpt-caliza)]'
-                      : 'border-[var(--lpt-caliza-2)] bg-transparent text-[var(--lpt-tinta-2)] hover:border-[var(--lpt-tinta-2)]'
-                  }`}
+                  className="lpt-cota lpt-plazo"
                 >
                   {f.meses(m)}
                 </button>
@@ -332,7 +326,7 @@ export default function FormTerrenos({
             placeholder={f.nombre}
             value={nombre}
             onChange={(e) => setNombre(e.target.value)}
-            className="lpt-cuerpo min-h-[52px] w-full rounded-[var(--lpt-r)] border border-[var(--lpt-caliza-2)] bg-white px-4 text-[0.9375rem] text-[var(--lpt-tinta)] transition-colors duration-200 placeholder:text-[var(--lpt-tinta-2)]/55 focus:border-[var(--lpt-tinta)]"
+            className="lpt-cuerpo lpt-campo"
           />
         </div>
         <div>
@@ -348,7 +342,7 @@ export default function FormTerrenos({
             placeholder={f.correo}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="lpt-cuerpo min-h-[52px] w-full rounded-[var(--lpt-r)] border border-[var(--lpt-caliza-2)] bg-white px-4 text-[0.9375rem] text-[var(--lpt-tinta)] transition-colors duration-200 placeholder:text-[var(--lpt-tinta-2)]/55 focus:border-[var(--lpt-tinta)]"
+            className="lpt-cuerpo lpt-campo"
           />
         </div>
         <div>
@@ -363,7 +357,7 @@ export default function FormTerrenos({
             placeholder={f.whatsapp}
             defaultCountry={copy.paisTelefono}
             required
-            className="lpt-cota min-h-[52px] w-full rounded-[var(--lpt-r)] border border-[var(--lpt-caliza-2)] bg-white px-4 text-[0.9375rem] text-[var(--lpt-tinta)] transition-colors duration-200 focus-within:border-[var(--lpt-tinta)]"
+            className="lpt-cota lpt-campo"
           />
         </div>
       </div>
@@ -380,7 +374,7 @@ export default function FormTerrenos({
       />
 
       {error && (
-        <p role="alert" className="lpt-cuerpo mt-3 text-sm text-[var(--lpt-estaca-2)]">
+        <p role="alert" className="lpt-cuerpo lpt-error mt-3 text-sm">
           {error}
         </p>
       )}
@@ -388,12 +382,12 @@ export default function FormTerrenos({
       <button
         type="submit"
         disabled={enviando}
-        className="lpt-titular mt-5 min-h-[56px] w-full rounded-[var(--lpt-r)] bg-[var(--lpt-estaca)] px-5 text-[1.0625rem] text-[var(--lpt-tinta)] transition-[background-color,transform] duration-200 hover:bg-[var(--lpt-estaca-2)] hover:text-[var(--lpt-caliza)] active:translate-y-px disabled:opacity-60"
+        className="lpt-enviar mt-5 active:translate-y-px"
       >
         {enviando ? f.enviando : f.enviar}
       </button>
 
-      <p className="lpt-cuerpo mt-3.5 text-[0.8125rem] leading-relaxed text-[var(--lpt-tinta-2)]">
+      <p className="lpt-cuerpo mt-3.5 text-[0.8125rem] leading-relaxed text-[rgb(235_253_255/0.76)]">
         {f.pie(tiempoRespuesta)}
       </p>
     </form>

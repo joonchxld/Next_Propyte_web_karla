@@ -1,118 +1,106 @@
 /* ============================================================
-   Tema de la LP corta de terrenos — variante B del A/B contra
-   /lp/lotes-playa-del-carmen.
+   Tema de la LP corta de terrenos (`.lpt-root`), versión de MARCA
+   (manual oficial de Propyte 2026; ver DESIGN.md y
+   `_components/v2/marca.css`). La raíz lleva `marca lpt-root`.
 
-   ALCANCE: todo vive bajo `.lpt-root`. La LP larga usa `.lp-root` y las dos
-   comparten el layout de `app/lp/`, así que un token sin prefijar se filtraría
-   de una variante a la otra y arruinaría la prueba. Ni un selector de este
-   archivo puede tocar nada fuera de esta ruta.
+   ALCANCE: todo vive bajo `.lpt-root` (o bajo `.lp-root:has(.lpt-root)` para
+   la cabecera compartida). Ni un selector de este archivo toca otra ruta.
 
-   POR QUÉ ESTA PALETA Y NO OTRA. Dos reflejos de categoría, rechazados a
-   propósito:
+   LA COMPOSICIÓN NO CAMBIA (9-nov-2026, «misma marca, otra composición»):
+   hero con foto y el formulario a la altura del titular, el sitio hoy y
+   proyectado, la mensualidad con su interruptor, el lote con su ficha, la
+   privada en láminas con su leyenda, el formulario repetido detrás del
+   mosaico y el cierre. Lo que cambia es la piel:
 
-     · Primer reflejo: Riviera Maya ⇒ turquesa, blanco y palmera. Es el fondo de
-       pantalla de cada anuncio de terrenos del mercado. Ser el sexto turquesa
-       de la página de resultados es ser invisible.
-     · Segundo reflejo: «inmobiliaria que no es turquesa» ⇒ crema con serif
-       editorial. Ese es exactamente el look de la variante A. Repetirlo aquí
-       haría que el A/B midiera ruido en vez de dos propuestas distintas.
-
-   Lo que queda es el material real de la operación: la selva sobre caliza del
-   interior de Playa del Carmen, y el naranja de la estaca con que un topógrafo
-   marca un vértice de lote. La página es una hoja de campo, no un folleto.
-
-   UNA SOLA SUPERFICIE CLARA EN TODA LA PÁGINA: el panel del formulario. En un
-   documento drenado en oscuro, la caliza es el único sitio donde el ojo
-   descansa, y ahí es donde está la conversión. La jerarquía la hace el
-   material, no una flecha.
+     · Se retiran la selva, la caliza y el naranja de estaca, la grotesca
+       ensanchada y la mono. Paleta del manual: Aztec, New Aqua (solo sobre
+       oscuro), Onahau, Water Dew, Dull Teal, Tech White.
+     · Bandas que alternan: Aztec con la retícula de nodos (hero, mensualidad,
+       segunda solicitud), Tech White / Water Dew para las láminas y la ficha,
+       y el degradado de marca en el cierre.
+     · Esquinas redondeadas (14 / 22 / 28 px) y pastillas para todo lo que se
+       pulsa. Ningún rótulo en mayúsculas con tracking ni numeración 01/02/03.
+     · El formulario es vidrio Aztec con el envío en pastilla Aqua.
    ============================================================ */
 
 .lpt-root {
-  /* Selva sobre caliza. Verde desaturado y CÁLIDO: un gris-verde frío haría
-     que la fotografía de hora dorada se leyera pegada encima, no dentro. */
-  --lpt-abismo: oklch(0.14 0.018 155);
-  --lpt-selva: oklch(0.19 0.022 155);
-  --lpt-selva-2: oklch(0.245 0.024 155);
-
-  /* Retícula del plano. Dos pesos: la trama de fondo y la cota que sí se lee. */
-  --lpt-linea: oklch(0.96 0.01 85 / 0.1);
-  --lpt-linea-fuerte: oklch(0.96 0.01 85 / 0.26);
-
-  /* Caliza: la ÚNICA superficie clara. Reservada al formulario. */
-  --lpt-caliza: oklch(0.965 0.008 85);
-  --lpt-caliza-2: oklch(0.925 0.01 85);
-  --lpt-tinta: oklch(0.21 0.015 155);
-  --lpt-tinta-2: oklch(0.44 0.012 155);
-
-  /* Texto sobre oscuro. Nunca blanco puro: aplana la profundidad. */
-  --lpt-claro: oklch(0.95 0.008 90);
-  --lpt-claro-2: oklch(0.95 0.008 90 / 0.66);
-  --lpt-claro-3: oklch(0.95 0.008 90 / 0.42);
-
-  /* ACENTO ÚNICO: naranja de estaca de topógrafo.
-     Sobre --lpt-selva da 8.4:1. La tinta encima da 7.9:1, así que el botón
-     sólido va con texto OSCURO: más contraste que el blanco y además lo
-     distingue del CTA naranja-con-blanco que usa todo el sector. */
-  --lpt-estaca: oklch(0.755 0.17 58);
-  --lpt-estaca-2: oklch(0.68 0.18 52);
-
-  /* Verde de WhatsApp: marca de un tercero, no se repinta. */
-  --lpt-wa: #25d366;
-
-  /* Radios: 4px en controles, 0 en bloques. Una hoja de campo no tiene
-     esquinas redondeadas; los controles sí, porque se tocan. */
-  --lpt-r: 4px;
+  background: var(--marca-tech);
+  color: var(--marca-aztec);
 }
 
-/* Trama del plano de lotificación. Va en el fondo de las bandas oscuras.
-   Es CSS puro: cero nodos, cero imágenes, cero coste de red. */
-.lpt-plano {
-  background-image:
-    linear-gradient(to right, var(--lpt-linea) 1px, transparent 1px),
-    linear-gradient(to bottom, var(--lpt-linea) 1px, transparent 1px);
-  background-size: 56px 56px;
-  background-position: center;
-}
-
-/* Cotas y cifras medidas. Mono con cifras tabulares: las columnas de dinero
-   tienen que cuadrar verticalmente o la tabla deja de leerse como una tabla. */
-.lpt-cota {
-  font-family: var(--font-lpt-mono), ui-monospace, "Cascadia Mono", monospace;
-  font-variant-numeric: tabular-nums;
-  font-feature-settings: "tnum" 1;
-}
-
-/* Voz de titular: la grotesca ensanchada. El eje de ancho es lo que da el
-   carácter de rotulación de plano; sin él es una sans más. */
-.lpt-titular {
-  font-family: var(--font-lpt-sans), ui-sans-serif, system-ui, sans-serif;
-  font-stretch: 112%;
-  font-weight: 700;
-  letter-spacing: -0.028em;
-  line-height: 0.94;
+/* Titulares: Inter 500 de marca. */
+.lpt-root .lpt-titular {
+  font-family: var(--marca-display);
+  font-weight: 500;
+  letter-spacing: -0.035em;
+  line-height: 1.02;
   text-wrap: balance;
 }
 
-.lpt-cuerpo {
-  font-family: var(--font-lpt-sans), ui-sans-serif, system-ui, sans-serif;
+/* Titular corto de dato (valores de la ficha): interlínea de lectura. */
+.lpt-root .lpt-titular.lpt-titular-corto {
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.lpt-root .lpt-cuerpo {
+  font-family: var(--marca-texto);
   text-wrap: pretty;
 }
 
-/* Rótulo de sección: mayúsculas cortas con guía. Se usa UNA vez por sección y
-   siempre acompañado de su número de referencia, como la leyenda de un plano.
-   Sin el número sería el rotulito genérico que lleva toda landing generada. */
-.lpt-rotulo {
-  font-family: var(--font-lpt-mono), ui-monospace, monospace;
-  font-size: 0.6875rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
+/* Cifras y detalles: Space Grotesk con cifras tabulares (no mono). */
+.lpt-root .lpt-cota {
+  font-family: var(--marca-detalle);
+  font-variant-numeric: tabular-nums lining-nums;
+  letter-spacing: 0;
+}
+
+/* Rótulo de sección: detalle en caja normal, sin número de referencia. Sobre
+   claro en Dull Teal; sobre oscuro en Onahau. */
+.lpt-root .lpt-rotulo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--marca-detalle);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--marca-teal);
+}
+
+.lpt-root .marca-oscura .lpt-rotulo,
+.lpt-root .lpt-form .lpt-rotulo {
+  color: var(--marca-onahau);
+}
+
+.lpt-root .lpt-rotulo::before {
+  content: '';
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+/* Banda oscura con retícula: la capa de nodos va detrás del contenido. */
+.lpt-root .lpt-banda {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.lpt-root .lpt-banda > .marca-reticula {
+  z-index: -1;
+}
+
+.lpt-root .marca-oscura :focus-visible {
+  outline-color: var(--marca-aqua);
 }
 
 /* ── Entrada del primer pliegue ─────────────────────────────────────────────
    SOLO transform, jamás opacity. El H1 es el elemento del LCP de una página
    que se paga por clic: un fundido lo retrasa, y un `opacity:0` que se atasque
-   —por JS caído, por hidratación fallida— la deja sin titular para siempre.
-   Mover es gratis y no puede dejar nada invisible. */
+   lo deja sin titular para siempre. */
 @keyframes lpt-subir {
   from {
     transform: translate3d(0, 20px, 0);
@@ -122,12 +110,11 @@
   }
 }
 
-.lpt-entra {
+.lpt-root .lpt-entra {
   animation: lpt-subir 0.85s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-/* La retícula sí puede fundirse: es decoración, y si se queda a cero no falta
-   ninguna información. */
+/* La retícula sí puede fundirse: es decoración. */
 @keyframes lpt-trama {
   from {
     opacity: 0;
@@ -137,37 +124,25 @@
   }
 }
 
-.lpt-entra-trama {
+.lpt-root .lpt-entra-trama {
   animation: lpt-trama 1.6s ease-out both;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .lpt-entra,
-  .lpt-entra-trama {
+  .lpt-root .lpt-entra,
+  .lpt-root .lpt-entra-trama {
     animation: none;
   }
 }
 
-/* ── Entrada de las láminas del mosaico ─────────────────────────────────────
-   MISMA REGLA QUE EL H1, APLICADA A LAS IMÁGENES: nada que dependa de JS para
-   ser visible.
-
-   `Reveal` y `Escalonado` (framer-motion) sirven `initial={{opacity:0}}`, así
-   que el cero viaja en el HTML del servidor y lo levanta un observer en el
-   cliente. Para un párrafo es un riesgo aceptable. Para las diez láminas de la
-   sección de la privada no lo es: son lo único que la persona vino a ver, y un
-   JS que no carga las deja en blanco.
-
-   Esto lo conduce el SCROLL, no un observer: `animation-timeline: view()` ata
-   el progreso de la animación a la posición del elemento en el viewport. No
-   hay estado que se pueda atascar. Y va dentro de un `@supports`, así que en
-   el navegador que no lo soporta la lámina no arranca a cero: se ve, sin más.
-   `animation-range` la deja terminada bien antes del centro de la pantalla,
-   para que nadie tenga que esperar a que su imagen acabe de aparecer. */
+/* ── Entrada de las láminas ─────────────────────────────────────────────────
+   Conducida por el SCROLL (`animation-timeline: view()`), no por un observer:
+   no hay estado que se pueda atascar en cero, y donde el navegador no lo
+   soporta la lámina simplemente se ve. */
 @keyframes lpt-lamina {
   from {
     opacity: 0;
-    transform: translate3d(0, 18px, 0);
+    transform: translate3d(0, 24px, 0);
   }
   to {
     opacity: 1;
@@ -177,7 +152,7 @@
 
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
-    .lpt-lamina-entra {
+    .lpt-root .lpt-lamina-entra {
       animation: lpt-lamina 1ms linear both;
       animation-timeline: view();
       animation-range: entry 4% cover 20%;
@@ -185,56 +160,258 @@
   }
 }
 
-/* Marca de esquina: la escuadra naranja del vértice de un lote. Es el motivo
-   que se repite en toda la página en vez de un icono redondeado por bloque. */
-.lpt-vertice {
+/* ── Láminas ────────────────────────────────────────────────────────────────
+   Imagen en esquina de 22 px dentro de una placa blanca de 28 px; la cartela
+   va sobre un velo Aztec local, así que el número de figura puede ir en Aqua. */
+.lpt-root .lpt-placa {
+  background: #ffffff;
+  border-radius: var(--marca-r-l);
+  padding: 0.5rem;
+  box-shadow: 0 1px 2px rgb(10 28 30 / 0.05), 0 18px 40px -28px rgb(10 28 30 / 0.35);
+}
+
+@media (min-width: 1024px) {
+  .lpt-root .lpt-placa {
+    padding: 0.625rem;
+  }
+}
+
+.lpt-root .lpt-imagen {
+  border-radius: var(--marca-r);
+  overflow: hidden;
+  background: var(--marca-night);
+}
+
+.lpt-root .lpt-cartela-fig {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.5rem;
+  padding: 0 0.6rem;
+  border-radius: 999px;
+  background: rgb(10 28 30 / 0.7);
+  color: var(--marca-aqua);
+  box-shadow: inset 0 0 0 1px rgb(162 249 255 / 0.3);
+}
+
+/* ── Datos ──────────────────────────────────────────────────────────────── */
+
+/* Tabla de datos: vidrio claro Water Dew. */
+.lpt-root .lpt-tabla {
+  background: var(--marca-dew);
+  border: 1px solid rgb(72 115 121 / 0.14);
+  border-radius: var(--marca-r-s);
+}
+
+/* Panel oscuro dentro de una banda Aztec (reparto del plan). */
+.lpt-root .lpt-panel-oscuro {
+  background: rgb(21 43 46 / 0.72);
+  border: 1px solid rgb(162 249 255 / 0.18);
+  border-radius: var(--marca-r);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Interruptor de plazo: grupo de pastillas sobre Aztec. */
+.lpt-root .lpt-interruptor {
+  display: inline-flex;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  border-radius: 999px;
+  background: rgb(21 43 46 / 0.8);
+  box-shadow: inset 0 0 0 1px rgb(162 249 255 / 0.22);
+}
+
+.lpt-root .lpt-interruptor button {
+  min-height: 44px;
+  padding: 0 1.25rem;
+  border-radius: 999px;
+  color: rgb(255 255 255 / 0.82);
+  transition: background-color 200ms ease, color 200ms ease;
+  cursor: pointer;
+}
+
+.lpt-root .lpt-interruptor button:hover {
+  color: #ffffff;
+}
+
+.lpt-root .lpt-interruptor button[aria-pressed='true'] {
+  background: var(--marca-aqua);
+  color: var(--marca-aztec);
+}
+
+/* ── Formulario: vidrio Aztec ────────────────────────────────────────────── */
+
+.lpt-root .lpt-form {
   position: relative;
+  color: #ffffff;
 }
 
-.lpt-vertice::before,
-.lpt-vertice::after {
-  content: "";
-  position: absolute;
-  width: 10px;
-  height: 10px;
-  border-color: var(--lpt-estaca);
-  border-style: solid;
-  pointer-events: none;
+.lpt-root .lpt-form .lpt-campo {
+  min-height: 52px;
+  width: 100%;
+  padding: 0 1rem;
+  border: 1px solid rgb(162 249 255 / 0.24);
+  border-radius: var(--marca-r-s);
+  background: rgb(255 255 255 / 0.05);
+  color: #ffffff;
+  font-size: 0.9375rem;
+  transition: border-color 200ms ease, background-color 200ms ease;
 }
 
-.lpt-vertice::before {
-  top: -1px;
-  left: -1px;
-  border-width: 1.5px 0 0 1.5px;
+.lpt-root .lpt-form .lpt-campo::placeholder {
+  color: rgb(235 253 255 / 0.72);
 }
 
-.lpt-vertice::after {
-  bottom: -1px;
-  right: -1px;
-  border-width: 0 1.5px 1.5px 0;
+.lpt-root .lpt-form .lpt-campo:hover {
+  border-color: rgb(162 249 255 / 0.45);
 }
 
-/* El foco nunca se hereda del navegador en superficie oscura: se pierde. */
-.lpt-root :focus-visible {
-  outline: 2px solid var(--lpt-estaca);
-  outline-offset: 2px;
+.lpt-root .lpt-form .lpt-campo:focus,
+.lpt-root .lpt-form .lpt-campo:focus-within {
+  border-color: var(--marca-aqua);
+  background: rgb(255 255 255 / 0.08);
+  outline: 0;
 }
 
-/* ── El banner de cookies, retintado SOLO en esta variante ──────────────────
-   `ConsentBannerLp` vive en el layout compartido de /lp, fuera de `.lpt-root`,
-   así que se pinta con los tokens de la variante A: terracota. Sobre esta
-   página salía un botón rojo compitiendo con el naranja del CTA, y en el mismo
-   pliegue.
+/* El selector de lada pinta el placeholder a 0.4: sobre Aztec no llega a
+   4.5:1. Y sus opciones nativas se abren sobre blanco: tinta oscura. */
+.lpt-root .lpt-form .PhoneInputInput::placeholder {
+  color: rgb(235 253 255 / 0.72);
+  opacity: 1;
+}
 
-   El problema no era solo que chocara de color. Era jerárquico: el botón más
-   saturado de la pantalla decía «Aceptar» cookies, no «Ver mi plan de pagos».
-   Aquí el banner se vuelve TINTA NEUTRA. Sigue siendo perfectamente legible y
-   accionable —hace falta que se acepte, porque sin consentimiento la conversión
-   no se atribuye en Ads— pero deja de disputarle el ojo a la conversión.
+.lpt-root .lpt-form .PhoneInputCountrySelect {
+  color: var(--marca-aztec);
+}
 
-   `:has()` acota el retinte a las páginas que montan `.lpt-root`: la variante A
-   no se entera de que este archivo existe. */
+.lpt-root .lpt-form .PhoneInputCountrySelectArrow {
+  color: var(--marca-onahau);
+  opacity: 0.8;
+}
+
+.lpt-root .lpt-form .lpt-campo:-webkit-autofill,
+.lpt-root .lpt-form .lpt-campo:-webkit-autofill:hover,
+.lpt-root .lpt-form .lpt-campo:-webkit-autofill:focus,
+.lpt-root .lpt-form .PhoneInputInput:-webkit-autofill {
+  -webkit-text-fill-color: #ffffff;
+  -webkit-box-shadow: 0 0 0 1000px #13282b inset;
+  caret-color: #ffffff;
+  transition: background-color 9999s ease-in-out 0s;
+}
+
+.lpt-root .lpt-form .lpt-plazo {
+  min-height: 44px;
+  flex: 1 1 0;
+  padding: 0 0.75rem;
+  border: 1px solid rgb(162 249 255 / 0.26);
+  border-radius: 999px;
+  color: rgb(255 255 255 / 0.85);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease;
+}
+
+.lpt-root .lpt-form .lpt-plazo:hover {
+  border-color: var(--marca-aqua);
+  color: #ffffff;
+}
+
+.lpt-root .lpt-form .lpt-plazo[aria-pressed='true'] {
+  background: var(--marca-aqua);
+  border-color: var(--marca-aqua);
+  color: var(--marca-aztec);
+}
+
+.lpt-root .lpt-form :focus-visible {
+  outline: 2px solid var(--marca-aqua);
+  outline-offset: 3px;
+}
+
+/* Envío: pastilla Aqua con texto Aztec, blanca al pasar. */
+.lpt-root .lpt-enviar {
+  min-height: 56px;
+  width: 100%;
+  padding: 0 1.25rem;
+  border-radius: 999px;
+  background: var(--marca-aqua);
+  color: var(--marca-aztec);
+  font-family: var(--marca-texto);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 200ms ease;
+}
+
+.lpt-root .lpt-enviar:hover:not(:disabled) {
+  background: #ffffff;
+}
+
+.lpt-root .lpt-enviar:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+/* Aviso de error sobre oscuro (DESIGN.md: #ffb4a8). */
+.lpt-root .lpt-error {
+  color: #ffb4a8;
+}
+
+/* Salida a WhatsApp: pastilla de contorno sobre oscuro. */
+.lpt-root .lpt-wa {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 52px;
+  padding: 0 1.4rem;
+  border: 1px solid rgb(162 249 255 / 0.3);
+  border-radius: 999px;
+  color: rgb(255 255 255 / 0.88);
+  font-size: 0.9375rem;
+  transition: border-color 200ms ease, color 200ms ease;
+}
+
+.lpt-root .lpt-wa:hover {
+  border-color: var(--marca-aqua);
+  color: #ffffff;
+}
+
+/* Botón de la barra móvil: pastilla Aqua. */
+.lpt-root .lpt-cta {
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+  padding: 0 1.25rem;
+  border-radius: 999px;
+  background: var(--marca-aqua);
+  color: var(--marca-aztec);
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lpt-root .lpt-interruptor button,
+  .lpt-root .lpt-form .lpt-campo,
+  .lpt-root .lpt-form .lpt-plazo,
+  .lpt-root .lpt-enviar,
+  .lpt-root .lpt-wa {
+    transition: none;
+  }
+}
+
+/* ── Cabecera y banner compartidos ──────────────────────────────────────────
+   La página abre sobre foto con velo Aztec: logo blanco, rótulo lateral en
+   caja normal. El banner de cookies (fuera de `.lpt-root`) se retinta a
+   Aztec para no disputarle el ojo al envío Aqua. */
 .lp-root:has(.lpt-root) {
-  --lp-accent: oklch(0.21 0.015 155);
-  --lp-accent-strong: oklch(0.3 0.018 155);
+  background: #0a1c1e;
+  --lp-accent: #0a1c1e;
+  --lp-accent-strong: #2e4f52;
+}
+
+.lp-root:has(.lpt-root) header img {
+  filter: drop-shadow(0 1px 10px rgb(0 0 0 / 0.35));
+}
+
+.lp-root:has(.lpt-root) header span {
+  color: rgb(235 253 255 / 0.85);
 }

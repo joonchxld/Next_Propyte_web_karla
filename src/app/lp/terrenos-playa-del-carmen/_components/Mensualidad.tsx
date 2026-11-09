@@ -25,6 +25,10 @@ import type { LocaleLp } from '../../_components/v2/i18n';
 // y que el total de mensualidades sea exactamente su parte del precio. Si algo
 // no cuadra, la frase no se publica y las cifras sí. Un dato menos, nunca un
 // dato falso.
+//
+// MARCA (9-nov-2026): vive en una banda Aztec. El interruptor es un grupo de
+// pastillas (la elegida en Aqua), la cifra va en New Aqua y el reparto es una
+// barra en pastilla dentro de un panel oscuro redondeado.
 // ============================================================
 
 const MXN = new Intl.NumberFormat('es-MX', {
@@ -127,11 +131,7 @@ export default function Mensualidad({
     <div className="grid gap-10 lg:grid-cols-[1fr_auto] lg:items-end lg:gap-16">
       <div>
         {plan.opciones.length > 1 && (
-          <div
-            role="group"
-            aria-label={copy.grupoAria}
-            className="inline-flex border border-[var(--lpt-linea-fuerte)]"
-          >
+          <div role="group" aria-label={copy.grupoAria} className="lpt-interruptor">
             {plan.opciones.map((o, i) => {
               const activo = i === idx;
               return (
@@ -140,11 +140,7 @@ export default function Mensualidad({
                   type="button"
                   onClick={() => setIdx(i)}
                   aria-pressed={activo}
-                  className={`lpt-cota min-h-11 px-5 text-sm transition-colors duration-200 ${
-                    activo
-                      ? 'bg-[var(--lpt-estaca)] text-[var(--lpt-tinta)]'
-                      : 'text-[var(--lpt-claro-2)] hover:text-[var(--lpt-claro)]'
-                  }`}
+                  className="lpt-cota text-sm"
                 >
                   {copy.plazo(o.meses)}
                 </button>
@@ -153,27 +149,27 @@ export default function Mensualidad({
           </div>
         )}
 
-        <p className="lpt-cota mt-8 text-xs uppercase tracking-[0.14em] text-[var(--lpt-claro-3)]">
+        <p className="lpt-cota mt-8 text-[0.9375rem] text-[var(--marca-onahau)]">
           {copy.tuMensualidad}
         </p>
 
         {/* La cifra. Es el elemento más grande de la página después del H1, y
             eso es deliberado: es la respuesta a la pregunta que trajo a esta
             persona desde el anuncio. */}
-        <p className="lpt-titular mt-1 text-[clamp(2.75rem,1.5rem+5.6vw,5.25rem)] text-[var(--lpt-estaca)]">
-          <CifraMorfa valor={opcion.mensualidadMxn} />
+        <p className="lpt-titular mt-1 text-[clamp(2.75rem,1.5rem+5.6vw,5.25rem)]">
+          <CifraMorfa valor={opcion.mensualidadMxn} className="marca-acento marca-cifra" />
         </p>
 
-        <p className="lpt-cuerpo mt-3 max-w-[44ch] text-[0.9375rem] leading-relaxed text-[var(--lpt-claro-2)]">
+        <p className="lpt-cuerpo mt-3 max-w-[44ch] text-[0.9375rem] leading-relaxed text-[rgb(235_253_255/0.8)]">
           {copy.pagos(opcion.pagos, sinInteresesVerificado)}
         </p>
       </div>
 
       {/* La regla del 20/60/20. Es un plano de pagos, no una tarjeta: tres
           tramos de una misma línea, con su cota debajo. */}
-      <div className="w-full lg:w-[26rem]">
+      <div className="lpt-panel-oscuro w-full p-5 sm:p-6 lg:w-[27rem]">
         <div
-          className="flex h-2 w-full overflow-hidden bg-[var(--lpt-linea)]"
+          className="flex h-2.5 w-full gap-1 overflow-hidden rounded-full"
           role="img"
           aria-label={copy.repartoAria(
             tramos.map((t) => `${t.etiqueta} ${t.pct}%`).join(', '),
@@ -182,26 +178,25 @@ export default function Mensualidad({
           {tramos.map((t, i) => (
             <span
               key={t.etiqueta}
-              className="block h-full transition-[flex-grow] duration-500"
+              className="block h-full rounded-full transition-[flex-grow] duration-500 motion-reduce:transition-none"
               style={{
                 flexGrow: t.pct,
-                backgroundColor:
-                  i === 1 ? 'var(--lpt-estaca)' : 'var(--lpt-claro-3)',
+                backgroundColor: i === 1 ? 'var(--marca-aqua)' : 'rgb(204 255 255 / 0.4)',
               }}
             />
           ))}
         </div>
 
-        <dl className="mt-5 divide-y divide-[var(--lpt-linea)]">
+        <dl className="mt-4 divide-y divide-[rgb(162_249_255/0.14)]">
           {tramos.map((t) => (
             <div key={t.etiqueta} className="flex items-baseline justify-between gap-4 py-3">
-              <dt className="lpt-cuerpo text-sm text-[var(--lpt-claro-2)]">
+              <dt className="lpt-cuerpo text-sm text-[rgb(235_253_255/0.82)]">
                 {t.etiqueta}{' '}
-                <span className="lpt-cota text-[var(--lpt-claro-3)]">
+                <span className="lpt-cota text-[rgb(204_255_255/0.7)]">
                   {Math.round(t.pct)}% · {t.momento}
                 </span>
               </dt>
-              <dd className="lpt-cota shrink-0 text-sm text-[var(--lpt-claro)]">{fmt(t.mxn)}</dd>
+              <dd className="lpt-cota shrink-0 text-sm font-medium text-white">{fmt(t.mxn)}</dd>
             </div>
           ))}
         </dl>

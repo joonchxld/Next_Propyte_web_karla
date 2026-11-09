@@ -10,6 +10,9 @@ import { COPY } from '../_copy';
 // ============================================================
 // El gancho de la portada (30-oct-2026): «dinos presupuesto y ciudad».
 //
+// Marca (9-nov-2026): presupuesto en pastillas y el índice en filas-pastilla
+// sobre la banda Aztec; la lógica no cambia.
+//
 // El índice de capítulos ya existía como tabla de contenido; ahora ES el
 // filtro de ciudad: tocar una ciudad deja solo su capítulo y baja a él. Los
 // conteos del índice responden al presupuesto elegido, así la persona ve
@@ -48,7 +51,7 @@ export default function FiltrosPortada({
     <div className="mt-6 max-w-[34rem]">
       {presupuesto && (
         <div role="group" aria-label={presupuesto.etiqueta}>
-          <p className="text-[0.9375rem] text-[var(--lpv-fg-2)]">{presupuesto.etiqueta}</p>
+          <p className="marca-detalle text-[0.9375rem] font-medium text-white/80">{presupuesto.etiqueta}</p>
           <div className="mt-3 flex flex-wrap gap-2">
             {presupuesto.opciones.map((o) => {
               const activo = seleccion.presupuesto === o.valor;
@@ -62,7 +65,7 @@ export default function FiltrosPortada({
                   className={`lpd-chip ${activo ? 'lpd-chip-activo' : ''}`}
                 >
                   {o.etiqueta}
-                  <span className="lpv-cifra opacity-60">{n}</span>
+                  <span className="marca-cifra opacity-70">{n}</span>
                 </button>
               );
             })}
@@ -77,8 +80,8 @@ export default function FiltrosPortada({
             aria-pressed={ciudadActiva === TODAS}
             onClick={() => elegir('ubicacion', null, true)}
           >
-            <span className="lpd-serif text-[clamp(1.75rem,1.2rem+2vw,2.75rem)]">{t.portada.todasCiudades}</span>
-            <span className="text-[0.9375rem] text-[var(--lpv-fg-2)]">
+            <span className="lpd-indice-ciudad">{t.portada.todasCiudades}</span>
+            <span className="lpd-indice-n">
               {plural(soloPresupuesto.length, ...t.departamento)}
             </span>
           </button>
@@ -92,8 +95,8 @@ export default function FiltrosPortada({
                 disabled={n === 0}
                 onClick={() => elegir('ubicacion', o.valor, true)}
               >
-                <span className="lpd-serif text-[clamp(1.75rem,1.2rem+2vw,2.75rem)]">{o.etiqueta}</span>
-                <span className="text-[0.9375rem] text-[var(--lpv-fg-2)]">
+                <span className="lpd-indice-ciudad">{o.etiqueta}</span>
+                <span className="lpd-indice-n">
                   {n === 0 ? t.portada.ningunoEnPresupuesto : plural(n, ...t.departamento)}
                 </span>
               </button>

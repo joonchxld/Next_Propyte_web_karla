@@ -66,7 +66,8 @@ export function numerarLaminas(imagenes: ImagenesLanding): IndiceLaminas {
   for (const clave of ORDEN_LAMINAS) {
     if (imagenes[clave]) {
       n += 1;
-      indice[clave] = `FIG. ${String(n).padStart(2, '0')}`;
+      // «Fig.» y no «FIG.»: regla de caja normal de la marca (9-nov-2026).
+      indice[clave] = `Fig. ${String(n).padStart(2, '0')}`;
     }
   }
   return indice;

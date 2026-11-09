@@ -21,6 +21,11 @@ import type { ImagenLanding } from '@/lib/supabase/lp-lotes';
 // es, y la escuadra naranja de vértice que ya marca el panel del formulario.
 // Esquina viva, cero radio: el tema lo declara para todo bloque.
 //
+// MARCA (9-nov-2026): la lámina deja la esquina viva y la escuadra naranja.
+// Ahora es una placa blanca de 28 px con la imagen a 22 px, y la cartela va
+// sobre un velo Aztec local: número de figura en pastilla Aqua (Aqua solo
+// sobre oscuro) y rótulo en caja normal. Vive siempre sobre fondo claro.
+//
 // El prefijo «Render del desarrollador» lo pone el componente, no quien lo
 // llama. Doce renders y una fotografía real conviven en esta página; si el
 // rótulo lo escribiera cada llamada, en algún sitio se suavizaría.
@@ -52,10 +57,8 @@ export default function FiguraTerrenos({
   conPie?: boolean;
 }) {
   return (
-    <figure className={className}>
-      <div
-        className={`lpt-vertice relative overflow-hidden border border-[var(--lpt-linea-fuerte)] bg-[var(--lpt-abismo)] ${aspecto}`}
-      >
+    <figure className={`lpt-placa ${className}`}>
+      <div className={`lpt-imagen relative ${aspecto}`}>
         <Image
           src={imagen.url}
           alt={imagen.alt}
@@ -72,21 +75,17 @@ export default function FiguraTerrenos({
             capa a pantalla completa: no toca el centro de la imagen. */}
         <div
           aria-hidden="true"
-          className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[var(--lpt-abismo)] via-[var(--lpt-abismo)]/70 to-transparent"
+          className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[rgb(10_28_30/0.85)] via-[rgb(10_28_30/0.5)] to-transparent"
         />
-        <div className="absolute inset-x-0 bottom-0 flex items-baseline gap-3 px-4 pb-3">
-          <span className="lpt-cota text-[0.625rem] tracking-[0.14em] text-[var(--lpt-estaca)]">
-            {lamina}
-          </span>
-          <span className="lpt-cota text-[0.6875rem] uppercase tracking-[0.1em] text-[var(--lpt-claro)]">
-            {rotulo}
-          </span>
+        <div className="absolute inset-x-0 bottom-0 flex items-center gap-2.5 px-3 pb-3 sm:px-4">
+          <span className="lpt-cota lpt-cartela-fig shrink-0 text-[0.75rem]">{lamina}</span>
+          <span className="lpt-cota min-w-0 truncate text-[0.875rem] font-medium text-white">{rotulo}</span>
         </div>
       </div>
 
       {conPie && (
-        <figcaption className="lpt-cuerpo mt-2.5 max-w-[52ch] text-[0.75rem] leading-relaxed text-[var(--lpt-claro-3)]">
-          <span className="text-[var(--lpt-claro-2)]">{prefijo[imagen.tipo]}</span>{' '}
+        <figcaption className="lpt-cuerpo max-w-[52ch] px-2 pb-1.5 pt-3 text-[0.8125rem] leading-relaxed text-[var(--marca-slate)]">
+          <span className="font-medium text-[var(--marca-aztec)]">{prefijo[imagen.tipo]}</span>{' '}
           {imagen.caption}
         </figcaption>
       )}

@@ -63,7 +63,7 @@ export default function LicenciaDesarrollo({
             },
           ].map((c) => (
             <div key={c.etiqueta}>
-              <dt className="text-[0.6875rem] uppercase tracking-[0.08em] text-white/40">
+              <dt className="lp-rotulo text-white/65">
                 {c.etiqueta}
               </dt>
               <dd className="mt-1.5 font-mono text-sm text-white/85">{c.valor}</dd>

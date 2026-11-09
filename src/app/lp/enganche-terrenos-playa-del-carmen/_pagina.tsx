@@ -1,5 +1,4 @@
 import Image from 'next/image';
-import localFont from 'next/font/local';
 import { getLotePlayaDelCarmen } from '@/lib/supabase/lp-lotes';
 import { FALLBACK_WHATSAPP } from '@/lib/site-contact';
 import FormEnganche from './_components/FormEnganche';
@@ -12,6 +11,7 @@ import { mxn, m2 } from './_components/formato';
 import { rich } from './_components/rich';
 import { COPY, localizarImagen } from './_copy';
 import type { LocaleLp } from '../_components/v2/i18n';
+import '../_components/v2/marca.css';
 import './lpe-theme.css';
 
 // ============================================================
@@ -50,17 +50,13 @@ import './lpe-theme.css';
 //
 // ═══ DE DÓNDE SALE EL ESTILO ═══
 //
-// Se pidió copiar el estilo completo de la landing de la competencia que sí
-// convierte (Ciudad Mayakoba / Bosques). Se midió la página real en el
-// navegador, no se copió de memoria: Poppins en 205 nodos, serif en itálica
-// para la palabra de acento, blanco dominante, `border-radius: 32px` en 79
-// nodos, un verde saturado para CTA y otro pálido para paneles, titular a 48 px
-// en peso 400, y 86 imágenes en 15 secciones.
-//
-// Todo eso está reproducido aquí. Lo que NO se copia —logotipo, fotografías,
-// textos y el verde de su marca— y por qué eso no es un detalle está explicado
-// en la cabecera de `lpe-theme.css`. El color sale de la paleta canónica de
-// Propyte.
+// La COMPOSICIÓN viene de la landing de un competidor que convierte (cápsula
+// de foto en banda oscura, declaración centrada, desglose, galería en
+// cápsulas, formulario repetido). La PIEL es la marca oficial de Propyte
+// (noviembre-2026, «misma marca, otra composición»): paleta del manual, Inter /
+// DM Sans / Space Grotesk, rótulos en caja normal, retícula de nodos en las
+// bandas Aztec y el formulario del hero en vidrio oscuro con CTA New Aqua. Ver
+// DESIGN.md, `_components/v2/marca.css` y la cabecera de `lpe-theme.css`.
 //
 // ═══ LO QUE NO CAMBIA, PARA QUE LAS TRES SE PUEDAN COMPARAR ═══
 //
@@ -91,29 +87,10 @@ import './lpe-theme.css';
 // ============================================================
 
 /**
- * Poppins: la geométrica del estilo copiado. Es la decisión tipográfica más
- * visible de la página y no es casual — en la landing de referencia sostiene
- * 205 nodos de texto. Se cargan cuatro pesos porque el estilo depende del
- * CONTRASTE entre un titular ligero (400) y la cifra (600), no de un solo peso
- * medio para todo.
- *
- * La serif en itálica de los acentos NO se declara aquí: es `--font-lp-display`
- * (Newsreader), que el layout compartido de `/lp` ya carga con su itálica. El
- * acento cuesta cero bytes de red en una página que se paga por clic.
- *
- * Autoalojada, no next/font/google: el porqué está en src/app/layout.tsx.
+ * Tipografía: la de la marca (Inter, DM Sans y Space Grotesk), que ya carga el
+ * layout raíz. Antes se cargaba Poppins aquí para copiar el estilo de un
+ * competidor; con la marca oficial no hace falta ni un byte de fuente extra.
  */
-const sans = localFont({
-  src: [
-    { path: '../../../fonts/poppins-latin-300.woff2', weight: '300', style: 'normal' },
-    { path: '../../../fonts/poppins-latin-400.woff2', weight: '400', style: 'normal' },
-    { path: '../../../fonts/poppins-latin-500.woff2', weight: '500', style: 'normal' },
-    { path: '../../../fonts/poppins-latin-600.woff2', weight: '600', style: 'normal' },
-  ],
-  declarations: [{ prop: 'font-family', value: 'Poppins' }],
-  variable: '--font-lpe-sans',
-  display: 'swap',
-});
 
 // `revalidate` y `metadata` viven en cada `page.tsx` (Next los exige ahí).
 
@@ -139,7 +116,7 @@ export default async function PaginaEnganche({ locale }: { locale: LocaleLp }) {
   // como estado y sin ofrecer otro lote como si fuera el mismo.
   if (!lote) {
     return (
-      <div className={`lpe-root ${sans.variable}`}>
+      <div className="lpe-root marca">
         <div className="mx-auto max-w-2xl px-5 py-32">
           <h1 className="lpe-titular text-[clamp(1.75rem,1.3rem+2vw,2.5rem)]">
             {rich(c.agotado.titulo)}
@@ -228,7 +205,7 @@ export default async function PaginaEnganche({ locale }: { locale: LocaleLp }) {
   const mensajeWa = c.whatsapp.mensaje(lote.slug, engancheTexto);
 
   return (
-    <div className={`lpe-root ${sans.variable}`}>
+    <div className="lpe-root marca">
       {/* ═══════════ 01 · Hero ═══════════
           La cápsula de foto inscrita en una banda oscura, que es la composición
           del original. La banda es AZTEC y no blanca por una razón concreta: el
@@ -241,8 +218,10 @@ export default async function PaginaEnganche({ locale }: { locale: LocaleLp }) {
           original deja aquí solo un botón, pero eso ya costó $991.40 MXN en 72
           clics con cero envíos en la variante A: el campo de teléfono se ve o no
           existe. */}
-      <section className="lpe-sobre-oscuro bg-[var(--lpe-aztec)] px-3 pb-12 pt-16 sm:px-5 sm:pb-16 lg:pb-20">
-        <div className="mx-auto max-w-6xl">
+      <section className="lpe-sobre-oscuro relative isolate overflow-hidden bg-[var(--lpe-aztec)] px-3 pb-12 pt-16 sm:px-5 sm:pb-16 lg:pb-20">
+        {/* Retícula de líneas y nodos del manual, detrás de la cápsula. */}
+        <div aria-hidden="true" className="marca-reticula" />
+        <div className="relative mx-auto max-w-6xl">
           <div className="lpe-capsula lpe-entra relative aspect-[4/3] sm:aspect-[16/9] lg:aspect-[21/9]">
             {hero && (
               <Image
@@ -271,8 +250,8 @@ export default async function PaginaEnganche({ locale }: { locale: LocaleLp }) {
                   aquí retrasa el LCP de una página que se paga por clic, y si se
                   atasca deja la página sin titular para siempre.
 
-                  La composición es la del original: palabra de acento en serif
-                  itálica + la cifra en la sans pesada, en la misma línea. */}
+                  Palabra de acento en Inter 600 y New Aqua + la cifra, en la
+                  misma línea. */}
               <h1 className="lpe-titular max-w-[22ch] text-[clamp(1.875rem,1.1rem+3.6vw,3.75rem)] text-white">
                 {engancheTexto
                   ? rich(c.hero.tituloConEnganche, {
@@ -303,7 +282,7 @@ export default async function PaginaEnganche({ locale }: { locale: LocaleLp }) {
               {plan && <EstructuraPago plan={plan} locale={locale} />}
             </div>
 
-            <div id="solicitud" className="scroll-mt-8 lg:col-span-6">
+            <div id="solicitud" className="lpe-vidrio scroll-mt-8 lg:col-span-6">
               <FormEnganche
                 variante="hero"
                 plazos={plazos}
@@ -342,10 +321,7 @@ export default async function PaginaEnganche({ locale }: { locale: LocaleLp }) {
       {plan && lote.precioMxn && (
         <section className="bg-[var(--lpe-hueso)] px-5 py-20 sm:px-8 lg:py-28">
           <div className="mx-auto max-w-6xl">
-            <p className="lpe-rotulo text-[var(--lpe-teal-texto)]">
-              {c.desglose.rotulo}
-            </p>
-            <h2 className="lpe-titular mt-4 max-w-[24ch] text-[clamp(1.75rem,1.3rem+2vw,2.875rem)]">
+            <h2 className="lpe-titular max-w-[24ch] text-[clamp(1.75rem,1.3rem+2vw,2.875rem)]">
               {rich(c.desglose.titulo)}
             </h2>
             <p className="lpe-cuerpo mt-5 max-w-[56ch] text-[1.0625rem] leading-relaxed text-[var(--lpe-tinta-2)]">
@@ -374,10 +350,7 @@ export default async function PaginaEnganche({ locale }: { locale: LocaleLp }) {
         <section className="bg-[var(--lpe-blanco)] px-5 py-20 sm:px-8 lg:py-28">
           <div className="mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-2 lg:gap-20">
             <div>
-              <p className="lpe-rotulo text-[var(--lpe-teal-texto)]">
-                {c.amenidades.rotulo}
-              </p>
-              <h2 className="lpe-titular mt-4 max-w-[20ch] text-[clamp(1.75rem,1.3rem+2vw,2.875rem)]">
+              <h2 className="lpe-titular max-w-[20ch] text-[clamp(1.75rem,1.3rem+2vw,2.875rem)]">
                 {rich(c.amenidades.titulo)}
               </h2>
 
@@ -420,8 +393,7 @@ export default async function PaginaEnganche({ locale }: { locale: LocaleLp }) {
       {galeria.length > 0 && (
         <section className="bg-[var(--lpe-hueso)] px-5 py-20 sm:px-8 lg:py-28">
           <div className="mx-auto max-w-6xl">
-            <p className="lpe-rotulo text-[var(--lpe-teal-texto)]">{c.galeria.rotulo}</p>
-            <h2 className="lpe-titular mt-4 max-w-[22ch] text-[clamp(1.75rem,1.3rem+2vw,2.875rem)]">
+            <h2 className="lpe-titular max-w-[22ch] text-[clamp(1.75rem,1.3rem+2vw,2.875rem)]">
               {rich(c.galeria.titulo)}
             </h2>
 
@@ -500,8 +472,7 @@ export default async function PaginaEnganche({ locale }: { locale: LocaleLp }) {
       {(img.urbanizacion || img.casasCenital) && (
         <section className="bg-[var(--lpe-blanco)] px-5 py-20 sm:px-8 lg:py-28">
           <div className="mx-auto max-w-6xl">
-            <p className="lpe-rotulo text-[var(--lpe-teal-texto)]">{c.sitio.rotulo}</p>
-            <h2 className="lpe-titular mt-4 max-w-[26ch] text-[clamp(1.75rem,1.3rem+2vw,2.875rem)]">
+            <h2 className="lpe-titular max-w-[26ch] text-[clamp(1.75rem,1.3rem+2vw,2.875rem)]">
               {rich(c.sitio.titulo)}
             </h2>
 
@@ -543,9 +514,12 @@ export default async function PaginaEnganche({ locale }: { locale: LocaleLp }) {
           cifra de rendimiento, porque no tenemos de dónde sacarla. Solo entra
           lo que está en una columna. */}
       {cifras.length > 0 && (
-        <section className="lpe-sobre-oscuro bg-[var(--lpe-aztec)] px-5 py-20 sm:px-8 lg:py-24">
-          <div className="mx-auto max-w-6xl">
-            <p className="lpe-rotulo text-[var(--lpe-teal)]">{c.cifras.rotulo}</p>
+        <section className="lpe-sobre-oscuro relative isolate overflow-hidden bg-[var(--lpe-aztec)] px-5 py-20 sm:px-8 lg:py-24">
+          <div aria-hidden="true" className="marca-reticula" />
+          <div className="relative mx-auto max-w-6xl">
+            <h2 className="lpe-titular text-[clamp(1.5rem,1.2rem+1.4vw,2.25rem)] text-white">
+              {c.cifras.rotulo}
+            </h2>
             {/* Las etiquetas van ancladas al fondo de la celda, no pegadas a
                 su cifra. Medido en producción: «$7,800 MXN» envuelve a dos
                 líneas y empujaba su etiqueta 46 px por debajo de las otras
@@ -560,13 +534,13 @@ export default async function PaginaEnganche({ locale }: { locale: LocaleLp }) {
                   <dd className="lpe-cifra text-[clamp(1.875rem,1.3rem+2.4vw,3rem)] tabular-nums text-white">
                     {c.valor}
                   </dd>
-                  <dt className="lpe-cuerpo mt-auto pt-3 text-[0.8125rem] leading-snug text-white/55">
+                  <dt className="lpe-rotulo mt-auto pt-3 text-[0.8125rem] leading-snug text-[var(--marca-onahau)]">
                     {c.pie}
                   </dt>
                 </div>
               ))}
             </dl>
-            <p className="lpe-cuerpo mt-12 max-w-[62ch] border-t border-white/15 pt-6 text-[0.8125rem] leading-relaxed text-white/50">
+            <p className="lpe-cuerpo mt-12 max-w-[62ch] border-t border-white/15 pt-6 text-[0.8125rem] leading-relaxed text-white/65">
               {c.cifras.nota}
             </p>
           </div>
@@ -577,10 +551,7 @@ export default async function PaginaEnganche({ locale }: { locale: LocaleLp }) {
       <section className="bg-[var(--lpe-blanco)] px-5 py-20 sm:px-8 lg:py-28">
         <div className="mx-auto grid max-w-6xl gap-12 lg:grid-cols-12 lg:gap-16">
           <div className="lg:col-span-6">
-            <p className="lpe-rotulo text-[var(--lpe-teal-texto)]">
-              {c.cierre.rotulo}
-            </p>
-            <h2 className="lpe-titular mt-4 text-[clamp(1.875rem,1.35rem+2.4vw,3.25rem)]">
+            <h2 className="lpe-titular text-[clamp(1.875rem,1.35rem+2.4vw,3.25rem)]">
               {rich(c.cierre.titulo)}
             </h2>
             <p className="lpe-cuerpo mt-6 max-w-[48ch] text-[1.0625rem] leading-relaxed text-[var(--lpe-tinta-2)]">

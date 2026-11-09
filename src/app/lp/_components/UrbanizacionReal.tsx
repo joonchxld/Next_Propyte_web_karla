@@ -68,14 +68,14 @@ export default function UrbanizacionReal({
           </div>
 
       {lote.servicios.length > 0 ? (
-        <div className={`border-t-2 border-[var(--lp-accent-on-dark)]`}>
-          <dl className={`border-x border-b ${RULE_DARK}`}>
+        <div>
+          <dl className={`overflow-hidden rounded-[var(--lp-r-panel)] border bg-white/[0.04] ${RULE_DARK}`}>
             {lote.servicios.map((s) => {
               const fecha = mesAnioL(s.fechaEstimada, locale);
               return (
                 <div
                   key={s.clave}
-                  className={`grid grid-cols-[1fr_auto] items-baseline gap-4 border-t ${RULE_DARK} px-4 py-3.5`}
+                  className={`grid grid-cols-[1fr_auto] items-baseline gap-4 border-t ${RULE_DARK} px-5 py-3.5 first:border-t-0`}
                 >
                   <dt className="text-sm text-white/85">
                     <span className="capitalize">{s.etiqueta}</span>

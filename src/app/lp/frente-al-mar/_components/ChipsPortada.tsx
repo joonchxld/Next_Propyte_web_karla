@@ -13,6 +13,8 @@ import { COPY } from '../_copy';
 //
 // Es el gancho de retención que pidió el brief del 30-oct-2026: quien llega
 // elige dónde antes de ver nada, y lo que ve después ya es suyo.
+// Marca (9-nov-2026): «ver todas» en pastilla New Aqua; ciudades en
+// pastillas de vidrio Aztec (`.lpo-chip`), la elegida en Onahau.
 // ============================================================
 
 function prefiereMenosMovimiento(): boolean {
@@ -39,9 +41,6 @@ export default function ChipsPortada({
       ?.scrollIntoView({ behavior: prefiereMenosMovimiento() ? 'auto' : 'smooth', block: 'start' });
   }
 
-  const chip =
-    'inline-flex min-h-[44px] cursor-pointer items-center gap-2 rounded-full border px-4 text-[0.9375rem] leading-none transition-colors duration-200 active:translate-y-px';
-
   return (
     <div role="group" aria-label={COPY[locale].portada.ariaCiudad} className="flex flex-wrap items-center gap-2">
       <button
@@ -50,7 +49,7 @@ export default function ChipsPortada({
           emitirFiltro('ubicacion', null);
           bajar();
         }}
-        className={`${chip} border-[var(--lpv-accent)] bg-[var(--lpv-accent)] font-medium text-[var(--lpv-on-accent)] hover:opacity-90`}
+        className="marca-boton min-h-[48px] text-[0.9375rem] font-semibold"
       >
         {etiquetaTodas}
         <ArrowDown className="h-4 w-4" aria-hidden />
@@ -63,14 +62,10 @@ export default function ChipsPortada({
             type="button"
             aria-pressed={activo}
             onClick={() => emitirFiltro('ubicacion', o.valor, true)}
-            className={`${chip} ${
-              activo
-                ? 'border-white bg-white text-[var(--lpv-bg)]'
-                : 'border-white/45 bg-[rgb(11_22_32/0.35)] text-white backdrop-blur-sm hover:border-white'
-            }`}
+            className="lpo-chip"
           >
             {o.etiqueta}
-            <span className="lpv-cifra opacity-60">{o.total}</span>
+            <span className="marca-cifra opacity-70">{o.total}</span>
           </button>
         );
       })}

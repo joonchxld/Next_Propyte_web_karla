@@ -10,6 +10,9 @@ import { useSeleccionFiltros } from '../../_components/v2/useFiltros';
 // No filtran aquí: mandan el filtro al catálogo por el evento compartido y
 // bajan hasta él. Comparten estado con la barra pegajosa y el formulario, así
 // que un chip elegido arriba aparece elegido abajo.
+//
+// Marca (9-nov-2026): pastillas con filete Aqua sobre la banda Aztec del hero;
+// la elegida se vuelve Aqua con texto Aztec (`lpt2-theme.css`).
 // ============================================================
 
 export default function ChipsHero({ defs }: { defs: FiltroDef[] }) {
@@ -17,9 +20,9 @@ export default function ChipsHero({ defs }: { defs: FiltroDef[] }) {
   return (
     <div className="flex flex-col gap-4">
       {defs.map((def) => (
-        <div key={def.id} role="group" aria-label={def.etiqueta} className="flex items-baseline gap-5">
-          <span className="w-[5.5ch] shrink-0 text-[0.8125rem] text-[var(--lpv-fg-3)]">{def.etiqueta}</span>
-          <div className="lpt2-fila-chips -mx-5 flex gap-6 overflow-x-auto px-5 sm:mx-0 sm:flex-wrap sm:px-0">
+        <div key={def.id} role="group" aria-label={def.etiqueta} className="flex items-center gap-4">
+          <span className="marca-detalle w-[6ch] shrink-0 text-[0.875rem] text-[var(--lpv-fg-3)]">{def.etiqueta}</span>
+          <div className="marca-sin-barra -mr-5 flex min-w-0 gap-2 overflow-x-auto pr-5 sm:mr-0 sm:flex-wrap sm:pr-0">
             {def.opciones.map((o) => (
               <button
                 key={o.valor}
@@ -28,7 +31,7 @@ export default function ChipsHero({ defs }: { defs: FiltroDef[] }) {
                 onClick={() => alternar(def.id, o.valor, true)}
                 className="lpt2-chip"
               >
-                {o.etiqueta} <span className="opacity-55">{o.total}</span>
+                {o.etiqueta} <span className="lpt2-chip-n">{o.total}</span>
               </button>
             ))}
           </div>

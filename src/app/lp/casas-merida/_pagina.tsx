@@ -1,4 +1,3 @@
-import localFont from 'next/font/local';
 import { TIPOS_CASA, getInventario, enIdioma } from '@/lib/supabase/lp-inventario';
 import { FALLBACK_WHATSAPP } from '@/lib/site-contact';
 import { dinero } from '../_components/format';
@@ -12,7 +11,8 @@ import { ubicacionCorta } from '../_components/v2/util';
 import Catalogo from './_components/Catalogo';
 import { COPY } from './_copy';
 import '../_components/v2/tokens.css';
-import './lpm-theme.css';
+import '../_components/v2/marca.css';
+import './lpme-theme.css';
 
 // ============================================================
 // Landing de pago: CASAS EN MÉRIDA (segunda versión, 30-oct-2026).
@@ -36,16 +36,11 @@ import './lpm-theme.css';
 // (`/lp/casas-merida`) y la inglesa (`/lp/homes-merida`). Cada `page.tsx`
 // aporta `metadata` y `revalidate`; el texto sale de `COPY[locale]`. En inglés
 // no hay gancho de crédito Infonavit/Fovissste (ver `_copy.ts`).
+//
+// MARCA (9-nov-2026): misma composición, piel del manual oficial (capa
+// `marca.css`, ver DESIGN.md). El prefijo de esta landing es `.lpme-`: el
+// anterior chocaba con clases sin ámbito de casas-riviera-maya.
 // ============================================================
-
-const display = localFont({
-  src: '../../../fonts/sora-latin.woff2',
-  weight: '300 700',
-  style: 'normal',
-  declarations: [{ prop: 'font-family', value: 'Sora' }],
-  variable: '--font-lpm-display',
-  display: 'swap',
-});
 
 export default async function PaginaCasasMerida({ locale = 'es' }: { locale?: LocaleLp }) {
   const t = COPY[locale];
@@ -56,9 +51,9 @@ export default async function PaginaCasasMerida({ locale = 'es' }: { locale?: Lo
 
   if (casas.length === 0) {
     return (
-      <div className={`lpv lpm-root ${display.variable} min-h-[70vh]`}>
+      <div className="lpv marca lpme-root min-h-[70vh]">
         <div className="mx-auto max-w-2xl px-5 py-32 sm:px-8">
-          <h1 className="lpm-display text-[clamp(2rem,1.3rem+2.5vw,3.25rem)]">
+          <h1 className="marca-titular text-[clamp(2rem,1.3rem+2.5vw,3.25rem)]">
             {t.vacio.titulo}
           </h1>
           <p className="mt-6 max-w-[54ch] text-base leading-relaxed text-[var(--lpv-fg-2)]">
@@ -68,7 +63,7 @@ export default async function PaginaCasasMerida({ locale = 'es' }: { locale?: Lo
             href={`https://wa.me/${FALLBACK_WHATSAPP}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-9 inline-flex min-h-[52px] items-center rounded-full bg-[var(--lpv-accent)] px-7 text-sm font-medium text-white"
+            className="marca-boton mt-9"
           >
             {t.vacio.cta}
           </a>
@@ -89,7 +84,7 @@ export default async function PaginaCasasMerida({ locale = 'es' }: { locale?: Lo
   );
 
   return (
-    <div className={`lpv lpm-root ${display.variable}`}>
+    <div className="lpv marca lpme-root">
       <Catalogo
         casas={casas}
         filtros={defs}
@@ -101,22 +96,22 @@ export default async function PaginaCasasMerida({ locale = 'es' }: { locale?: Lo
       />
 
       {/* ══ PREGUNTAS ══ */}
-      <div className="mx-auto max-w-[96rem] border-t border-[var(--lpv-line)] px-5 py-16 sm:px-8 sm:py-24">
+      <div className="mx-auto max-w-[96rem] px-5 py-16 sm:px-8 sm:py-24">
         <div className="grid gap-10 lg:grid-cols-12">
-          <h2 className="lpm-display text-[clamp(1.75rem,1.2rem+2vw,3rem)] text-[var(--lpv-fg)] lg:col-span-4">
+          <h2 className="marca-titular text-[clamp(1.75rem,1.2rem+2vw,2.75rem)] text-[var(--lpv-fg)] lg:col-span-4">
             {t.faqTitulo}
           </h2>
-          <div className="lg:col-span-8 lg:col-start-5">
+          <div className="marca-tarjeta px-5 py-3 sm:px-8 sm:py-5 lg:col-span-8 lg:col-start-5">
             <FaqAcordeon
               faqs={en ? FAQ_COMPRA_Y_FINANCIAMIENTO_EN : FAQ_COMPRA_Y_FINANCIAMIENTO}
               locale={locale}
-              titulo="" className="[&>h2]:hidden [&>div]:mt-0" />
+              titulo="" className="[&>h2]:hidden [&>div]:mt-0 [&>div]:border-y-0" />
           </div>
         </div>
       </div>
 
       <PieLegal
-        tono="claro"
+        tono="oscuro"
         locale={locale}
         aviso={t.pieAviso}
         inventario={

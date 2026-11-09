@@ -139,11 +139,11 @@ export default function DesgloseEnganche({
           aria-label={c.proporcionAria(plan)}
         >
           <div
-            className="rounded-[var(--lpe-r-pill)] bg-[var(--lpe-teal)]"
+            className="rounded-[var(--lpe-r-pill)] bg-[var(--lpe-aztec)]"
             style={{ width: `${plan.enganchePct}%` }}
           />
           <div
-            className="rounded-[var(--lpe-r-pill)] bg-[var(--lpe-aqua)]"
+            className="rounded-[var(--lpe-r-pill)] bg-[var(--lpe-teal)]"
             style={{ width: `${plan.mensualidadesPct}%` }}
           />
           <div
@@ -158,8 +158,8 @@ export default function DesgloseEnganche({
             desincronizarse de la barra. */}
         <ul className="mt-4 flex flex-wrap gap-x-6 gap-y-2">
           {[
-            { c: 'var(--lpe-teal)', t: c.enganche.titulo, p: plan.enganchePct },
-            { c: 'var(--lpe-aqua)', t: c.mensualidades.titulo, p: plan.mensualidadesPct },
+            { c: 'var(--lpe-aztec)', t: c.enganche.titulo, p: plan.enganchePct },
+            { c: 'var(--lpe-teal)', t: c.mensualidades.titulo, p: plan.mensualidadesPct },
             { c: 'var(--lpe-tinta-3)', t: c.contraentrega.titulo, p: plan.contraentregaPct },
           ].map((l) => (
             <li key={l.t} className="flex items-center gap-2">
@@ -199,7 +199,7 @@ export default function DesgloseEnganche({
             <div className={t.destacado ? 'min-w-0' : ''}>
               <div className="flex items-baseline justify-between gap-3">
                 <span className="lpe-rotulo text-[var(--lpe-teal-texto)]">
-                  {t.n} · {t.titulo}
+                  {t.titulo}
                 </span>
                 {!t.destacado && (
                   <span className="lpe-cifra text-[0.875rem] text-[var(--lpe-tinta-3-texto)]">

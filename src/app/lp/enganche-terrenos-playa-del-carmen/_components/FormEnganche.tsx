@@ -261,7 +261,7 @@ function GrupoOpciones({
                 activo
                   ? 'border-[var(--lpe-tinta)] bg-[var(--lpe-tinta)] font-medium text-[var(--lpe-blanco)]'
                   : `bg-transparent text-[var(--lpe-tinta-2)] hover:border-[var(--lpe-tinta-3)] ${
-                      hayError ? 'border-[#b42318]' : 'border-[var(--lpe-linea)]'
+                      hayError ? 'border-[var(--lpe-error)]' : 'border-[var(--lpe-linea)]'
                     }`
               }`}
             >
@@ -269,7 +269,7 @@ function GrupoOpciones({
               {columna && o.ayuda && (
                 <span
                   className={`mt-0.5 block text-[0.8125rem] font-normal ${
-                    activo ? 'text-[var(--lpe-teal)]' : 'text-[var(--lpe-tinta-3-texto)]'
+                    activo ? 'text-[var(--lpe-blanco)] opacity-80' : 'text-[var(--lpe-tinta-3-texto)]'
                   }`}
                 >
                   {o.ayuda}
@@ -283,7 +283,7 @@ function GrupoOpciones({
         <p
           id={`${idBase}-${clave}-error`}
           role="alert"
-          className="lpe-cuerpo mt-2 text-[0.8125rem] text-[#b42318]"
+          className="lpe-cuerpo mt-2 text-[0.8125rem] text-[var(--lpe-error)]"
         >
           {error}
         </p>
@@ -614,12 +614,12 @@ export default function FormEnganche({
    *  dibuja el borde en el contenedor y no en el `<input>`. */
   const bordes = (lleno: boolean, hayError: boolean, dentro = false) =>
     hayError
-      ? 'border-[#b42318] bg-white'
+      ? 'border-[var(--lpe-error)] bg-[var(--lpe-campo)]'
       : lleno
-        ? 'border-[var(--lpe-tinta-3)] bg-white'
+        ? 'border-[var(--lpe-tinta-3)] bg-[var(--lpe-campo)]'
         : dentro
-          ? 'border-[var(--lpe-linea)] bg-[var(--lpe-hueso)] focus-within:border-[var(--lpe-tinta)] focus-within:bg-white'
-          : 'border-[var(--lpe-linea)] bg-[var(--lpe-hueso)] focus:border-[var(--lpe-tinta)] focus:bg-white';
+          ? 'border-[var(--lpe-linea)] bg-[var(--lpe-hueso)] focus-within:border-[var(--lpe-tinta)] focus-within:bg-[var(--lpe-campo)]'
+          : 'border-[var(--lpe-linea)] bg-[var(--lpe-hueso)] focus:border-[var(--lpe-tinta)] focus:bg-[var(--lpe-campo)]';
 
   return (
     <form
@@ -627,7 +627,7 @@ export default function FormEnganche({
       onSubmit={enviar}
       data-lpe-form={variante}
       noValidate
-      className="rounded-[var(--lpe-r)] border border-[var(--lpe-linea)] bg-[var(--lpe-blanco)] p-6 shadow-[0_28px_70px_-32px_rgb(15_25_35/0.35)] sm:p-9"
+      className="rounded-[var(--lpe-r)] border border-[var(--lpe-linea)] bg-[var(--lpe-superficie)] p-6 shadow-[0_1px_2px_rgb(10_28_30/0.05),0_18px_40px_-28px_rgb(10_28_30/0.35)] sm:p-9"
     >
       {/* ═══ LA PROMESA ═══
           ⚠️ EL TITULAR DICE LO QUE RECIBES, NO LO QUE PAGAS.
@@ -715,7 +715,7 @@ export default function FormEnganche({
             <p
               id={`${uid}-nombre-error`}
               role="alert"
-              className="lpe-cuerpo mt-2 text-[0.8125rem] text-[#b42318]"
+              className="lpe-cuerpo mt-2 text-[0.8125rem] text-[var(--lpe-error)]"
             >
               {errores.nombre}
             </p>
@@ -755,7 +755,7 @@ export default function FormEnganche({
               <p
                 id={`${uid}-correo-error`}
                 role="alert"
-                className="lpe-cuerpo mt-2 text-[0.8125rem] text-[#b42318]"
+                className="lpe-cuerpo mt-2 text-[0.8125rem] text-[var(--lpe-error)]"
               >
                 {errores.correo}
               </p>
@@ -835,7 +835,7 @@ export default function FormEnganche({
             <p
               id={`${uid}-tel-error`}
               role="alert"
-              className="lpe-cuerpo mt-2 text-[0.8125rem] text-[#b42318]"
+              className="lpe-cuerpo mt-2 text-[0.8125rem] text-[var(--lpe-error)]"
             >
               {errores.telefono}
             </p>
@@ -985,7 +985,7 @@ export default function FormEnganche({
           culpa de la persona y la salida es otra, así que va aparte y pegado al
           botón que falló. */}
       {error && (
-        <p role="alert" className="lpe-cuerpo mt-5 text-[0.875rem] text-[#b42318]">
+        <p role="alert" className="lpe-cuerpo mt-5 text-[0.875rem] text-[var(--lpe-error)]">
           {error}
         </p>
       )}
@@ -993,14 +993,14 @@ export default function FormEnganche({
       <button
         type="submit"
         disabled={enviando}
-        className="group mt-7 flex min-h-[60px] w-full items-center justify-between gap-3 rounded-[var(--lpe-r-pill)] bg-[var(--lpe-teal)] pl-7 pr-2.5 text-[1.0625rem] font-medium text-[var(--lpe-tinta)] transition-[background-color,transform] duration-200 hover:bg-[var(--lpe-teal-hover)] active:translate-y-px disabled:opacity-60"
+        className="group mt-7 flex min-h-[60px] w-full items-center justify-between gap-3 rounded-[var(--lpe-r-pill)] bg-[var(--lpe-cta)] pl-7 pr-2.5 text-[1.0625rem] font-semibold text-[var(--lpe-cta-texto)] transition-[background-color,transform] duration-200 hover:bg-[var(--lpe-cta-hover)] active:translate-y-px disabled:opacity-60"
       >
         <span className="lpe-cuerpo font-medium">
           {enviando ? t.enviando : t.boton}
         </span>
         <span
           aria-hidden="true"
-          className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[var(--lpe-tinta)] text-[var(--lpe-teal)] transition-transform duration-200 group-hover:translate-x-0.5"
+          className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[var(--lpe-cta-texto)] text-[var(--lpe-cta)] transition-transform duration-200 group-hover:translate-x-0.5"
         >
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
             <path

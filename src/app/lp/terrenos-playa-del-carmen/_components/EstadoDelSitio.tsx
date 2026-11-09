@@ -29,6 +29,11 @@ import type { CopyTerrenos } from '../_copy';
 // cómo se ve el terreno el día que firmas. Aquí la honestidad no es un freno
 // a la conversión, es el argumento diferencial — y encima es el par de
 // imágenes que la persona pediría en el primer mensaje de WhatsApp.
+//
+// MARCA (9-nov-2026): banda Tech White con las dos láminas en placa blanca;
+// el conteo de vendidos va en Inter Aztec dentro de la tabla Water Dew (Aqua
+// no va sobre claro). Sin número de sección: el rótulo es un detalle en caja
+// normal. `numeroSeccion` se conserva en la firma por compatibilidad.
 // ============================================================
 
 export default function EstadoDelSitio({
@@ -64,25 +69,25 @@ export default function EstadoDelSitio({
       : null;
 
   return (
-    <section className="border-t border-[var(--lpt-linea-fuerte)] bg-[var(--lpt-abismo)]">
+    <section className="bg-[var(--marca-tech)]" data-seccion={numeroSeccion}>
       <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8 lg:py-28">
         <Reveal>
-          <p className="lpt-rotulo text-[var(--lpt-estaca)]">{numeroSeccion} · {copy.rotulo}</p>
+          <p className="lpt-rotulo">{copy.rotulo}</p>
         </Reveal>
         <Reveal delay={0.06}>
-          <h2 className="lpt-titular mt-4 max-w-[26ch] text-[clamp(1.875rem,1.4rem+2.2vw,3rem)] text-[var(--lpt-claro)]">
+          <h2 className="lpt-titular mt-4 max-w-[26ch] text-[clamp(1.875rem,1.4rem+2.2vw,3rem)] text-[var(--marca-aztec)]">
             {copy.titulo}
           </h2>
         </Reveal>
 
-        <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:gap-12">
+        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:gap-6">
           {hoy && (
             /* Sin `Reveal`: es una imagen, no puede depender de JS para verse.
                Ver el comentario del mosaico en `Privada.tsx`. */
             <div className="lpt-lamina-entra">
               <FiguraTerrenos
                 imagen={hoy}
-                lamina={laminas.urbanizacion ?? 'FIG.'}
+                lamina={laminas.urbanizacion ?? 'Fig.'}
                 rotulo={copy.hoy}
                 prefijo={figura}
                 aspecto="aspect-[4/3]"
@@ -94,7 +99,7 @@ export default function EstadoDelSitio({
             <div className="lpt-lamina-entra">
               <FiguraTerrenos
                 imagen={proyectado}
-                lamina={laminas.casasCenital ?? 'FIG.'}
+                lamina={laminas.casasCenital ?? 'Fig.'}
                 rotulo={copy.proyectado}
                 prefijo={figura}
                 aspecto="aspect-[4/3]"
@@ -105,20 +110,20 @@ export default function EstadoDelSitio({
         </div>
 
         <Reveal delay={0.08}>
-          <div className="mt-12 grid gap-8 border-t border-[var(--lpt-linea-fuerte)] pt-8 lg:grid-cols-12 lg:gap-12">
-            <p className="lpt-cuerpo max-w-[58ch] text-[1.0625rem] leading-relaxed text-[var(--lpt-claro-2)] lg:col-span-7">
+          <div className="mt-10 grid gap-6 lg:grid-cols-12 lg:items-center lg:gap-12">
+            <p className="lpt-cuerpo max-w-[58ch] text-[1.0625rem] leading-relaxed text-[var(--marca-slate)] lg:col-span-7">
               {copy.texto(superficieTexto)}
             </p>
 
             {vendidos !== null && (
-              <div className="lg:col-span-5 lg:justify-self-end lg:text-right">
-                <p className="lpt-titular text-[clamp(2.25rem,1.4rem+3.4vw,3.5rem)] text-[var(--lpt-estaca)]">
+              <div className="lpt-tabla p-5 sm:p-6 lg:col-span-5">
+                <p className="lpt-titular marca-cifra text-[clamp(2.25rem,1.4rem+3.4vw,3.5rem)] text-[var(--marca-aztec)]">
                   {vendidos}
                 </p>
-                <p className="lpt-cota mt-1 text-[0.6875rem] uppercase tracking-[0.12em] text-[var(--lpt-claro-3)]">
+                <p className="lpt-cota mt-1 text-[0.875rem] text-[var(--marca-teal)]">
                   {copy.vendidos(totales ?? 0)}
                 </p>
-                <p className="lpt-cuerpo mt-3 max-w-[34ch] text-[0.8125rem] leading-relaxed text-[var(--lpt-claro-3)] lg:ml-auto">
+                <p className="lpt-cuerpo mt-3 max-w-[40ch] text-[0.8125rem] leading-relaxed text-[var(--marca-slate)]">
                   {copy.aviso}
                 </p>
               </div>

@@ -68,7 +68,7 @@ export default function StickyCta({
       // `hidden` en vez de desmontar: el lector de pantalla no anuncia una barra
       // que aparece y desaparece con el scroll, y la transición puede correr.
       aria-hidden={!mostrar}
-      className={`fixed inset-x-0 bottom-0 z-30 border-t border-[var(--lp-line)] bg-[var(--lp-paper)]/95 backdrop-blur transition-transform duration-300 supports-[padding:max(0px)]:pb-[max(0.5rem,env(safe-area-inset-bottom))] lg:hidden ${
+      className={`fixed inset-x-0 bottom-0 z-30 border-t border-[var(--lp-line)] bg-white/90 backdrop-blur transition-transform duration-300 supports-[padding:max(0px)]:pb-[max(0.5rem,env(safe-area-inset-bottom))] lg:hidden ${
         mostrar ? 'translate-y-0' : 'translate-y-full'
       }`}
     >
@@ -91,7 +91,7 @@ export default function StickyCta({
           // Ancla real, no botón con scrollIntoView: funciona sin JS y el foco
           // aterriza en el formulario. Tap target de 48px con padding real.
           tabIndex={mostrar ? undefined : -1}
-          className="inline-flex min-h-[48px] shrink-0 cursor-pointer items-center justify-center rounded-[var(--lp-r-control)] bg-[var(--lp-accent)] px-6 py-3 text-base font-semibold text-white shadow-[0_2px_10px_rgb(168_64_42/0.28)] transition-colors duration-200 hover:bg-[var(--lp-accent-strong)]"
+          className="inline-flex min-h-[48px] shrink-0 cursor-pointer items-center justify-center rounded-full bg-[var(--lp-accent)] px-6 py-3 text-base font-semibold text-[var(--lp-on-accent)] transition-colors duration-200 hover:bg-[var(--lp-accent-strong)]"
         >
           {mensualidad ? t.verPlan : t.pedirDetalle}
         </a>
