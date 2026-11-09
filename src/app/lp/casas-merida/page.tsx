@@ -1,127 +1,19 @@
 import type { Metadata } from 'next';
-import localFont from 'next/font/local';
-import { TIPOS_CASA, getInventario } from '@/lib/supabase/lp-inventario';
-import { FALLBACK_WHATSAPP } from '@/lib/site-contact';
-import { dinero } from '../_components/format';
-import FaqAcordeon from '../_components/v2/FaqAcordeon';
-import BarraMovil from '../_components/v2/BarraMovil';
-import PieLegal from '../_components/v2/PieLegal';
-import { FAQ_COMPRA_Y_FINANCIAMIENTO } from '../_components/v2/faqs';
-import { filtroCredito, filtroPresupuesto, filtroRecamaras, filtros } from '../_components/v2/filtros';
-import { ubicacionCorta } from '../_components/v2/util';
-import Catalogo from './_components/Catalogo';
-import { FORM, PIE_AVISO } from './_copy';
-import '../_components/v2/tokens.css';
-import './lpm-theme.css';
+import PaginaCasasMerida from './_pagina';
+import { COPY_ES } from './_copy';
 
-// ============================================================
-// Landing de pago: CASAS EN MÉRIDA (segunda versión, 30-oct-2026).
-//
-// Lógica propia, distinta del resto de la familia: EL DOSSIER. El Hub publica
-// hoy una sola casa en Mérida, y la página es su ficha completa en una vista:
-// galería fija a la izquierda; precio, datos y formulario a la derecha.
-// Después, todas las fotos en mosaico y las preguntas. Si entran más casas,
-// aparecen como filas debajo del mosaico y se pueden elegir para el
-// formulario; el dossier sigue siendo la primera visible.
-//
-// Tercera pasada (30-oct-2026): la página abre con el GANCHO de crédito
-// (Infonavit / Fovissste) cuando el Hub lo declara, y los filtros del
-// formulario (crédito, presupuesto, recámaras) se construyen aquí desde el
-// inventario real: una opción sin casas no existe.
-//
-// Reglas heredadas: toda cifra sale del inventario; ningún nombre de
-// desarrollo llega al DOM; cero urgencia inventada.
-// ============================================================
+// Landing de casas en Mérida — ESPAÑOL. El cuerpo vive en `_pagina.tsx`,
+// compartido con `/lp/homes-merida`. Aquí queda solo lo que Next exige en el
+// archivo de la ruta: `metadata` y `revalidate`.
 
 export const revalidate = 300;
 
 export const metadata: Metadata = {
-  title: 'Casas en Mérida con crédito Infonavit o Fovissste | Precio y enganche publicados',
-  description:
-    'Casas publicadas hoy en Mérida que aceptan Infonavit y Fovissste, con precio cerrado, enganche y disponibilidad. Recibe la ficha completa con planos por correo.',
+  title: COPY_ES.meta.title,
+  description: COPY_ES.meta.description,
   robots: { index: false, follow: true, googleBot: { index: false, follow: true } },
 };
 
-const display = localFont({
-  src: '../../../fonts/sora-latin.woff2',
-  weight: '300 700',
-  style: 'normal',
-  declarations: [{ prop: 'font-family', value: 'Sora' }],
-  variable: '--font-lpm-display',
-  display: 'swap',
-});
-
-export default async function LandingCasasMerida() {
-  const casas = await getInventario({ tipos: TIPOS_CASA, ciudades: ['Mérida'] });
-  const mensajeWa = FORM.whatsappGenerico;
-
-  if (casas.length === 0) {
-    return (
-      <div className={`lpv lpm-root ${display.variable} min-h-[70vh]`}>
-        <div className="mx-auto max-w-2xl px-5 py-32 sm:px-8">
-          <h1 className="lpm-display text-[clamp(2rem,1.3rem+2.5vw,3.25rem)]">
-            Ahora mismo no tenemos casas publicadas en Mérida.
-          </h1>
-          <p className="mt-6 max-w-[54ch] text-base leading-relaxed text-[var(--lpv-fg-2)]">
-            Escríbenos y te avisamos en cuanto entre inventario, con los números completos.
-          </p>
-          <a
-            href={`https://wa.me/${FALLBACK_WHATSAPP}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-9 inline-flex min-h-[52px] items-center rounded-full bg-[var(--lpv-accent)] px-7 text-sm font-medium text-white"
-          >
-            Avísenme por WhatsApp
-          </a>
-        </div>
-      </div>
-    );
-  }
-
-  const principal = casas[0];
-  const desde = casas[0]?.precio ?? null;
-  const hasta = casas[casas.length - 1]?.precio ?? null;
-  const defs = filtros(
-    filtroCredito(casas),
-    filtroPresupuesto(casas, [1_500_000, 2_000_000]),
-    filtroRecamaras(casas),
-  );
-
-  return (
-    <div className={`lpv lpm-root ${display.variable}`}>
-      <Catalogo casas={casas} filtros={defs} telefonoWhatsApp={FALLBACK_WHATSAPP} />
-
-      {/* ══ PREGUNTAS ══ */}
-      <div className="mx-auto max-w-[96rem] border-t border-[var(--lpv-line)] px-5 py-16 sm:px-8 sm:py-24">
-        <div className="grid gap-10 lg:grid-cols-12">
-          <h2 className="lpm-display text-[clamp(1.75rem,1.2rem+2vw,3rem)] text-[var(--lpv-fg)] lg:col-span-4">
-            Lo que preguntan antes de comprar
-          </h2>
-          <div className="lg:col-span-8 lg:col-start-5">
-            <FaqAcordeon faqs={FAQ_COMPRA_Y_FINANCIAMIENTO} titulo="" className="[&>h2]:hidden [&>div]:mt-0" />
-          </div>
-        </div>
-      </div>
-
-      <PieLegal
-        tono="claro"
-        aviso={PIE_AVISO}
-        inventario={
-          desde && hasta
-            ? casas.length === 1
-              ? `Inventario publicado: 1 casa en ${ubicacionCorta(principal)}, ${dinero(desde)}.`
-              : `Inventario publicado: ${casas.length} casas de ${dinero(desde)} a ${dinero(hasta)}.`
-            : null
-        }
-      />
-
-      <BarraMovil
-        etiqueta="Recibir la ficha"
-        telefonoWhatsApp={FALLBACK_WHATSAPP}
-        mensajeWhatsApp={mensajeWa}
-        surface="lp_casas_merida_barra_movil"
-        href="#solicitar"
-      />
-    </div>
-  );
+export default function LandingCasasMerida() {
+  return <PaginaCasasMerida locale="es" />;
 }

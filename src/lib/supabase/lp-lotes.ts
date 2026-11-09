@@ -762,7 +762,7 @@ function mapearAsesor(d: Record<string, unknown>): AsesorLanding | null {
 }
 
 /** Dirección y horario canónicos del Hub (`Propyte_site_config`). */
-async function getOficina(): Promise<OficinaLanding | null> {
+async function getOficina(locale: 'es' | 'en' = 'es'): Promise<OficinaLanding | null> {
   const supabase = createPublicSupabaseClient();
   if (!supabase) return null;
 
@@ -770,14 +770,25 @@ async function getOficina(): Promise<OficinaLanding | null> {
     .schema('real_estate_hub' as 'public')
     .from('Propyte_site_config')
     .select('key, value')
-    .in('key', ['contact.address_es', 'contact.hours_es']);
+    .in('key', [
+      'contact.address_es',
+      'contact.hours_es',
+      'contact.address_en',
+      'contact.hours_en',
+    ]);
 
   if (!data) return null;
   const mapa = new Map(
     (data as { key: string; value: string }[]).map((r) => [r.key, r.value]),
   );
-  const direccion = sanitizarTexto(mapa.get('contact.address_es'));
-  const horario = sanitizarTexto(mapa.get('contact.hours_es'));
+  // En inglés se prefiere la clave `_en` del Hub (la usa también /contacto) y
+  // se cae a la española si esa clave no existe: nunca se queda sin oficina.
+  const direccion =
+    (locale === 'en' ? sanitizarTexto(mapa.get('contact.address_en')) : null) ??
+    sanitizarTexto(mapa.get('contact.address_es'));
+  const horario =
+    (locale === 'en' ? sanitizarTexto(mapa.get('contact.hours_en')) : null) ??
+    sanitizarTexto(mapa.get('contact.hours_es'));
   if (!direccion || !horario) return null;
   return { direccion, horario };
 }
@@ -789,7 +800,9 @@ async function getOficina(): Promise<OficinaLanding | null> {
  * del inventario. La página trata ese null como estado "agotado", no como
  * error: con un inventario de una unidad, esa transición es probable.
  */
-export async function getLotePlayaDelCarmen(): Promise<LoteLanding | null> {
+export async function getLotePlayaDelCarmen(
+  locale: 'es' | 'en' = 'es',
+): Promise<LoteLanding | null> {
   const supabase = createPublicSupabaseClient();
   // createPublicSupabaseClient() devuelve null si faltan las envs. Sin datos la
   // página renderiza el estado "ya no está disponible", no un 500 en una ruta
@@ -874,7 +887,7 @@ export async function getLotePlayaDelCarmen(): Promise<LoteLanding | null> {
   const [licencia, asesor, oficina] = await Promise.all([
     getLicenciaDesarrollo(devId),
     getAsesor((u.agent_id as string | null) ?? null),
-    getOficina(),
+    getOficina(locale),
   ]);
 
   const superficieM2 = numeroONull(u.area_m2);

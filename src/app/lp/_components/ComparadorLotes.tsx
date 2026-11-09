@@ -2,7 +2,9 @@
 
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { ArrowLeft, ArrowRight } from '@/lib/icons';
-import { mxn } from './format';
+import { m2, mxn } from './format';
+import { COMPARADOR } from '../lotes-playa-del-carmen/_copy';
+import type { LocaleLp } from './v2/i18n';
 import { DisclaimerCifras } from './ui';
 import GaleriaFicha from './v2/GaleriaFicha';
 import { ANCLA_INVENTARIO, ChipsUbicacion, TODAS, useFiltroUbicacion } from './v2/ChipsUbicacion';
@@ -65,7 +67,20 @@ function comoPropiedad(l: LoteComparable): PropiedadLanding {
   };
 }
 
-export default function ComparadorLotes({ lotes }: { lotes: LoteComparable[] }) {
+export default function ComparadorLotes({
+  lotes,
+  locale = 'es',
+}: {
+  lotes: LoteComparable[];
+  locale?: LocaleLp;
+}) {
+  const t = COMPARADOR[locale];
+  // En español se usa la etiqueta que ya trae el data layer; en inglés se
+  // rearma desde los campos crudos (ciudad, superficie, precio).
+  const etiquetaDe = (l: LoteComparable) =>
+    t.etiqueta
+      ? t.etiqueta(l.ciudad, l.superficieM2 ? m2(l.superficieM2) : null, mxn(l.precioListaMxn))
+      : l.etiqueta;
   const grupoPlazo = useId();
   const propiedades = useMemo(() => lotes.map(comoPropiedad), [lotes]);
   const { activa, setActiva, visibles, ubicaciones } = useFiltroUbicacion(propiedades, 'ciudad');
@@ -138,11 +153,10 @@ export default function ComparadorLotes({ lotes }: { lotes: LoteComparable[] }) 
           id="comparador-titulo"
           className="max-w-[24ch] lp-display text-[clamp(1.5rem,1.2rem+1.1vw,2.125rem)] leading-tight tracking-[-0.02em] text-balance text-[var(--lp-on-dark)]"
         >
-          Terrenos residenciales en la Riviera Maya
+                    {t.titulo}
         </h2>
         <p className="mt-4 max-w-[62ch] text-base leading-relaxed text-[var(--lp-on-dark-soft)]">
-          Somos comercializadora, no desarrolladora: si ninguno encaja con tu presupuesto
-          o tu superficie, dínoslo y te buscamos otro en la zona.
+          {t.intro}
         </p>
 
         {ubicaciones.length > 1 && (
@@ -154,7 +168,7 @@ export default function ComparadorLotes({ lotes }: { lotes: LoteComparable[] }) 
                 setActiva(clave);
                 setPlazoIdx(null);
               }}
-              etiquetaTodas="Todas"
+              locale={locale}
               tono="oscuro"
             />
           </div>
@@ -167,10 +181,10 @@ export default function ComparadorLotes({ lotes }: { lotes: LoteComparable[] }) 
             {String(Math.min(tarjeta, Math.max(lotesVisibles.length - 1, 0)) + 1).padStart(2, '0')} / {String(lotesVisibles.length).padStart(2, '0')}
           </p>
           <div className="flex gap-2">
-            <button type="button" onClick={() => desplazar(-1)} aria-label="Lote anterior" className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--lp-line-dark)] text-[var(--lp-on-dark)] transition-colors hover:border-[var(--lp-on-dark)]">
+            <button type="button" onClick={() => desplazar(-1)} aria-label={t.anterior} className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--lp-line-dark)] text-[var(--lp-on-dark)] transition-colors hover:border-[var(--lp-on-dark)]">
               <ArrowLeft className="size-4" aria-hidden="true" />
             </button>
-            <button type="button" onClick={() => desplazar(1)} aria-label="Lote siguiente" className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--lp-line-dark)] text-[var(--lp-on-dark)] transition-colors hover:border-[var(--lp-on-dark)]">
+            <button type="button" onClick={() => desplazar(1)} aria-label={t.siguiente} className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--lp-line-dark)] text-[var(--lp-on-dark)] transition-colors hover:border-[var(--lp-on-dark)]">
               <ArrowRight className="size-4" aria-hidden="true" />
             </button>
           </div>
@@ -192,7 +206,8 @@ export default function ComparadorLotes({ lotes }: { lotes: LoteComparable[] }) 
                     error de hidratacion). El pie es el control de seleccion. */}
                 <GaleriaFicha
                     imagenes={l.imagenes}
-                    alt={l.etiqueta}
+                    alt={etiquetaDe(l)}
+                    locale={locale}
                     aspecto="aspect-[4/3]"
                     sizes="(min-width: 1024px) 30vw, 46vw"
                     tope={8}
@@ -210,10 +225,10 @@ export default function ComparadorLotes({ lotes }: { lotes: LoteComparable[] }) 
                   <div className="p-3 sm:p-4">
                     <p className="text-[0.6875rem] uppercase tracking-[0.08em] text-[var(--lp-on-dark-soft)]">
                       {l.ciudad}
-                      {l.esDeEstaLanding ? ' · el de este anuncio' : ''}
+                      {l.esDeEstaLanding ? t.esDeEstaLanding : ''}
                     </p>
                     <p className="lp-num mt-1 text-sm text-[var(--lp-on-dark)]">
-                      {l.superficieM2 ? `${l.superficieM2} m²` : 'Superficie por confirmar'}
+                      {l.superficieM2 ? `${l.superficieM2} m²` : t.superficiePorConfirmar}
                     </p>
                     <p className="lp-num mt-1 text-base font-medium text-[var(--lp-on-dark)]">
                       {mxn(l.precioListaMxn)}
@@ -225,16 +240,16 @@ export default function ComparadorLotes({ lotes }: { lotes: LoteComparable[] }) 
           })}
         </ul>
         <p className="mt-3 text-xs text-[var(--lp-on-dark-soft)]">
-          Imágenes proporcionadas por cada desarrollador; pueden incluir renders del proyecto.
+          {t.imagenes}
         </p>
 
         <div className="mt-8 rounded-[var(--lp-r-media)] border border-[var(--lp-line-dark)] p-6">
-          <p className="lp-num text-sm text-[var(--lp-on-dark)]">{lote.etiqueta}</p>
+          <p className="lp-num text-sm text-[var(--lp-on-dark)]">{etiquetaDe(lote)}</p>
 
           {lote.plazos.length > 1 && (
             <fieldset className="mt-5">
               <legend className="font-mono text-[0.6875rem] uppercase tracking-[0.08em] text-[var(--lp-on-dark-soft)]">
-                Plazo
+                                {t.plazo}
               </legend>
               <div className="mt-3 flex flex-wrap gap-2">
                 {lote.plazos.map((p, i) => {
@@ -250,7 +265,7 @@ export default function ComparadorLotes({ lotes }: { lotes: LoteComparable[] }) 
                         onChange={() => setPlazoIdx(i)}
                       />
                       <label htmlFor={id} className={CHIP}>
-                        {p.meses} meses
+                        {p.meses} {t.meses}
                       </label>
                     </div>
                   );
@@ -266,38 +281,38 @@ export default function ComparadorLotes({ lotes }: { lotes: LoteComparable[] }) 
                   {mxn(plazo.mensualidadMxn)}
                 </p>
                 <p className="mt-2 text-sm text-[var(--lp-on-dark-soft)]">
-                  al mes · {plazo.pagos} pagos sin intereses
+                  {t.alMes} · {t.pagosSinIntereses(plazo.pagos)}
                 </p>
 
                 {hayDescuento ? (
                   <p className="mt-4 text-sm text-[var(--lp-on-dark-soft)]">
-                    Precio a {plazo.meses} meses{' '}
-                    <span className="lp-num text-[var(--lp-on-dark)]">{mxn(plazo.precioMxn)}</span>: el
-                    desarrollador descuenta {plazo.descuentoPct.toFixed(1)}% sobre los{' '}
-                    {mxn(lote.precioListaMxn)} de lista por pagar en menos tiempo.
+                    {t.descuentoA(plazo.meses)}{' '}
+                    <span className="lp-num text-[var(--lp-on-dark)]">{mxn(plazo.precioMxn)}</span>
+                    {t.descuentoB(plazo.descuentoPct.toFixed(1))}{' '}
+                    {mxn(lote.precioListaMxn)} {t.descuentoC}
                   </p>
                 ) : (
                   <p className="mt-4 text-sm text-[var(--lp-on-dark-soft)]">
-                    Precio{' '}
+                    {t.precio}{' '}
                     <span className="lp-num text-[var(--lp-on-dark)]">{mxn(plazo.precioMxn)}</span>
                   </p>
                 )}
 
                 <dl className="mt-5 border-t border-[var(--lp-line-dark)]">
                   {[
-                    { k: 'Enganche', v: plazo.engancheMxn, nota: 'Al firmar' },
+                    { k: t.enganche, v: plazo.engancheMxn, nota: t.alFirmar },
                     {
-                      k: 'Mensualidades',
+                      k: t.mensualidades,
                       v: plazo.mensualidadMxn * plazo.pagos,
-                      nota: `${plazo.pagos} pagos de ${mxn(plazo.mensualidadMxn)}`,
+                      nota: t.pagosDe(plazo.pagos, mxn(plazo.mensualidadMxn)),
                     },
                     {
-                      k: 'Contra entrega',
+                      k: t.contraentrega,
                       v: plazo.contraentregaMxn,
                       nota:
                         plazo.contraentregaVia === 'hipotecario'
-                          ? 'Al entregar. El desarrollador lo plantea con crédito hipotecario.'
-                          : 'Al entregar',
+                          ? t.alEntregarHipotecario
+                          : t.alEntregar,
                     },
                   ]
                     .filter((f) => f.v > 0)
@@ -321,11 +336,13 @@ export default function ComparadorLotes({ lotes }: { lotes: LoteComparable[] }) 
                   {mxn(lote.precioListaMxn)}
                 </p>
                 <p className="mt-3 max-w-[54ch] text-sm leading-relaxed text-[var(--lp-on-dark-soft)]">
-                  {lote.motivoSinPlan}
+                  {t.motivo && lote.motivoSinPlanCodigo
+                    ? t.motivo(lote.motivoSinPlanCodigo, lote.contado)
+                    : lote.motivoSinPlan}
                 </p>
                 {lote.contado && lote.contado.descuentoPct > 0 && (
                   <p className="mt-3 max-w-[54ch] text-sm leading-relaxed text-[var(--lp-on-dark-soft)]">
-                    Pagándolo de contado, el desarrollador descuenta{' '}
+                    {t.contadoA}{' '}
                     {lote.contado.descuentoPct.toFixed(0)}%:{' '}
                     <span className="lp-num text-[var(--lp-on-dark)]">{mxn(lote.contado.precioMxn)}</span>.
                   </p>
@@ -335,7 +352,7 @@ export default function ComparadorLotes({ lotes }: { lotes: LoteComparable[] }) 
 
             {lote.apartadoMxn !== null && (
               <p className="mt-4 text-sm text-[var(--lp-on-dark-soft)]">
-                El apartado para reservarlo es de{' '}
+                {t.apartadoA}{' '}
                 <span className="lp-num text-[var(--lp-on-dark)]">{mxn(lote.apartadoMxn)}</span>.
               </p>
             )}
@@ -343,9 +360,9 @@ export default function ComparadorLotes({ lotes }: { lotes: LoteComparable[] }) 
         </div>
 
         <div className="mt-6">
-          <DisclaimerCifras tono="oscuro" alcance="el esquema que declara cada desarrollador" />
+          <DisclaimerCifras tono="oscuro" alcance="cadaDesarrollador" locale={locale} />
           <p className="mt-2 max-w-[62ch] text-xs leading-relaxed text-[var(--lp-on-dark-soft)]">
-            Solo publicamos la mensualidad donde el desarrollador tiene el esquema declarado.
+            {t.soloPublicamos}
           </p>
         </div>
 
@@ -354,7 +371,7 @@ export default function ComparadorLotes({ lotes }: { lotes: LoteComparable[] }) 
             href="#solicitar"
             className="inline-flex min-h-[52px] cursor-pointer items-center justify-center rounded-[var(--lp-r-control)] border border-[var(--lp-accent-on-dark)]/45 px-7 text-sm font-medium text-[var(--lp-accent-on-dark)] transition-colors duration-200 hover:border-[var(--lp-accent-on-dark)] hover:bg-[var(--lp-accent-on-dark)]/10"
           >
-            Pedir el detalle de este lote
+            {t.cta}
           </a>
         </div>
       </div>

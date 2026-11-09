@@ -2,6 +2,8 @@
 
 import { useId, useState } from 'react';
 import { mxn } from './format';
+import { SELECTOR } from '../lotes-playa-del-carmen/_copy';
+import type { LocaleLp } from './v2/i18n';
 import type { OpcionPlazo } from '@/lib/supabase/lp-lotes';
 
 // ============================================================
@@ -21,10 +23,13 @@ import type { OpcionPlazo } from '@/lib/supabase/lp-lotes';
 export default function SelectorPlazo({
   opciones,
   sinIntereses,
+  locale = 'es',
 }: {
   opciones: OpcionPlazo[];
   sinIntereses: boolean;
+  locale?: LocaleLp;
 }) {
+  const t = SELECTOR[locale];
   // Default al plazo más largo: es la mensualidad más baja y, sobre todo, es la
   // cifra que ya publica el hero. Que el hero y este bloque mostraran números
   // distintos al cargar se leería como un error de la página, no como opción.
@@ -53,7 +58,7 @@ export default function SelectorPlazo({
       {opciones.length > 1 && (
         <fieldset>
           <legend className="font-mono text-[0.6875rem] uppercase tracking-[0.08em] text-[var(--lp-muted)]">
-            Elige el plazo
+            {t.elige}
           </legend>
           <div className="mt-3 flex flex-wrap gap-2">
             {opciones.map((o) => {
@@ -69,7 +74,7 @@ export default function SelectorPlazo({
                     onChange={() => setMeses(o.meses)}
                   />
                   <label htmlFor={id} className={`${CHIP_BASE} ${CHIP_OFF} ${CHIP_ON} ${CHIP_FOCUS}`}>
-                    {o.meses} meses
+                    {o.meses} {t.meses}
                   </label>
                 </div>
               );
@@ -85,15 +90,14 @@ export default function SelectorPlazo({
           {mxn(activa.mensualidadMxn)}
         </p>
         <p className="mt-2 text-sm text-[var(--lp-ink-soft)]">
-          al mes · {activa.pagos} pagos
-          {sinIntereses && ' sin intereses'}
+          {t.alMes} · {activa.pagos} {t.pagos}
+          {sinIntereses && t.sinIntereses}
         </p>
       </div>
 
       {opciones.length > 1 && (
         <p className="mt-4 max-w-[52ch] text-xs leading-relaxed text-[var(--lp-muted)]">
-          El plazo cambia el tamaño de la mensualidad, no lo que acabas pagando:
-          sin intereses, el total es el mismo en cualquiera de las opciones.
+          {t.nota}
         </p>
       )}
     </div>

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { MessageCircle } from '@/lib/icons';
 import { trackWhatsAppClick } from '@/lib/analytics/track';
+import { KIT, type LocaleLp } from './i18n';
 
 // ============================================================
 // Barra fija de móvil. Solo móvil, y solo cuando el hero sale de vista:
@@ -16,12 +17,14 @@ export default function BarraMovil({
   mensajeWhatsApp,
   surface,
   href = '#solicitar',
+  locale = 'es',
 }: {
   etiqueta: string;
   telefonoWhatsApp: string;
   mensajeWhatsApp: string;
   surface: string;
   href?: string;
+  locale?: LocaleLp;
 }) {
   const [visible, setVisible] = useState(false);
 
@@ -59,7 +62,7 @@ export default function BarraMovil({
           rel="noopener noreferrer"
           tabIndex={visible ? undefined : -1}
           onClick={() => trackWhatsAppClick({ surface })}
-          aria-label="Escribir por WhatsApp"
+          aria-label={KIT[locale].whatsappAria}
           className="flex min-h-[56px] w-[68px] shrink-0 items-center justify-center"
         >
           <MessageCircle className="h-5 w-5" style={{ color: 'var(--lpv-wa)' }} aria-hidden />

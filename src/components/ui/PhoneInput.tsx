@@ -39,6 +39,8 @@ interface PhoneInputFieldProps {
    *  `className` de un <input> normal en estos formularios. */
   className?: string;
   toolParamDescription?: string;
+  /** País preseleccionado. Las landings en inglés pasan 'US' (tráfico de EE.UU. y Canadá). */
+  defaultCountry?: 'MX' | 'US';
 }
 
 export default function PhoneInputField({
@@ -53,13 +55,14 @@ export default function PhoneInputField({
   required,
   className,
   toolParamDescription,
+  defaultCountry = 'MX',
 }: PhoneInputFieldProps) {
   return (
     <ReactPhoneInputWithCountry
       id={id}
       name={name}
       international
-      defaultCountry="MX"
+      defaultCountry={defaultCountry}
       countryOptionsOrder={PREFERRED_COUNTRIES}
       value={value}
       onChange={onChange}

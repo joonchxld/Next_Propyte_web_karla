@@ -1,4 +1,5 @@
-import { fechaLarga } from './format';
+import { fechaLargaL, BADGE } from '../lotes-playa-del-carmen/_copy';
+import type { LocaleLp } from './v2/i18n';
 
 // ============================================================
 // Estado del lote a la fecha de corte.
@@ -34,6 +35,7 @@ export default function AvailabilityBadge({
   estado,
   disponibles,
   fechaCorte,
+  locale = 'es',
 }: {
   /** Estado comercial literal del registro. */
   estado: string | null;
@@ -41,8 +43,10 @@ export default function AvailabilityBadge({
   disponibles: number | null;
   /** ISO corto. Se formatea aquí para no repetirlo en cada llamada. */
   fechaCorte: string | null;
+  locale?: LocaleLp;
 }) {
-  const corte = fechaCorte ? fechaLarga(fechaCorte) : null;
+  const t = BADGE[locale];
+  const corte = fechaCorte ? fechaLargaL(fechaCorte, locale) : null;
   if (!estado && !corte) return null;
 
   return (
@@ -58,13 +62,12 @@ export default function AvailabilityBadge({
       )}
       {disponibles !== null && (
         <span className="text-[0.6875rem] text-[var(--lp-on-dark-soft)]">
-          <span className="lp-num">{disponibles}</span> lotes disponibles según el
-          desarrollador
+          <span className="lp-num">{disponibles}</span> {t.disponibles}
         </span>
       )}
       {corte && (
         <span className="lp-num text-[0.6875rem] tracking-[0.04em] text-[var(--lp-on-dark-soft)]">
-          Al {corte}
+          {t.al} {corte}
         </span>
       )}
     </span>

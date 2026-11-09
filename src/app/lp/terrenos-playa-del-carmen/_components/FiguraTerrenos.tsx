@@ -26,11 +26,6 @@ import type { ImagenLanding } from '@/lib/supabase/lp-lotes';
 // rótulo lo escribiera cada llamada, en algún sitio se suavizaría.
 // ============================================================
 
-const PREFIJO: Record<ImagenLanding['tipo'], string> = {
-  render: 'Render del desarrollador.',
-  foto: 'Fotografía real.',
-};
-
 export default function FiguraTerrenos({
   imagen,
   sizes,
@@ -43,7 +38,10 @@ export default function FiguraTerrenos({
   aspecto = 'aspect-[4/3]',
   /** `false` en mosaicos densos, donde el pie iría repetido bajo cada lámina. */
   conPie = true,
+  prefijo,
 }: {
+  /** Prefijo del pie por tipo de imagen, en el idioma de la página. */
+  prefijo: Record<ImagenLanding['tipo'], string>;
   imagen: ImagenLanding;
   sizes: string;
   lamina: string;
@@ -88,7 +86,7 @@ export default function FiguraTerrenos({
 
       {conPie && (
         <figcaption className="lpt-cuerpo mt-2.5 max-w-[52ch] text-[0.75rem] leading-relaxed text-[var(--lpt-claro-3)]">
-          <span className="text-[var(--lpt-claro-2)]">{PREFIJO[imagen.tipo]}</span>{' '}
+          <span className="text-[var(--lpt-claro-2)]">{prefijo[imagen.tipo]}</span>{' '}
           {imagen.caption}
         </figcaption>
       )}

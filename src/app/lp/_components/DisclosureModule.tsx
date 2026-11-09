@@ -3,7 +3,6 @@ import { TituloSeccion } from './ui';
 import UrbanizacionReal, { ANCLA_URBANIZACION } from './UrbanizacionReal';
 import LoQueFaltaConfirmar, {
   ANCLA_GATES,
-  NUMERO_PALABRA,
   construirPendientes,
 } from './LoQueFaltaConfirmar';
 import SituacionJuridica from './SituacionJuridica';
@@ -11,6 +10,8 @@ import CostosNoIncluidos from './CostosNoIncluidos';
 import ParaQuienNoEs from './ParaQuienNoEs';
 import AbrirPanelPorHash from './AbrirPanelPorHash';
 import type { LoteLanding } from '@/lib/supabase/lp-lotes';
+import { DISCLOSURE } from '../lotes-playa-del-carmen/_copy';
+import type { LocaleLp } from './v2/i18n';
 
 // ============================================================
 // Antes de firmar: lo que debes saber.
@@ -79,14 +80,21 @@ function Panel({
   );
 }
 
-export default function DisclosureModule({ lote }: { lote: LoteLanding }) {
-  const pendientes = construirPendientes(lote);
-  const cuantos = NUMERO_PALABRA[pendientes.length] ?? String(pendientes.length);
+export default function DisclosureModule({
+  lote,
+  locale = 'es',
+}: {
+  lote: LoteLanding;
+  locale?: LocaleLp;
+}) {
+  const t = DISCLOSURE[locale];
+  const pendientes = construirPendientes(lote, locale);
+  const cuantos = t.numeroPalabra[pendientes.length] ?? String(pendientes.length);
 
   const conectados = lote.servicios.filter((s) => s.estado === 'disponible').length;
   const resumenServicios = lote.servicios.length
-    ? `${lote.servicios.length} servicios · ${conectados === 0 ? 'ninguno conectado hoy' : `${conectados} conectados`}`
-    : 'estatus por confirmar';
+    ? t.resumenServicios(lote.servicios.length, conectados)
+    : t.resumenServiciosVacio;
 
   const conceptos =
     (lote.costos?.cargosUnicos.length ?? 0) +
@@ -101,12 +109,10 @@ export default function DisclosureModule({ lote }: { lote: LoteLanding }) {
       <AbrirPanelPorHash />
       <div className="mx-auto max-w-6xl px-5 py-14 lg:py-20">
         <TituloSeccion id="antes-de-firmar-titulo" tono="oscuro">
-          Antes de firmar: lo que debes saber
+          {t.titulo}
         </TituloSeccion>
         <p className="mt-5 max-w-[58ch] text-base leading-relaxed text-white/70">
-          Publicamos esto porque la mayoría de los anuncios de esta zona simplemente
-          no lo menciona. Está todo aquí, agrupado: ábrelo por partes o léelo
-          completo.
+          {t.intro}
         </p>
 
         <div className="mt-10 border-t border-[var(--lp-line-dark)]">
@@ -115,45 +121,45 @@ export default function DisclosureModule({ lote }: { lote: LoteLanding }) {
               caja donde escondimos las malas noticias. */}
           <Panel
             id={ANCLA_URBANIZACION}
-            titulo="Qué tiene el lote hoy, y qué falta"
+            titulo={t.serviciosTitulo}
             resumen={resumenServicios}
             abierto
           >
-            <UrbanizacionReal lote={lote} />
+            <UrbanizacionReal lote={lote} locale={locale} />
           </Panel>
 
           {pendientes.length > 0 && (
             <Panel
               id={ANCLA_GATES}
-              titulo={`${cuantos} cosa${pendientes.length > 1 ? 's' : ''} que todavía no sabemos`}
-              resumen={`${pendientes.length} ${pendientes.length > 1 ? 'datos' : 'dato'} en trámite`}
+              titulo={t.pendientesTitulo(cuantos, pendientes.length)}
+              resumen={t.pendientesResumen(pendientes.length)}
             >
-              <LoQueFaltaConfirmar lote={lote} />
+              <LoQueFaltaConfirmar lote={lote} locale={locale} />
             </Panel>
           )}
 
           <Panel
             id="juridico"
-            titulo="Situación jurídica, sin adjetivos"
-            resumen="Fideicomiso · no escriturable hoy"
+            titulo={t.juridicoTitulo}
+            resumen={t.juridicoResumen}
           >
-            <SituacionJuridica lote={lote} />
+            <SituacionJuridica lote={lote} locale={locale} />
           </Panel>
 
           <Panel
             id="costos"
-            titulo="Lo que no está en el precio"
-            resumen={conceptos ? `${conceptos} conceptos adicionales` : 'por confirmar'}
+            titulo={t.costosTitulo}
+            resumen={conceptos ? t.costosResumen(conceptos) : t.costosResumenVacio}
           >
-            <CostosNoIncluidos lote={lote} />
+            <CostosNoIncluidos lote={lote} locale={locale} />
           </Panel>
 
           <Panel
             id="para-quien-no-es"
-            titulo="Para quién no es este producto"
-            resumen="3 perfiles a los que no les sirve"
+            titulo={t.noEsTitulo}
+            resumen={t.noEsResumen}
           >
-            <ParaQuienNoEs lote={lote} />
+            <ParaQuienNoEs lote={lote} locale={locale} />
           </Panel>
         </div>
       </div>

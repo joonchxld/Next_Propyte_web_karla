@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { CHANGED_EVENT, readConsent } from '@/lib/cookies/consent';
+import { COPY } from '../_copy';
+import type { LocaleLp } from '../../_components/v2/i18n';
 
 // ============================================================
 // Barra fija de móvil. Existe por una razón medida: en un teléfono, el
@@ -23,10 +25,14 @@ import { CHANGED_EVENT, readConsent } from '@/lib/cookies/consent';
 
 export default function BarraMovil({
   mensualidadTexto,
+  locale,
 }: {
+  /** Idioma; el diccionario lleva funciones y se resuelve aquí, en el cliente. */
+  locale: LocaleLp;
   /** Ya formateada por el servidor: aquí no se hace aritmética de dinero. */
   mensualidadTexto: string | null;
 }) {
+  const copy = COPY[locale].barra;
   const [decidido, setDecidido] = useState(false);
   const [pasoElHero, setPasoElHero] = useState(false);
 
@@ -67,7 +73,7 @@ export default function BarraMovil({
         {mensualidadTexto && (
           <p className="min-w-0 flex-1">
             <span className="lpt-cota block text-[0.625rem] uppercase tracking-[0.12em] text-[var(--lpt-claro-3)]">
-              Desde
+              {copy.desde}
             </span>
             <span className="lpt-cota block truncate text-sm text-[var(--lpt-claro)]">
               {mensualidadTexto}
@@ -79,7 +85,7 @@ export default function BarraMovil({
           tabIndex={visible ? undefined : -1}
           className="lpt-titular shrink-0 rounded-[var(--lpt-r)] bg-[var(--lpt-estaca)] px-5 py-3.5 text-[0.9375rem] text-[var(--lpt-tinta)]"
         >
-          Ver mi plan
+          {copy.cta}
         </a>
       </div>
     </div>

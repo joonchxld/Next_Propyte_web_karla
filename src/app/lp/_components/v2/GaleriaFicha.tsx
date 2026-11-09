@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight } from '@/lib/icons';
+import { KIT, type LocaleLp } from './i18n';
 
 // ============================================================
 // Galería de una ficha: carrusel de fotos con scroll-snap nativo.
@@ -34,7 +35,8 @@ export default function GaleriaFicha({
   prioridad = false,
   tope = 12,
   className = '',
-  sinFoto = 'Sin fotografía',
+  locale = 'es',
+  sinFoto = KIT[locale].sinFoto,
   controles = 'encima',
   pie,
 }: {
@@ -45,6 +47,8 @@ export default function GaleriaFicha({
   prioridad?: boolean;
   tope?: number;
   className?: string;
+  /** Antes que `sinFoto`: su valor por defecto depende del idioma. */
+  locale?: LocaleLp;
   sinFoto?: string;
   controles?: 'encima' | 'abajo';
   /** Texto a la izquierda de la fila de controles (solo `abajo`). */
@@ -124,7 +128,7 @@ export default function GaleriaFicha({
             type="button"
             onClick={() => ir(-1)}
             disabled={indice === 0}
-            aria-label="Foto anterior"
+            aria-label={KIT[locale].fotoAnterior}
             className="absolute left-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-[rgb(10_10_12/0.55)] text-white opacity-0 transition-opacity duration-200 hover:bg-[rgb(10_10_12/0.8)] focus-visible:opacity-100 disabled:opacity-0 group-hover/galeria:opacity-100 [@media(hover:none)]:opacity-100"
           >
             <ChevronLeft className="h-4 w-4" aria-hidden />
@@ -133,7 +137,7 @@ export default function GaleriaFicha({
             type="button"
             onClick={() => ir(1)}
             disabled={indice >= fotos.length - 1}
-            aria-label="Foto siguiente"
+            aria-label={KIT[locale].fotoSiguiente}
             className="absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-[rgb(10_10_12/0.55)] text-white opacity-0 transition-opacity duration-200 hover:bg-[rgb(10_10_12/0.8)] focus-visible:opacity-100 disabled:opacity-0 group-hover/galeria:opacity-100 [@media(hover:none)]:opacity-100"
           >
             <ChevronRight className="h-4 w-4" aria-hidden />
@@ -164,7 +168,7 @@ export default function GaleriaFicha({
               type="button"
               onClick={() => ir(-1)}
               disabled={indice === 0}
-              aria-label="Foto anterior"
+              aria-label={KIT[locale].fotoAnterior}
               className="flex h-8 w-8 items-center justify-center rounded-full border border-[var(--lpv-line-2)] text-[var(--lpv-fg)] transition-colors hover:bg-[var(--lpv-fg)] hover:text-[var(--lpv-bg)] disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-[var(--lpv-fg)]"
             >
               <ArrowLeft className="h-3.5 w-3.5" aria-hidden />
@@ -177,7 +181,7 @@ export default function GaleriaFicha({
               type="button"
               onClick={() => ir(1)}
               disabled={indice >= fotos.length - 1}
-              aria-label="Foto siguiente"
+              aria-label={KIT[locale].fotoSiguiente}
               className="flex h-8 w-8 items-center justify-center rounded-full border border-[var(--lpv-line-2)] text-[var(--lpv-fg)] transition-colors hover:bg-[var(--lpv-fg)] hover:text-[var(--lpv-bg)] disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-[var(--lpv-fg)]"
             >
               <ArrowRight className="h-3.5 w-3.5" aria-hidden />

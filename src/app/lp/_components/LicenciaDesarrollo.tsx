@@ -1,5 +1,6 @@
 import { RULE_DARK } from './ui';
-import { fechaLarga } from './format';
+import { fechaLargaL, LICENCIA } from '../lotes-playa-del-carmen/_copy';
+import type { LocaleLp } from './v2/i18n';
 import PendingStatus from './PendingStatus';
 import type { LicenciaDesarrollo as Licencia } from '@/lib/supabase/lp-lotes';
 
@@ -25,11 +26,14 @@ import type { LicenciaDesarrollo as Licencia } from '@/lib/supabase/lp-lotes';
 export default function LicenciaDesarrollo({
   licencia,
   actualizado,
+  locale = 'es',
 }: {
   licencia: Licencia;
   /** Fecha de corte de la consulta: cuándo se verificó por última vez. */
   actualizado: string | null;
+  locale?: LocaleLp;
 }) {
+  const t = LICENCIA[locale];
   return (
     <section
       aria-labelledby="licencia-titulo"
@@ -39,22 +43,22 @@ export default function LicenciaDesarrollo({
         id="licencia-titulo"
         className="lp-display text-base font-semibold tracking-tight text-white"
       >
-        Licencia y autorización de venta
+        {t.titulo}
       </h3>
 
       {licencia.completa ? (
         <dl className="mt-5 grid gap-x-8 gap-y-5 sm:grid-cols-2">
           {[
-            { etiqueta: 'Licencia del desarrollo', valor: licencia.licenciaNumero },
+            { etiqueta: t.licencia, valor: licencia.licenciaNumero },
             {
-              etiqueta: 'Fecha de licencia',
-              valor: licencia.licenciaFecha ? fechaLarga(licencia.licenciaFecha) : null,
+              etiqueta: t.fechaLicencia,
+              valor: licencia.licenciaFecha ? fechaLargaL(licencia.licenciaFecha, locale) : null,
             },
-            { etiqueta: 'Autorización de venta', valor: licencia.autorizacionNumero },
+            { etiqueta: t.autorizacion, valor: licencia.autorizacionNumero },
             {
-              etiqueta: 'Fecha de autorización',
+              etiqueta: t.fechaAutorizacion,
               valor: licencia.autorizacionFecha
-                ? fechaLarga(licencia.autorizacionFecha)
+                ? fechaLargaL(licencia.autorizacionFecha, locale)
                 : null,
             },
           ].map((c) => (
@@ -70,30 +74,28 @@ export default function LicenciaDesarrollo({
         <div className="mt-5">
           <PendingStatus
             tono="oscuro"
-            titulo="Licencia del desarrollo y autorización de venta municipal"
+            titulo={t.pendienteTitulo}
+            locale={locale}
             actualizado={actualizado}
             cta={
               <>
-                Pídelas y te las mandamos el mismo día en que las tengamos.{' '}
+                {t.cta}{' '}
                 <a
                   href="#solicitar"
                   className="underline decoration-white/30 underline-offset-4 transition-colors duration-200 hover:text-white"
                 >
-                  Pedirlas
+                  {t.ctaLink}
                 </a>
                 .
               </>
             }
           >
-            Son obligatorias conforme al artículo 69 de la Ley de Asentamientos
-            Urbanos de Quintana Roo. Todavía no las tenemos por escrito del
-            desarrollador; las estamos recabando y se publican aquí en cuanto
-            lleguen.{' '}
+            {t.cuerpo}{' '}
             <a
               href="#falta-confirmar"
               className="underline decoration-white/30 underline-offset-4 transition-colors duration-200 hover:text-white"
             >
-              Qué más falta
+              {t.cuerpoLink}
             </a>
             .
           </PendingStatus>

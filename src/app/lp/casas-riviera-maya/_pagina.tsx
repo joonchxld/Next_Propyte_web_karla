@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import localFont from 'next/font/local';
 import { getCasasRivieraMaya, resumenInventario } from '@/lib/supabase/lp-casas';
+import { enIdioma } from '@/lib/supabase/lp-inventario';
 import { FALLBACK_WHATSAPP } from '@/lib/site-contact';
 import { dinero, dineroCompacto } from '../_components/format';
 import FormAutonomo from './_components/FormAutonomo';
@@ -144,7 +145,7 @@ function CorrigeLang({ copy }: { copy: CopyCasas }) {
 }
 
 export default async function PaginaCasas({ copy }: { copy: CopyCasas }) {
-  const casas = await getCasasRivieraMaya();
+  const casas = enIdioma(await getCasasRivieraMaya(), copy.locale);
   const resumen = resumenInventario(casas);
 
   // Inventario vacío es un escenario probable, no un caso borde: basta con que

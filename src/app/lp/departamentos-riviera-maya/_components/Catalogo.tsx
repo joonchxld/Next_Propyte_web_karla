@@ -10,8 +10,9 @@ import FormInventario from '../../_components/v2/FormInventario';
 import GaleriaFicha from '../../_components/v2/GaleriaFicha';
 import { ANCLA_INVENTARIO } from '../../_components/v2/ChipsUbicacion';
 import { useFiltros } from '../../_components/v2/useFiltros';
-import { ESTADO_TEXTO, plural, ubicacionCorta } from '../../_components/v2/util';
-import { FORM } from '../_copy';
+import type { LocaleLp } from '../../_components/v2/i18n';
+import { estadoTexto, plural, ubicacionCorta } from '../../_components/v2/util';
+import { COPY } from '../_copy';
 
 // ============================================================
 // Capitulos por ciudad + formulario en linea.
@@ -39,24 +40,25 @@ export interface Capitulo {
  * Caracteristicas grandes con icono, como pidio el brief: lo que tiene cada
  * departamento de un vistazo. Solo datos existentes; lo que falta no sale.
  */
-function Specs({ p }: { p: PropiedadLanding }) {
+function Specs({ p, locale }: { p: PropiedadLanding; locale: LocaleLp }) {
+  const t = COPY[locale].specs;
   const items: { icono: typeof Bed; valor: string; etiqueta: string; clave: string }[] = [];
-  if (p.recamaras) items.push({ clave: 'rec', icono: Bed, valor: String(p.recamaras), etiqueta: p.recamaras === 1 ? 'recámara' : 'recámaras' });
-  if (p.banos) items.push({ clave: 'ban', icono: Bath, valor: String(p.banos), etiqueta: p.banos === 1 ? 'baño' : 'baños' });
-  if (p.m2Construidos) items.push({ clave: 'm2', icono: Maximize, valor: m2(p.m2Construidos), etiqueta: 'construidos' });
-  if (p.vista) items.push({ clave: 'vista', icono: p.frenteAlMar ? Waves : Eye, valor: p.vista, etiqueta: 'vista' });
+  if (p.recamaras) items.push({ clave: 'rec', icono: Bed, valor: String(p.recamaras), etiqueta: p.recamaras === 1 ? t.recamara[0] : t.recamara[1] });
+  if (p.banos) items.push({ clave: 'ban', icono: Bath, valor: String(p.banos), etiqueta: p.banos === 1 ? t.bano[0] : t.bano[1] });
+  if (p.m2Construidos) items.push({ clave: 'm2', icono: Maximize, valor: m2(p.m2Construidos), etiqueta: t.construidos });
+  if (p.vista) items.push({ clave: 'vista', icono: p.frenteAlMar ? Waves : Eye, valor: p.vista, etiqueta: t.vista });
   if (p.estadoComercial !== 'disponible') {
     items.push({
       clave: 'estado',
       icono: p.estadoComercial === 'preventa' ? Calendar : Key,
-      valor: ESTADO_TEXTO[p.estadoComercial],
-      etiqueta: 'entrega',
+      valor: estadoTexto(locale)[p.estadoComercial],
+      etiqueta: t.entrega,
     });
   }
-  if (p.entrega) items.push({ clave: 'entrega', icono: Home, valor: p.entrega, etiqueta: 'se entrega' });
+  if (p.entrega) items.push({ clave: 'entrega', icono: Home, valor: p.entrega, etiqueta: t.seEntrega });
   if (items.length === 0) return null;
   return (
-    <ul className="lpd-specs mt-4 grid grid-cols-2 gap-x-4 gap-y-3" aria-label="Características">
+    <ul className="lpd-specs mt-4 grid grid-cols-2 gap-x-4 gap-y-3" aria-label={t.aria}>
       {items.map(({ clave, icono: Icono, valor, etiqueta }) => (
         <li key={clave} className="flex items-center gap-2.5">
           <Icono className="h-5 w-5 shrink-0 text-[var(--lpv-accent)]" aria-hidden />
@@ -75,13 +77,16 @@ function Riel({
   elegida,
   onElegir,
   prioridad,
+  locale,
 }: {
+  locale: LocaleLp;
   capitulo: Capitulo;
   elegida: string | null;
   onElegir: (slug: string) => void;
   prioridad: boolean;
 }) {
   const pista = useRef<HTMLUListElement>(null);
+  const t = COPY[locale];
   const { ubicacion, propiedades } = capitulo;
   const desde = propiedades[0]?.precio ?? null;
 
@@ -101,15 +106,15 @@ function Riel({
           </h2>
           <div className="flex items-center gap-5 pb-2 sm:pb-4">
             <p className="text-[0.9375rem] text-[var(--lpv-fg-2)]">
-              {plural(propiedades.length, 'departamento', 'departamentos')}
-              {desde ? ` · desde ${dineroCompacto(desde)}` : ''}
+              {plural(propiedades.length, ...t.departamento)}
+              {desde ? `${t.riel.desde}${dineroCompacto(desde)}` : ''}
             </p>
             {propiedades.length > 2 && (
               <div className="hidden items-center gap-2 sm:flex">
                 <button
                   type="button"
                   onClick={() => desplazar(-1)}
-                  aria-label={`Anteriores en ${ubicacion.nombre}`}
+                  aria-label={t.riel.anteriores(ubicacion.nombre)}
                   className="lpd-flecha h-10 w-10 items-center justify-center border border-[var(--lpv-line-2)] text-[var(--lpv-fg)] hover:border-[var(--lpv-fg)]"
                 >
                   <ChevronLeft className="h-4 w-4" aria-hidden />
@@ -117,7 +122,7 @@ function Riel({
                 <button
                   type="button"
                   onClick={() => desplazar(1)}
-                  aria-label={`Siguientes en ${ubicacion.nombre}`}
+                  aria-label={t.riel.siguientes(ubicacion.nombre)}
                   className="lpd-flecha h-10 w-10 items-center justify-center border border-[var(--lpv-line-2)] text-[var(--lpv-fg)] hover:border-[var(--lpv-fg)]"
                 >
                   <ChevronRight className="h-4 w-4" aria-hidden />
@@ -131,7 +136,7 @@ function Riel({
       <ul
         ref={pista}
         className="lpd-riel mx-auto mt-8 flex max-w-[96rem] gap-5 overflow-x-auto px-5 pb-14 sm:px-8 sm:pb-20"
-        aria-label={`Departamentos en ${ubicacion.nombre}`}
+        aria-label={t.riel.lista(ubicacion.nombre)}
       >
         {propiedades.map((p, i) => {
           const esElegida = elegida === p.slug;
@@ -144,21 +149,22 @@ function Riel({
                 sizes="(min-width: 640px) 22rem, 80vw"
                 prioridad={prioridad && i < 2}
                 tope={6}
+                locale={locale}
                 className="!rounded-none"
               />
               <div className="mt-4">
                 <p className="lpd-serif text-[1.5rem] text-[var(--lpv-fg)]">
-                  {p.precio ? dinero(p.precio) : 'Precio por confirmar'}
+                  {p.precio ? dinero(p.precio) : t.riel.precioPorConfirmar}
                 </p>
                 <p className="mt-1.5 line-clamp-2 text-[0.9375rem] leading-snug text-[var(--lpv-fg)]">{p.titulo}</p>
                 <p className="mt-1 text-[0.8125rem] text-[var(--lpv-fg-2)]">{ubicacionCorta(p)}</p>
-                <Specs p={p} />
+                <Specs p={p} locale={locale} />
                 <p className="mt-3 text-[0.8125rem] text-[var(--lpv-fg-2)]">
                   {p.enganchePct ? (
-                    <>Enganche {p.enganchePct}%</>
+                    <>{t.riel.enganche(p.enganchePct)}</>
                   ) : (
                     <span className="border-b border-dotted border-[var(--lpv-fg-3)] text-[var(--lpv-fg-3)]">
-                      Enganche por confirmar
+                      {t.riel.enganchePorConfirmar}
                     </span>
                   )}
                 </p>
@@ -168,7 +174,7 @@ function Riel({
                   aria-pressed={esElegida}
                   className="lpd-enlace mt-3 text-[0.9375rem]"
                 >
-                  {esElegida ? 'Elegido' : 'Me interesa'}
+                  {esElegida ? t.riel.elegido : t.riel.meInteresa}
                 </button>
               </div>
             </li>
@@ -183,11 +189,14 @@ export default function Catalogo({
   todos,
   defs,
   telefonoWhatsApp,
+  locale = 'es',
 }: {
+  locale?: LocaleLp;
   todos: PropiedadLanding[];
   defs: FiltroDef[];
   telefonoWhatsApp: string;
 }) {
+  const t = COPY[locale];
   const [elegida, setElegida] = useState<string | null>(null);
   const anclaForm = useRef<HTMLDivElement>(null);
   const { visibles, activos, limpiar } = useFiltros(todos, defs);
@@ -220,26 +229,26 @@ export default function Catalogo({
           <div className="mx-auto flex max-w-[96rem] flex-wrap items-baseline justify-between gap-3 px-5 pt-8 sm:px-8">
             <p aria-live="polite" className="text-[0.9375rem] text-[var(--lpv-fg-2)]">
               {visibles.length === 0
-                ? 'Ninguno coincide con todo lo que elegiste.'
-                : `${plural(visibles.length, 'departamento coincide', 'departamentos coinciden')} con lo que elegiste.`}
+                ? t.catalogo.ninguno
+                : `${plural(visibles.length, t.catalogo.coincidenSing, t.catalogo.coincidenPlural)}${t.catalogo.coincidenResto}`}
             </p>
             <button type="button" onClick={limpiar} className="lpd-enlace text-[0.9375rem]">
-              Quitar filtros
+              {t.catalogo.quitarFiltros}
             </button>
           </div>
         )}
 
         {capitulos.map((c, i) => (
-          <Riel key={c.ubicacion.clave} capitulo={c} elegida={elegidaVisible} onElegir={elegir} prioridad={i === 0} />
+          <Riel key={c.ubicacion.clave} capitulo={c} elegida={elegidaVisible} onElegir={elegir} prioridad={i === 0} locale={locale} />
         ))}
 
         {visibles.length === 0 && (
           <div className="mx-auto max-w-[96rem] border-t border-[var(--lpv-line)] px-5 py-16 sm:px-8 sm:py-24">
             <p className="lpd-serif max-w-[22ch] text-[clamp(2rem,1.4rem+2.6vw,3.5rem)] text-[var(--lpv-fg)]">
-              Con ese presupuesto no hay nada publicado en esa ciudad.
+              {t.catalogo.sinResultadosTitulo}
             </p>
             <p className="mt-5 max-w-[48ch] text-base leading-relaxed text-[var(--lpv-fg-2)]">
-              Quita un filtro, o mándanos el formulario y te decimos qué hay cerca de lo que buscas.
+              {t.catalogo.sinResultadosCuerpo}
             </p>
           </div>
         )}
@@ -249,14 +258,17 @@ export default function Catalogo({
         <div className="mx-auto max-w-[34rem] px-5 py-16 sm:px-0 sm:py-24">
           <h2 className="lpd-serif text-[clamp(2rem,1.4rem+2.6vw,3.5rem)] text-[var(--lpv-fg)]">
             {activos > 0 && visibles.length > 0
-              ? `Te mandamos la información completa de ${visibles.length === 1 ? 'ese' : `esos ${visibles.length}`}.`
-              : `Te mandamos la información completa de los ${todos.length}.`}
+              ? visibles.length === 1
+                ? t.catalogo.cierreUno
+                : t.catalogo.cierreVarios(visibles.length)
+              : t.catalogo.cierreTodos(todos.length)}
           </h2>
           <div className="mt-10">
             <FormInventario
-              source="lp_deptos_rm"
+              source={t.fuente}
               variante="cierre"
-              copy={FORM}
+              copy={t.form}
+              locale={locale}
               opciones={opciones}
               seleccion={elegidaVisible}
               onSeleccion={setElegida}

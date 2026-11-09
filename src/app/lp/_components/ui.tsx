@@ -1,4 +1,6 @@
 import { Check, Clock, Minus } from '@/lib/icons';
+import { COMUN } from '../lotes-playa-del-carmen/_copy';
+import type { LocaleLp } from './v2/i18n';
 
 // ============================================================
 // Primitivas de la landing.
@@ -37,16 +39,18 @@ export const RULE_DARK = 'border-[var(--lp-line-dark)]';
 export function EnlaceGate({
   que,
   tono = 'claro',
+  locale = 'es',
 }: {
   que: string;
   tono?: 'claro' | 'oscuro';
+  locale?: LocaleLp;
 }) {
   return (
     <a
       href="#falta-confirmar"
       className={`lp-gate text-sm ${tono === 'oscuro' ? 'lp-gate-dark' : ''}`}
     >
-      Falta confirmar: {que}
+      {COMUN[locale].gatePrefijo} {que}
     </a>
   );
 }
@@ -138,8 +142,15 @@ const ESTADO_META: Record<Estado, { etiqueta: string; Icono: typeof Check; clase
  * Estado de un servicio. El icono acompaña al texto: el color nunca es el único
  * indicador, porque quien no distingue verde de terracota también necesita saberlo.
  */
-export function EstadoServicio({ estado }: { estado: Estado }) {
-  const { etiqueta, Icono, clase } = ESTADO_META[estado];
+export function EstadoServicio({
+  estado,
+  locale = 'es',
+}: {
+  estado: Estado;
+  locale?: LocaleLp;
+}) {
+  const { Icono, clase } = ESTADO_META[estado];
+  const etiqueta = COMUN[locale].estadoServicio[estado];
   return (
     <span className={`inline-flex items-center gap-1.5 text-sm ${clase}`}>
       <Icono className="size-3.5 shrink-0" aria-hidden="true" />
@@ -188,22 +199,22 @@ export function TituloSeccion({
  * de varios desarrolladores.
  */
 export function DisclaimerCifras({
-  alcance = 'el esquema que declara el desarrollador',
+  alcance = 'desarrollador',
   tono = 'claro',
+  locale = 'es',
 }: {
-  alcance?: string;
+  alcance?: 'desarrollador' | 'cadaDesarrollador';
   tono?: 'claro' | 'oscuro';
+  locale?: LocaleLp;
 }) {
+  const t = COMUN[locale];
   return (
     <p
       className={`max-w-[62ch] text-xs leading-relaxed ${
         tono === 'oscuro' ? 'text-[var(--lp-on-dark-soft)]' : 'text-[var(--lp-muted)]'
       }`}
     >
-      Cifras calculadas sobre el precio publicado y {alcance}, redondeadas al peso.
-      No son una tabla de amortización: esa te la mandamos por escrito, con las
-      fechas de cada pago, antes de que firmes nada. Condiciones sujetas a cambio
-      y disponibilidad.
+      {t.disclaimer(t.alcance[alcance])}
     </p>
   );
 }

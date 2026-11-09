@@ -3,6 +3,8 @@ import { TituloSeccion } from './ui';
 import { m2, mxn, mxnExacto } from './format';
 
 import type { LoteLanding } from '@/lib/supabase/lp-lotes';
+import { QUE } from '../lotes-playa-del-carmen/_copy';
+import type { LocaleLp } from './v2/i18n';
 
 // ============================================================
 // Qué estás comprando.
@@ -33,22 +35,6 @@ import type { LoteLanding } from '@/lib/supabase/lp-lotes';
  * Deliberadamente NO hay fallback genérico: una amenidad sin entrada aquí se
  * omite. Preferimos publicar seis amenidades que signifiquen algo a diez que no.
  */
-const CONSECUENCIA: Record<string, string> = {
-  'acceso controlado':
-    'Tus hijos pueden salir solos de la casa. Es la razón por la que la gente se muda a una privada.',
-  'seguridad 24h': 'Hay alguien despierto a las tres de la mañana.',
-  cctv: 'Lo que pasa en las áreas comunes queda grabado.',
-  'alberca comunitaria':
-    'Aprenden a nadar a dos cuadras de tu puerta, sin subirse al coche.',
-  'pet zone': 'El perro es parte del plan, no un problema a resolver.',
-  'salon de eventos': 'Los cumpleaños ocurren dentro de la privada.',
-  gimnasio: 'Ya está en el mantenimiento. No hay membresía que cancelar.',
-  cancha: 'Los adolescentes tienen a dónde ir sin salir.',
-  'jardin comunitario':
-    'Se camina. En Playa del Carmen eso no se da por hecho.',
-  'area de ninos': 'Los pones a la vista mientras haces otra cosa.',
-  'casa club': 'Hay dónde recibir visitas cuando tu casa se queda chica.',
-};
 
 /**
  * Territorio de cada amenidad.
@@ -79,11 +65,6 @@ const TERRITORIO: Record<string, 'familia' | 'seguridad' | 'vida diaria'> = {
 /** Orden de presentación. Familia primero: es el motivo de compra dominante. */
 const ORDEN_TERRITORIOS = ['familia', 'seguridad', 'vida diaria'] as const;
 
-const ROTULO: Record<(typeof ORDEN_TERRITORIOS)[number], string> = {
-  familia: 'Para los que viven contigo',
-  seguridad: 'Para dormir tranquilo',
-  'vida diaria': 'Para el día a día',
-};
 
 /** Quita acentos y normaliza para hacer match con `CONSECUENCIA`. */
 function clave(amenidad: string): string {
@@ -96,12 +77,19 @@ function clave(amenidad: string): string {
     .trim();
 }
 
-export default function QueEstasComprando({ lote }: { lote: LoteLanding }) {
+export default function QueEstasComprando({
+  lote,
+  locale = 'es',
+}: {
+  lote: LoteLanding;
+  locale?: LocaleLp;
+}) {
+  const c = QUE[locale];
   // Sólo sobreviven las amenidades con consecuencia escribible.
   const amenidades = lote.amenidades
     .map((a) => ({
-      nombre: a,
-      consecuencia: CONSECUENCIA[clave(a)],
+      nombre: c.amenidadNombre[clave(a)] ?? a,
+      consecuencia: c.consecuencia[clave(a)],
       territorio: TERRITORIO[clave(a)] ?? ('vida diaria' as const),
     }))
     .filter((a) => Boolean(a.consecuencia));
@@ -112,7 +100,7 @@ export default function QueEstasComprando({ lote }: { lote: LoteLanding }) {
 
   return (
     <section aria-labelledby="comprando-titulo">
-      <TituloSeccion id="comprando-titulo">Qué estás comprando, exactamente</TituloSeccion>
+      <TituloSeccion id="comprando-titulo">{c.titulo}</TituloSeccion>
 
       {/* Resumen en una frase. Bajó del hero, donde ocupaba la banda entera
           justo después de las cifras y repetía en prosa lo que las cifras
@@ -121,28 +109,27 @@ export default function QueEstasComprando({ lote }: { lote: LoteLanding }) {
           privada, no ejidal— aterriza donde el visitante ya se está preguntando
           qué está comprando. */}
       <p className="mt-5 max-w-[58ch] lp-display text-[clamp(1.0625rem,1rem+0.4vw,1.375rem)] leading-[1.5] text-[var(--lp-ink)]">
-        En Playa del Carmen tenemos un lote residencial disponible de{' '}
+        {c.introA}{' '}
         <span className="lp-num">
-          {lote.superficieM2 ? m2(lote.superficieM2) : 'superficie por confirmar'}
+          {lote.superficieM2 ? m2(lote.superficieM2) : c.superficiePorConfirmar}
         </span>{' '}
-        en{' '}
+        {c.introB}{' '}
         <span className="lp-num">
-          {lote.precioMxn ? `${mxn(lote.precioMxn)}` : 'precio por confirmar'}
+          {lote.precioMxn ? `${mxn(lote.precioMxn)}` : c.precioPorConfirmar}
         </span>
         {lote.precioM2Mxn && (
           <>
-            , es decir <span className="lp-num">{mxnExacto(lote.precioM2Mxn)}</span> por
-            metro cuadrado
+            {c.porM2A} <span className="lp-num">{mxnExacto(lote.precioM2Mxn)}</span>{' '}
+            {c.porM2B}
           </>
         )}
-        . Está en preventa dentro de una privada sobre Av. Universidades, a 4.2 km de
-        la playa, con financiamiento directo del desarrollador
-        {lote.plan?.sinIntereses && <> y sin intereses</>}
+        {c.introC}
+        {lote.plan?.sinIntereses && <>{c.sinIntereses}</>}
         {/* El porcentaje NO depende del plan: vive en `lote.enganchePct`. Leerlo
             de `plan` producía «enganche de enganche» cuando faltaba la tasa. */}
-        {lote.enganchePct && <>: {lote.enganchePct}% de enganche</>}
-        {plazoMax && <> y hasta {plazoMax.meses} meses</>}. Es propiedad privada, no
-        terreno ejidal.
+        {lote.enganchePct && <>{c.enganche(lote.enganchePct)}</>}
+        {plazoMax && <>{c.hasta(plazoMax.meses)}</>}
+        {c.introD}
       </p>
 
       {/* UNA columna, no dos. Esta sección ya vive dentro de la columna
@@ -156,53 +143,40 @@ export default function QueEstasComprando({ lote }: { lote: LoteLanding }) {
           como imagen en vez de como columna lateral. */}
       <div className="mt-8 flex flex-col gap-8">
         <div className="flex max-w-[62ch] flex-col gap-4 text-base leading-relaxed text-[var(--lp-ink-soft)]">
-          <p>
-            No una casa terminada: el espacio para decidir la tuya. Cuando compras
-            un terreno no heredas los acabados ni la distribución de alguien más.
-          </p>
-          <p>
-            Y estás comprando ubicación en una ciudad que ya existe. La diferencia
-            con un desarrollo en plena selva esperando que llegue la infraestructura
-            es que aquí la vida urbana ya está alrededor: 4.2 km a la playa, 2 km a
-            la carretera federal, sobre Av. Universidades.
-          </p>
+          <p>{c.p1}</p>
+          <p>{c.p2}</p>
           {/* La consecuencia del uso de suelo, no el uso de suelo. COS y CUS
               siguen publicados en el bloque jurídico; aquí va lo que significan. */}
           {apr && lote.superficieM2 && (
             <p>
-              Sobre {m2(lote.superficieM2)}, el uso de suelo permite ocupar{' '}
-              <span className="lp-num">{m2(apr.huellaM2)}</span> en
-              planta y construir hasta{' '}
+              {c.aprA} {m2(lote.superficieM2)}
+              {c.aprB}{' '}
+              <span className="lp-num">{m2(apr.huellaM2)}</span> {c.aprC}{' '}
               <strong className="font-semibold text-[var(--lp-ink)]">
                 <span className="lp-num">{m2(apr.construibleM2)}</span>{' '}
-                en total
+                {c.aprD}
               </strong>
-              : una casa de {apr.niveles === 2 ? 'dos' : apr.niveles} niveles con tres
-              recámaras, no de dos.
+              {c.aprE(apr.niveles === 2 ? c.nivelesDos : String(apr.niveles))}
             </p>
           )}
 
-          <p>
-            La lógica del producto es asegurar hoy la ubicación y el precio de
-            preventa, y construir cuando los tiempos y el presupuesto lo permitan.
-            El desarrollo fija una ventana máxima de cinco años para iniciar obra.
-          </p>
+          <p>{c.p4}</p>
 
           {amenidades.length > 0 && (
             <div className="mt-2">
               <p className="text-sm text-[var(--lp-ink-soft)]">
-                Dentro de la privada
+                {c.amenA}
                 {lote.lotesTotalesPrivada && (
                   <>
                     {' '}
-                    de{' '}
+                    {c.amenDe}{' '}
                     <span className="lp-num">
                       {lote.lotesTotalesPrivada}
                     </span>{' '}
-                    lotes
+                    {c.amenLotes}
                   </>
                 )}
-                , esto es lo que cada amenidad significa un martes cualquiera:
+                {c.amenB}
               </p>
               {/* Agrupadas en tres territorios, no en lista plana. Once
                   amenidades seguidas obligan a leerlas todas para saber si hay
@@ -217,7 +191,7 @@ export default function QueEstasComprando({ lote }: { lote: LoteLanding }) {
                   return (
                     <div key={t}>
                       <p className="text-[0.625rem] uppercase tracking-[0.14em] text-[var(--lp-muted)]">
-                        {ROTULO[t]}
+                        {c.rotulo[t]}
                       </p>
                       <dl className="mt-3 grid gap-x-10 gap-y-5 sm:grid-cols-2">
                         {delGrupo.map((a) => (
@@ -236,8 +210,7 @@ export default function QueEstasComprando({ lote }: { lote: LoteLanding }) {
                 })}
               </div>
               <p className="mt-3 text-sm text-[var(--lp-muted)]">
-                Se entregan conforme al calendario de obra, y ese calendario está más
-                abajo con sus fechas y con lo que todavía no podemos confirmar.
+                {c.amenNota}
               </p>
             </div>
           )}
@@ -258,7 +231,7 @@ export default function QueEstasComprando({ lote }: { lote: LoteLanding }) {
           // columna de texto larguísima a su izquierda. Apilada, seguir a la
           // vista mientras se lee lo de abajo sería una imagen persiguiendo al
           // lector.
-          <Figure imagen={imagen} sizes="(max-width: 1024px) 100vw, 46vw" />
+          <Figure imagen={imagen} sizes="(max-width: 1024px) 100vw, 46vw" locale={locale} />
         )}
       </div>
     </section>

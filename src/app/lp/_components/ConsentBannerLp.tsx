@@ -19,12 +19,23 @@ import { readConsent, writeConsent } from '@/lib/cookies/consent';
 // sobre datos incompletos.
 // ============================================================
 
+// El banner vive en el layout de `/lp`, que no sabe qué landing monta. El
+// idioma se toma de `<html lang>`, que las landings en inglés corrigen con
+// `CorrigeLang` antes de hidratar; como el banner solo aparece tras montar,
+// lo lee ya corregido (9-nov-2026).
+const TEXTOS = {
+  es: { aria: 'Consentimiento de cookies', cuerpo: 'Usamos cookies de medición. Puedes rechazarlas y la página funciona igual.', aceptar: 'Aceptar', rechazar: 'Rechazar' },
+  en: { aria: 'Cookie consent', cuerpo: 'We use measurement cookies. You can decline them and the page works the same.', aceptar: 'Accept', rechazar: 'Decline' },
+} as const;
+
 export default function ConsentBannerLp() {
   const [visible, setVisible] = useState(false);
+  const [idioma, setIdioma] = useState<keyof typeof TEXTOS>('es');
   const barra = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // Solo se muestra si el visitante no ha decidido antes, en este sitio.
+    if (document.documentElement.lang === 'en') setIdioma('en');
     if (readConsent() === null) setVisible(true);
   }, []);
 
@@ -57,6 +68,7 @@ export default function ConsentBannerLp() {
   }, [visible]);
 
   if (!visible) return null;
+  const t = TEXTOS[idioma];
 
   function decidir(aceptar: boolean) {
     writeConsent({ analytics: aceptar, marketing: aceptar });
@@ -66,7 +78,7 @@ export default function ConsentBannerLp() {
   return (
     <div
       role="dialog"
-      aria-label="Consentimiento de cookies"
+      aria-label={t.aria}
       // ANTES iba en `bottom-20` para dejar libre la barra de CTA fija. Medido
       // en 390x844, ese hueco de 80 px colocaba el banner en y 616–764, encima
       // de los DOS CTA del hero (y 636–692 y y 704–756): al cargar la página
@@ -111,8 +123,7 @@ export default function ConsentBannerLp() {
           —que se pueden rechazar sin romper la página—, que es la parte
           honesta y la que de verdad reduce el rechazo por desconfianza. */}
       <p className="min-w-[11rem] flex-1 text-xs leading-relaxed text-[var(--lp-ink-soft)]">
-        Usamos cookies de medición. Puedes rechazarlas y la página funciona
-        igual.
+        {t.cuerpo}
       </p>
       {/* Los botones NO crecen: en una barra de ancho completo, dos botones
           `flex-1` medirían media pantalla cada uno para decir «Aceptar». Se
@@ -124,14 +135,14 @@ export default function ConsentBannerLp() {
           onClick={() => decidir(true)}
           className="min-h-[44px] cursor-pointer rounded-[var(--lp-r-control)] bg-[var(--lp-accent)] px-5 py-2 text-xs font-medium text-white transition-colors duration-200 hover:bg-[var(--lp-accent-strong)]"
         >
-          Aceptar
+          {t.aceptar}
         </button>
         <button
           type="button"
           onClick={() => decidir(false)}
           className="min-h-[44px] cursor-pointer rounded-[var(--lp-r-control)] border border-[var(--lp-line)] px-5 py-2 text-xs font-medium text-[var(--lp-ink-soft)] transition-colors duration-200 hover:bg-[var(--lp-paper-2)]"
         >
-          Rechazar
+          {t.rechazar}
         </button>
       </div>
     </div>

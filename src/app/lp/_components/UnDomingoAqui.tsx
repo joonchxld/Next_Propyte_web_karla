@@ -1,6 +1,8 @@
 import Figure from './Figure';
 import { TituloSeccion } from './ui';
 import type { LoteLanding } from '@/lib/supabase/lp-lotes';
+import { DOMINGO } from '../lotes-playa-del-carmen/_copy';
+import type { LocaleLp } from './v2/i18n';
 
 // ============================================================
 // Un domingo aquí.
@@ -24,7 +26,14 @@ import type { LoteLanding } from '@/lib/supabase/lp-lotes';
 // secciones más abajo. Interrumpir la escena para pedir un WhatsApp la anulaba.
 // ============================================================
 
-export default function UnDomingoAqui({ lote }: { lote: LoteLanding }) {
+export default function UnDomingoAqui({
+  lote,
+  locale = 'es',
+}: {
+  lote: LoteLanding;
+  locale?: LocaleLp;
+}) {
+  const t = DOMINGO[locale];
   const imagen = lote.imagenes.domingo;
 
   return (
@@ -32,39 +41,25 @@ export default function UnDomingoAqui({ lote }: { lote: LoteLanding }) {
       <div className="mx-auto max-w-6xl px-5 py-14 lg:py-20">
         <div className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-16">
           <div>
-            <TituloSeccion id="domingo-titulo">Un domingo aquí</TituloSeccion>
+            <TituloSeccion id="domingo-titulo">{t.titulo}</TituloSeccion>
 
             <div className="mt-6 flex max-w-[58ch] flex-col gap-4 text-base leading-relaxed text-[var(--lp-ink-soft)]">
+              <p>{t.p1}</p>
               <p>
-                Salen de casa a las nueve menos veinte y a las nueve están en la
-                arena. Son 4.2 km: no es una excursión, es una decisión de última
-                hora.
-              </p>
-              <p>
-                Vuelven a comer y en la tarde los niños se van solos a la alberca.
-                Solos, porque la privada tiene un solo acceso controlado y vigilancia
-                las 24 horas, y porque son{' '}
+                {t.p2A}{' '}
                 {lote.lotesTotalesPrivada ? (
                   <span className="lp-num">
                     {lote.lotesTotalesPrivada}
                   </span>
                 ) : (
-                  'unos cientos de'
+                  t.p2Cientos
                 )}{' '}
-                lotes y no tres mil: en un año conoces a tus vecinos por su nombre.
+                {t.p2B}
               </p>
-              <p>
-                El perro sale al pet park, no a la banqueta. El cumpleaños se hace en
-                el salón de eventos, no en un salón rentado del otro lado de la
-                ciudad. El gimnasio está a dos cuadras de tu puerta y ya lo estás
-                pagando en el mantenimiento, así que no hay membresía que cancelar en
-                marzo.
-              </p>
+              <p>{t.p3}</p>
               {/* El párrafo que hace que esto sea Sage y no folleto. No se quita. */}
               <p className="text-[var(--lp-muted)]">
-                Nada de esto es una proyección. Son las amenidades que el
-                desarrollador se comprometió a entregar, con el calendario de obra que
-                está más abajo y las fechas que todavía no podemos confirmar.
+                {t.p4}
               </p>
             </div>
           </div>
@@ -74,6 +69,7 @@ export default function UnDomingoAqui({ lote }: { lote: LoteLanding }) {
               imagen={imagen}
               sizes="(max-width: 1024px) 100vw, 46vw"
               aspecto="aspect-[4/3] lg:aspect-[5/4]"
+              locale={locale}
             />
           )}
         </div>

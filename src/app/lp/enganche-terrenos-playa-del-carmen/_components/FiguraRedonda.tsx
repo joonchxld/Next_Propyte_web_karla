@@ -1,5 +1,7 @@
 import Image from 'next/image';
 import type { ImagenLanding } from '@/lib/supabase/lp-lotes';
+import { COPY } from '../_copy';
+import type { LocaleLp } from '../../_components/v2/i18n';
 
 // ============================================================
 // Toda imagen de la variante C: en cápsula de 32 px, y ROTULADA.
@@ -30,11 +32,6 @@ import type { ImagenLanding } from '@/lib/supabase/lp-lotes';
 // `ARCHIVOS_RECHAZADOS` en `lp-lotes.ts`.
 // ============================================================
 
-const PREFIJO: Record<ImagenLanding['tipo'], string> = {
-  render: 'Render del desarrollador.',
-  foto: 'Fotografía real.',
-};
-
 export default function FiguraRedonda({
   imagen,
   sizes,
@@ -45,6 +42,7 @@ export default function FiguraRedonda({
   etiqueta,
   /** `false` en mosaicos densos, donde 12 pies serían una columna de letra chica. */
   conPie = true,
+  locale = 'es',
 }: {
   imagen: ImagenLanding;
   sizes: string;
@@ -53,6 +51,8 @@ export default function FiguraRedonda({
   aspecto?: string;
   etiqueta?: string;
   conPie?: boolean;
+  /** Idioma del prefijo «Render / Fotografía». Por defecto español. */
+  locale?: LocaleLp;
 }) {
   return (
     <figure className={className}>
@@ -79,7 +79,7 @@ export default function FiguraRedonda({
 
       {conPie && (
         <figcaption className="lpe-cuerpo mt-3 max-w-[54ch] text-[0.8125rem] leading-relaxed text-[var(--lpe-tinta-3-texto)]">
-          <span className="text-[var(--lpe-tinta-2)]">{PREFIJO[imagen.tipo]}</span>{' '}
+          <span className="text-[var(--lpe-tinta-2)]">{COPY[locale].figura[imagen.tipo === 'render' ? 'render' : 'foto']}</span>{' '}
           {imagen.caption}
         </figcaption>
       )}

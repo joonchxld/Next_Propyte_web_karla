@@ -1,3 +1,5 @@
+// @lp-idioma en
+// @lp-par casas-riviera-maya
 import type { Metadata } from 'next';
 import PaginaCasas from '../casas-riviera-maya/_pagina';
 import { COPY_EN } from '../casas-riviera-maya/_copy';

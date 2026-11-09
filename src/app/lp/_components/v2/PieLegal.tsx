@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { KIT, rutaLegal, type LocaleLp } from './i18n';
 
 // ============================================================
 // Pie mínimo: los únicos enlaces de salida de la página, obligatorios por ley.
@@ -9,12 +10,15 @@ export default function PieLegal({
   aviso,
   inventario,
   tono = 'oscuro',
+  locale = 'es',
 }: {
   aviso: string;
   /** «Inventario publicado: 10 casas de $4.4 M a $35.7 M MXN.» o null. */
   inventario?: string | null;
   tono?: 'claro' | 'oscuro';
+  locale?: LocaleLp;
 }) {
+  const t = KIT[locale];
   const oscuro = tono === 'oscuro';
   return (
     <footer
@@ -34,11 +38,11 @@ export default function PieLegal({
           {inventario ? ` ${inventario}` : null}
         </p>
         <nav className="flex shrink-0 gap-5">
-          <Link href="/es/privacidad" prefetch={false} className="underline underline-offset-2">
-            Privacidad
+          <Link href={rutaLegal(locale, 'privacidad')} prefetch={false} className="underline underline-offset-2">
+            {t.privacidad}
           </Link>
-          <Link href="/es/terminos" prefetch={false} className="underline underline-offset-2">
-            Términos
+          <Link href={rutaLegal(locale, 'terminos')} prefetch={false} className="underline underline-offset-2">
+            {t.terminos}
           </Link>
         </nav>
       </div>

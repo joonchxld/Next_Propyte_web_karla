@@ -10,8 +10,10 @@ import type { FiltroDef } from '../../_components/v2/filtros';
 import { useFiltros } from '../../_components/v2/useFiltros';
 import FormInventario from '../../_components/v2/FormInventario';
 import GaleriaFicha from '../../_components/v2/GaleriaFicha';
-import { ESTADO_TEXTO, plural, ubicacionCorta } from '../../_components/v2/util';
-import { FORM } from '../_copy';
+import { estadoTexto, plural, ubicacionCorta } from '../../_components/v2/util';
+import type { LocaleLp } from '../../_components/v2/i18n';
+import type { CopyCatalogoPdc } from '../_copy';
+import type { CopyForm } from '../../_components/v2/FormInventario';
 
 // ============================================================
 // Las casas, una por una, y el formulario.
@@ -47,12 +49,22 @@ export default function Catalogo({
   filtros,
   telefonoWhatsApp,
   fotoFormulario,
+  locale = 'es',
+  copy,
+  form,
+  source,
 }: {
   casas: PropiedadLanding[];
   filtros: FiltroDef[];
   telefonoWhatsApp: string;
   fotoFormulario: { src: string; alt: string } | null;
+  locale?: LocaleLp;
+  copy: CopyCatalogoPdc;
+  form: CopyForm;
+  /** Fuente del lead: cambia por idioma (`lp_casas_pdc` / `lp_casas_pdc_en`). */
+  source: 'lp_casas_pdc' | 'lp_casas_pdc_en';
 }) {
+  const estados = estadoTexto(locale);
   const { seleccion, elegir: elegirFiltro, visibles, activos, limpiar } = useFiltros(casas, filtros);
   const zonas = filtros.find((f) => f.id === 'ubicacion')?.opciones ?? [];
   const zonaActiva = seleccion.ubicacion ?? null;
@@ -77,7 +89,7 @@ export default function Catalogo({
               onClick={() => elegirFiltro('ubicacion', null)}
               className="lpx-chip inline-flex min-h-[38px] shrink-0 items-center rounded-full px-4 text-[0.875rem]"
             >
-              Todas
+              {copy.todas}
             </button>
             {zonas.map((u) => (
               <button
@@ -92,7 +104,7 @@ export default function Catalogo({
               </button>
             ))}
             <p className="ml-auto shrink-0 whitespace-nowrap text-sm text-[var(--lpv-fg-3)]" aria-live="polite">
-              {plural(visibles.length, 'casa', 'casas')}
+              {plural(visibles.length, copy.casa[0], copy.casa[1])}
               {activos > (zonaActiva ? 1 : 0) && (
                 <>
                   {' '}
@@ -101,7 +113,7 @@ export default function Catalogo({
                     onClick={limpiar}
                     className="cursor-pointer underline underline-offset-2 hover:text-[var(--lpv-fg)]"
                   >
-                    Quitar filtros
+                    {copy.quitarFiltros}
                   </button>
                 </>
               )}
@@ -112,14 +124,14 @@ export default function Catalogo({
         {visibles.length === 0 ? (
           <div className="mx-auto max-w-[96rem] px-5 py-24 sm:px-8">
             <p className="text-[var(--lpv-fg-2)]">
-              Ninguna casa publicada cumple todo lo que elegiste. Quita un filtro o pide la información y te decimos qué hay cerca.
+              {copy.sinCoincidencias}
             </p>
             <button
               type="button"
               onClick={limpiar}
               className="lpx-chip mt-6 inline-flex min-h-[44px] cursor-pointer items-center rounded-full px-5 text-[0.875rem]"
             >
-              Ver todas las casas
+              {copy.verTodas}
             </button>
           </div>
         ) : (
@@ -134,6 +146,7 @@ export default function Catalogo({
                   <GaleriaFicha
                     imagenes={casa.imagenes}
                     alt={`${casa.titulo}, ${ubicacionCorta(casa)}`}
+                    locale={locale}
                     aspecto={esUltimoImpar ? 'aspect-[21/9]' : 'aspect-[4/3] lg:aspect-[3/2]'}
                     sizes={esUltimoImpar ? '100vw' : '(min-width: 1024px) 58vw, 100vw'}
                     prioridad={i < 2}
@@ -150,27 +163,27 @@ export default function Catalogo({
                     </h3>
                     {/* Las características, grandes y con icono, siempre a la vista. */}
                     <p className="lpx-specs lpx-sobre-foto mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[clamp(0.9375rem,0.85rem+0.4vw,1.125rem)] text-white">
-                      {casa.recamaras ? <Dato icono={Bed}>{casa.recamaras} rec</Dato> : null}
-                      {casa.banos ? <Dato icono={Bath}>{casa.banos} {casa.banos === 1 ? 'baño' : 'baños'}</Dato> : null}
+                      {casa.recamaras ? <Dato icono={Bed}>{casa.recamaras} {casa.recamaras === 1 ? copy.rec[0] : copy.rec[1]}</Dato> : null}
+                      {casa.banos ? <Dato icono={Bath}>{casa.banos} {casa.banos === 1 ? copy.bano[0] : copy.bano[1]}</Dato> : null}
                       {casa.m2Construidos ? <Dato icono={Ruler}>{m2(casa.m2Construidos)}</Dato> : null}
-                      {casa.alberca ? <Dato icono={Waves}>Alberca</Dato> : null}
+                      {casa.alberca ? <Dato icono={Waves}>{copy.alberca}</Dato> : null}
                       {casa.estadoComercial === 'entrega_inmediata' ? (
-                        <Dato icono={KeyRound}>{ESTADO_TEXTO.entrega_inmediata}</Dato>
+                        <Dato icono={KeyRound}>{estados.entrega_inmediata}</Dato>
                       ) : casa.estadoComercial === 'preventa' ? (
-                        <Dato icono={Clock}>{ESTADO_TEXTO.preventa}</Dato>
+                        <Dato icono={Clock}>{estados.preventa}</Dato>
                       ) : null}
-                      {casa.enganchePct ? <span>Enganche {casa.enganchePct}%</span> : null}
+                      {casa.enganchePct ? <span>{copy.enganche.replace('{pct}', String(casa.enganchePct))}</span> : null}
                     </p>
                     <div className="mt-3 flex items-end justify-between gap-4">
                       <p className="lpx-display lpx-sobre-foto text-[clamp(1.375rem,1rem+1.4vw,2.25rem)]">
-                        {casa.precio ? dinero(casa.precio) : 'Precio por confirmar'}
+                        {casa.precio ? dinero(casa.precio) : copy.precioPorConfirmar}
                       </p>
                       <span
                         className={`lpx-sobre-foto inline-block shrink-0 rounded-full border px-3.5 py-1.5 text-[0.8125rem] ${
                           esElegida ? 'border-white bg-white text-[#111] [text-shadow:none]' : 'border-white/60 text-white'
                         }`}
                       >
-                        {esElegida ? 'Elegida' : 'Quiero esta casa'}
+                        {esElegida ? copy.elegida : copy.quieroEsta}
                       </span>
                     </div>
                   </div>
@@ -180,7 +193,7 @@ export default function Catalogo({
                     type="button"
                     onClick={() => elegir(casa.slug)}
                     aria-pressed={esElegida}
-                    aria-label={`Quiero esta casa: ${casa.titulo}`}
+                    aria-label={copy.ariaQuieroEsta.replace('{titulo}', casa.titulo)}
                     className="absolute inset-x-0 bottom-0 top-1/2 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
                   />
                 </li>
@@ -207,9 +220,10 @@ export default function Catalogo({
           <div className="lg:col-span-7">
             <div className="mx-auto max-w-[44rem] px-5 py-14 sm:px-12 sm:py-20">
               <FormInventario
-                source="lp_casas_pdc"
+                source={source}
                 variante="cierre"
-                copy={FORM}
+                locale={locale}
+                copy={form}
                 opciones={opciones}
                 seleccion={elegida}
                 onSeleccion={setElegida}

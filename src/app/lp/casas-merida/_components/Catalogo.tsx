@@ -9,8 +9,10 @@ import FormInventario from '../../_components/v2/FormInventario';
 import GaleriaFicha from '../../_components/v2/GaleriaFicha';
 import type { FiltroDef } from '../../_components/v2/filtros';
 import { useFiltros } from '../../_components/v2/useFiltros';
-import { ESTADO_TEXTO, ubicacionCorta } from '../../_components/v2/util';
-import { FORM, HOOK } from '../_copy';
+import { estadoTexto, ubicacionCorta } from '../../_components/v2/util';
+import type { LocaleLp } from '../../_components/v2/i18n';
+import type { CopyForm } from '../../_components/v2/FormInventario';
+import type { CopyCatalogoMerida } from '../_copy';
 
 // ============================================================
 // El dossier: la casa principal en una sola vista, y debajo lo demás.
@@ -37,29 +39,31 @@ interface Spec {
 }
 
 /** Solo lo que el Hub declara. Ningún dato se estima. */
-function specs(casa: PropiedadLanding): Spec[] {
+function specs(casa: PropiedadLanding, t: CopyCatalogoMerida): Spec[] {
   const lista: Spec[] = [];
   if (casa.recamaras) {
-    lista.push({ icono: Bed, valor: String(casa.recamaras), etiqueta: casa.recamaras === 1 ? 'recámara' : 'recámaras' });
+    lista.push({ icono: Bed, valor: String(casa.recamaras), etiqueta: casa.recamaras === 1 ? t.recamara[0] : t.recamara[1] });
   }
   if (casa.banos) {
-    lista.push({ icono: Bath, valor: String(casa.banos), etiqueta: casa.banos === 1 ? 'baño' : 'baños' });
+    lista.push({ icono: Bath, valor: String(casa.banos), etiqueta: casa.banos === 1 ? t.bano[0] : t.bano[1] });
   }
-  if (casa.m2Construidos) lista.push({ icono: Ruler, valor: m2(casa.m2Construidos), etiqueta: 'construidos' });
-  if (casa.m2Terreno) lista.push({ icono: Square, valor: m2(casa.m2Terreno), etiqueta: 'de terreno' });
+  if (casa.m2Construidos) lista.push({ icono: Ruler, valor: m2(casa.m2Construidos), etiqueta: t.construidos });
+  if (casa.m2Terreno) lista.push({ icono: Square, valor: m2(casa.m2Terreno), etiqueta: t.deTerreno });
   return lista;
 }
 
-function creditosDe(casa: PropiedadLanding): string[] {
+/** Sin sellos de crédito cuando `mostrarCreditos` es false (inglés; ver `_copy.ts`). */
+function creditosDe(casa: PropiedadLanding, t: CopyCatalogoMerida): string[] {
+  if (!t.mostrarCreditos) return [];
   const lista: string[] = [];
-  if (casa.creditos.infonavit) lista.push('Acepta Infonavit');
-  if (casa.creditos.fovissste) lista.push('Acepta Fovissste');
-  if (casa.creditos.hipotecario) lista.push('Acepta crédito bancario');
+  if (casa.creditos.infonavit) lista.push(t.aceptaInfonavit);
+  if (casa.creditos.fovissste) lista.push(t.aceptaFovissste);
+  if (casa.creditos.hipotecario) lista.push(t.aceptaBancario);
   return lista;
 }
 
-function Creditos({ casa, tamano = 'md' }: { casa: PropiedadLanding; tamano?: 'md' | 'sm' }) {
-  const lista = creditosDe(casa);
+function Creditos({ casa, t, tamano = 'md' }: { casa: PropiedadLanding; t: CopyCatalogoMerida; tamano?: 'md' | 'sm' }) {
+  const lista = creditosDe(casa, t);
   if (lista.length === 0) return null;
   return (
     <ul className={`flex flex-wrap ${tamano === 'md' ? 'gap-x-5 gap-y-2' : 'gap-x-4 gap-y-1.5'}`}>
@@ -90,11 +94,21 @@ export default function Catalogo({
   casas,
   filtros: defs,
   telefonoWhatsApp,
+  locale = 'es',
+  copy: t,
+  form,
+  source,
 }: {
   casas: PropiedadLanding[];
   filtros: FiltroDef[];
   telefonoWhatsApp: string;
+  locale?: LocaleLp;
+  copy: CopyCatalogoMerida;
+  form: CopyForm;
+  /** Fuente del lead: cambia por idioma (`lp_casas_merida` / `lp_casas_merida_en`). */
+  source: 'lp_casas_merida' | 'lp_casas_merida_en';
 }) {
+  const estados = estadoTexto(locale);
   const { seleccion, alternar, limpiar, visibles, activos } = useFiltros(casas, defs);
   const principal = visibles[0] ?? casas[0];
   const otras = visibles.slice(1);
@@ -115,19 +129,19 @@ export default function Catalogo({
 
   if (!principal) return null;
 
-  const conCredito = casas.some((c) => c.creditos.infonavit || c.creditos.fovissste);
+  const conCredito = t.mostrarCreditos && casas.some((c) => c.creditos.infonavit || c.creditos.fovissste);
   const filtroCredito = defs.find((d) => d.id === 'credito');
   const desde = casas[0]?.precio ?? null;
   const enganches = casas.map((c) => c.enganchePct).filter((e): e is number => e !== null && e > 0);
   const enganche = enganches.length > 0 ? Math.min(...enganches) : null;
   const zonas = [...new Set(casas.map(ubicacionCorta))];
   const fotos = principal.imagenes;
-  const listaSpecs = specs(principal);
+  const listaSpecs = specs(principal, t);
 
   const apoyo = [
-    desde ? (casas.length > 1 ? `Desde ${dinero(desde)}` : dinero(desde)) : null,
-    enganche ? `enganche del ${enganche}%` : null,
-    zonas.length === 1 ? `en ${zonas[0]}` : zonas.length > 1 ? `en ${zonas.join(' y ')}` : null,
+    desde ? (casas.length > 1 ? t.desde.replace('{precio}', dinero(desde)) : dinero(desde)) : null,
+    enganche ? t.enganche.replace('{pct}', String(enganche)) : null,
+    zonas.length > 0 ? t.en.replace('{zona}', zonas.join(` ${t.unir} `)) : null,
   ]
     .filter((t): t is string => t !== null)
     .join(', ');
@@ -137,7 +151,7 @@ export default function Catalogo({
       {/* ══ EL GANCHO: titular de crédito y cómo quieres pagar ══ */}
       <header className="mx-auto max-w-[96rem] px-5 pb-10 pt-24 sm:px-8 sm:pt-28 lg:pb-14">
         <h1 className="lpm-display max-w-[22ch] text-[clamp(2rem,1.2rem+2.6vw,3.75rem)] text-[var(--lpv-fg)]">
-          {conCredito ? HOOK.tituloCredito : HOOK.tituloBase}
+          {conCredito ? t.tituloCredito : t.tituloBase}
         </h1>
         {apoyo && (
           <p className="lpm-display-ligero mt-5 max-w-[40ch] text-[clamp(1.125rem,1rem+0.7vw,1.5rem)] text-[var(--lpv-fg-2)]">
@@ -145,10 +159,10 @@ export default function Catalogo({
           </p>
         )}
 
-        {filtroCredito && (
+        {filtroCredito && t.mostrarCreditos && (
           <div className="mt-8">
-            <p className="text-[0.9375rem] text-[var(--lpv-fg-3)]">{HOOK.comoPagar}</p>
-            <div role="group" aria-label={HOOK.comoPagar} className="mt-3 flex flex-wrap gap-2">
+            <p className="text-[0.9375rem] text-[var(--lpv-fg-3)]">{t.comoPagar}</p>
+            <div role="group" aria-label={t.comoPagar} className="mt-3 flex flex-wrap gap-2">
               {filtroCredito.opciones.map((o) => {
                 const activo = seleccion.credito === o.valor;
                 return (
@@ -180,6 +194,7 @@ export default function Catalogo({
             key={principal.id}
             imagenes={fotos}
             alt={`${principal.titulo}, ${ubicacionCorta(principal)}`}
+            locale={locale}
             aspecto="h-[60svh] lg:h-[100svh]"
             sizes="(min-width: 1024px) 50vw, 100vw"
             prioridad
@@ -190,10 +205,10 @@ export default function Catalogo({
 
         <div className="px-5 pb-16 pt-10 sm:px-10 lg:px-14 lg:pb-24 lg:pt-20 xl:px-20">
           <p className="text-[0.9375rem] text-[var(--lpv-fg-2)]">
-            Casa en venta · {ubicacionCorta(principal)}
+            {t.casaEnVenta.replace('{ubicacion}', ubicacionCorta(principal))}
           </p>
           <p className="lpm-display mt-4 whitespace-nowrap text-[clamp(2.25rem,1.2rem+2.6vw,3.75rem)] text-[var(--lpv-fg)]">
-            {principal.precio ? dinero(principal.precio) : 'Precio por confirmar'}
+            {principal.precio ? dinero(principal.precio) : t.precioPorConfirmar}
           </p>
           <h2 className="lpm-display-ligero mt-4 max-w-[28ch] text-[clamp(1.25rem,1.05rem+0.9vw,1.75rem)] text-[var(--lpv-fg)]">
             {principal.titulo}
@@ -214,38 +229,39 @@ export default function Catalogo({
           <dl className="mt-7 border-t border-[var(--lpv-line)]">
             {principal.estacionamientos ? (
               <div className="grid grid-cols-[9rem_1fr] items-baseline gap-4 border-b border-[var(--lpv-line)] py-3">
-                <dt className="text-[0.9375rem] text-[var(--lpv-fg-3)]">Estacionamiento</dt>
+                <dt className="text-[0.9375rem] text-[var(--lpv-fg-3)]">{t.estacionamiento}</dt>
                 <dd className="lpm-display text-[1.125rem] text-[var(--lpv-fg)]">
-                  {principal.estacionamientos} {principal.estacionamientos === 1 ? 'auto' : 'autos'}
+                  {principal.estacionamientos} {principal.estacionamientos === 1 ? t.auto[0] : t.auto[1]}
                 </dd>
               </div>
             ) : null}
             {principal.enganchePct ? (
               <div className="grid grid-cols-[9rem_1fr] items-baseline gap-4 border-b border-[var(--lpv-line)] py-3">
-                <dt className="text-[0.9375rem] text-[var(--lpv-fg-3)]">Enganche</dt>
+                <dt className="text-[0.9375rem] text-[var(--lpv-fg-3)]">{t.engancheEtiqueta}</dt>
                 <dd className="lpm-display text-[1.125rem] text-[var(--lpv-fg)]">
                   {principal.enganchePct}%{principal.engancheMxn ? ` · ${mxn(principal.engancheMxn)}` : ''}
                 </dd>
               </div>
             ) : null}
             <div className="grid grid-cols-[9rem_1fr] items-baseline gap-4 border-b border-[var(--lpv-line)] py-3">
-              <dt className="text-[0.9375rem] text-[var(--lpv-fg-3)]">Estado</dt>
+              <dt className="text-[0.9375rem] text-[var(--lpv-fg-3)]">{t.estado}</dt>
               <dd className="lpm-display inline-flex items-center gap-2 text-[1.125rem] text-[var(--lpv-fg)]">
                 <Key className="h-4 w-4 text-[var(--lpv-fg-3)]" aria-hidden />
-                {ESTADO_TEXTO[principal.estadoComercial]}
+                {estados[principal.estadoComercial]}
               </dd>
             </div>
           </dl>
 
           <div className="mt-6">
-            <Creditos casa={principal} />
+            <Creditos casa={principal} t={t} />
           </div>
 
           <div id="solicitar" className="mt-12 scroll-mt-6 lg:mt-14">
             <FormInventario
-              source="lp_casas_merida"
+              source={source}
               variante="hero"
-              copy={FORM}
+              locale={locale}
+              copy={form}
               opciones={opciones}
               seleccion={elegida}
               onSeleccion={setElegida}
@@ -263,7 +279,7 @@ export default function Catalogo({
         <section className="lpm-mosaico border-t border-[var(--lpv-line)] bg-[var(--lpv-bg-2)]">
           <div className="mx-auto max-w-[96rem] px-5 py-16 sm:px-8 sm:py-24">
             <h2 className="lpm-display text-[clamp(1.75rem,1.2rem+2vw,3rem)] text-[var(--lpv-fg)]">
-              Las {fotos.length} fotos
+              {t.fotos.replace('{n}', String(fotos.length))}
             </h2>
             <div className="mt-10 grid grid-cols-2 gap-1 md:grid-cols-3">
               {fotos.map((src, i) => (
@@ -275,7 +291,7 @@ export default function Catalogo({
                 >
                   <Image
                     src={src}
-                    alt={`${principal.titulo}, foto ${i + 1}`}
+                    alt={t.fotoAlt.replace('{titulo}', principal.titulo).replace('{n}', String(i + 1))}
                     fill
                     loading="lazy"
                     sizes={i === 0 ? '(min-width: 768px) 66vw, 100vw' : '(min-width: 768px) 33vw, 50vw'}
@@ -292,28 +308,28 @@ export default function Catalogo({
       {visibles.length === 0 ? (
         <section className="mx-auto max-w-[60rem] px-5 py-20 text-center sm:px-8 sm:py-28">
           <p className="lpm-display-ligero text-[clamp(1.375rem,1.1rem+1.4vw,2.25rem)] text-[var(--lpv-fg)]">
-            {HOOK.sinCoincidencias}
+            {t.sinCoincidencias}
           </p>
           <button type="button" onClick={limpiar} className="lpm-enlace mt-7 inline-block text-[1.0625rem]">
-            {HOOK.quitarFiltros}
+            {t.quitarFiltros}
           </button>
         </section>
       ) : otras.length > 0 || activos > 0 ? (
         <section className="mx-auto max-w-[96rem] px-5 py-16 sm:px-8 sm:py-24">
           <div className="flex flex-wrap items-baseline justify-between gap-4">
             <h2 className="lpm-display text-[clamp(1.75rem,1.2rem+2vw,3rem)] text-[var(--lpv-fg)]">
-              {otras.length > 0 ? HOOK.otras : HOOK.unaCoincide}
+              {otras.length > 0 ? t.otras : t.unaCoincide}
             </h2>
             {activos > 0 && (
               <button type="button" onClick={limpiar} className="lpm-enlace text-[0.9375rem]">
-                {HOOK.quitarFiltros}
+                {t.quitarFiltros}
               </button>
             )}
           </div>
           {otras.length > 0 && (
             <ul className="mt-10 border-t border-[var(--lpv-line-2)]">
               {otras.map((casa) => {
-                const lista = specs(casa);
+                const lista = specs(casa, t);
                 return (
                   <li key={casa.id} className="grid gap-6 border-b border-[var(--lpv-line)] py-8 lg:grid-cols-12">
                     <figure className="relative aspect-[4/3] bg-[var(--lpv-bg-2)] lg:col-span-4">
@@ -329,7 +345,7 @@ export default function Catalogo({
                     </figure>
                     <div className="lg:col-span-8">
                       <p className="lpm-display text-[clamp(1.5rem,1.2rem+1.2vw,2.25rem)] text-[var(--lpv-fg)]">
-                        {casa.precio ? dinero(casa.precio) : 'Precio por confirmar'}
+                        {casa.precio ? dinero(casa.precio) : t.precioPorConfirmar}
                       </p>
                       <p className="mt-3 text-[1.0625rem] text-[var(--lpv-fg)]">{casa.titulo}</p>
                       <p className="mt-1 text-[0.9375rem] text-[var(--lpv-fg-3)]">{ubicacionCorta(casa)}</p>
@@ -345,10 +361,10 @@ export default function Catalogo({
                         </ul>
                       )}
                       <div className="mt-3">
-                        <Creditos casa={casa} tamano="sm" />
+                        <Creditos casa={casa} t={t} tamano="sm" />
                       </div>
                       <button type="button" onClick={() => elegir(casa.slug)} className="lpm-enlace mt-5 text-[0.9375rem]">
-                        {elegida === casa.slug ? 'Elegida' : 'Me interesa'}
+                        {elegida === casa.slug ? t.elegida : t.meInteresa}
                       </button>
                     </div>
                   </li>
@@ -360,10 +376,10 @@ export default function Catalogo({
       ) : (
         <section className="mx-auto max-w-[60rem] px-5 py-20 text-center sm:px-8 sm:py-28">
           <p className="lpm-display-ligero text-[clamp(1.375rem,1.1rem+1.4vw,2.25rem)] text-[var(--lpv-fg)]">
-            {HOOK.otraOpcion}
+            {t.otraOpcion}
           </p>
           <a href="#solicitar" className="lpm-enlace mt-7 inline-block text-[1.0625rem]">
-            Pedir otra opción
+            {t.pedirOtra}
           </a>
         </section>
       )}

@@ -49,6 +49,8 @@ export interface PropiedadLanding {
   id: string;
   slug: string;
   titulo: string;
+  /** Título en inglés del Hub (`v_units.title_en`), si lo hay. Ver `enIdioma()`. */
+  tituloEn?: string | null;
   /** `Casa`, `Villa`, `Departamento`, `Estudio`, `Penthouse`, `Lote`, `Terreno`. */
   tipo: string;
   ciudad: string;
@@ -107,6 +109,7 @@ export interface FilaInventario {
   id: string;
   slug: string | null;
   title: string | null;
+  title_en?: string | null;
   unit_type: string | null;
   city: string | null;
   state: string | null;
@@ -169,7 +172,7 @@ const PRECIO_MAX_MXN = 80_000_000;
 const SUPERFICIE_MIN_M2 = 15;
 
 const COLUMNAS = [
-  'id', 'slug', 'title', 'unit_type', 'city', 'state', 'zone', 'neighborhood',
+  'id', 'slug', 'title', 'title_en', 'unit_type', 'city', 'state', 'zone', 'neighborhood',
   'bedrooms', 'bathrooms', 'built_area_m2', 'lot_area_m2', 'area_m2',
   'price_mxn', 'price_usd', 'currency',
   'down_payment_pct', 'down_payment_mxn', 'fin_enganche_pct', 'fin_meses_opciones',
@@ -263,6 +266,7 @@ function mapear(fila: FilaInventario): PropiedadLanding | null {
     id: fila.id,
     slug: fila.slug,
     titulo: fila.title.trim(),
+    tituloEn: fila.title_en?.trim() || null,
     tipo: fila.unit_type,
     ciudad: fila.city ?? '',
     estado: fila.state ?? '',
@@ -340,6 +344,19 @@ export function construirInventario(
  * Inventario publicado que pasa el filtro. Tipo, ciudad, estado y vista van a
  * la consulta; el resto se resuelve en memoria.
  */
+/**
+ * Para las landings en inglés (9-nov-2026): usa `title_en` del Hub como
+ * `titulo` cuando existe. Sin traducción, se queda el título en español: es
+ * mejor un título real que uno inventado aquí. En español devuelve la lista tal cual.
+ */
+export function enIdioma<T extends { titulo: string; tituloEn?: string | null }>(
+  lista: T[],
+  locale: 'es' | 'en',
+): T[] {
+  if (locale === 'es') return lista;
+  return lista.map((p) => (p.tituloEn ? { ...p, titulo: p.tituloEn } : p));
+}
+
 export async function getInventario(filtro: FiltroInventario = {}): Promise<PropiedadLanding[]> {
   const supabase = createPublicSupabaseClient();
   if (!supabase) return [];

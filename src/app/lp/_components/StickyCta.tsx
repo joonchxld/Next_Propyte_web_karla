@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { STICKY } from '../lotes-playa-del-carmen/_copy';
+import type { LocaleLp } from './v2/i18n';
 
 // ============================================================
 // Barra de CTA fija en móvil.
@@ -25,10 +27,13 @@ import { useEffect, useState } from 'react';
 export default function StickyCta({
   precioTotal,
   mensualidad,
+  locale = 'es',
 }: {
   precioTotal: string | null;
   mensualidad: string | null;
+  locale?: LocaleLp;
 }) {
+  const t = STICKY[locale];
   const [visible, setVisible] = useState(false);
   const [formularioALaVista, setFormularioALaVista] = useState(false);
 
@@ -76,7 +81,7 @@ export default function StickyCta({
           )}
           {mensualidad && (
             <p className="lp-num truncate text-xs leading-tight text-[var(--lp-muted)]">
-              {mensualidad} al mes
+              {mensualidad} {t.alMes}
             </p>
           )}
         </div>
@@ -88,7 +93,7 @@ export default function StickyCta({
           tabIndex={mostrar ? undefined : -1}
           className="inline-flex min-h-[48px] shrink-0 cursor-pointer items-center justify-center rounded-[var(--lp-r-control)] bg-[var(--lp-accent)] px-6 py-3 text-base font-semibold text-white shadow-[0_2px_10px_rgb(168_64_42/0.28)] transition-colors duration-200 hover:bg-[var(--lp-accent-strong)]"
         >
-          {mensualidad ? 'Ver mi plan' : 'Pedir el detalle'}
+          {mensualidad ? t.verPlan : t.pedirDetalle}
         </a>
       </div>
     </div>

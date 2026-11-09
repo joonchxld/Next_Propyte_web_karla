@@ -9,8 +9,9 @@ import type { FiltroDef } from '../../_components/v2/filtros';
 import { useFiltros } from '../../_components/v2/useFiltros';
 import FormInventario from '../../_components/v2/FormInventario';
 import GaleriaFicha from '../../_components/v2/GaleriaFicha';
-import { ESTADO_TEXTO, plural, ubicacionCorta } from '../../_components/v2/util';
-import { COMERCIALIZADORA, FORM, NOTA_MENSUALIDAD, SIN_PLAN } from '../_copy';
+import type { LocaleLp } from '../../_components/v2/i18n';
+import { estadoTexto, ubicacionCorta } from '../../_components/v2/util';
+import { COPY } from '../_copy';
 import MapaLotes from './MapaLotes';
 
 // ============================================================
@@ -55,6 +56,7 @@ function Fila({
   elegido,
   prioridad,
   plazoFiltro,
+  locale,
 }: {
   lote: PropiedadLanding;
   abierta: boolean;
@@ -64,7 +66,9 @@ function Fila({
   prioridad: boolean;
   /** Plazo elegido en los filtros, si lo hay y este lote lo ofrece. */
   plazoFiltro: number | null;
+  locale: LocaleLp;
 }) {
+  const t = COPY[locale].catalogo;
   const plazos = lote.mesesOpciones;
   // El plazo del filtro manda; la elección manual en la fila solo vale
   // mientras el filtro no cambie (se guarda junto con el filtro que la vio
@@ -79,7 +83,7 @@ function Fila({
     lote.precio && lote.enganchePct
       ? (lote.engancheMxn ?? (lote.precio.monto * lote.enganchePct) / 100)
       : null;
-  const estado = lote.estadoComercial !== 'disponible' ? ESTADO_TEXTO[lote.estadoComercial] : null;
+  const estado = lote.estadoComercial !== 'disponible' ? estadoTexto(locale)[lote.estadoComercial] : null;
   const idDetalle = `detalle-${lote.id}`;
 
   return (
@@ -99,7 +103,7 @@ function Fila({
               <span className="ml-1.5 align-top text-[0.4em] font-normal text-[var(--lpv-fg-3)]">m²</span>
             </>
           ) : (
-            <span className="lpt2-display-ligero text-[0.45em] text-[var(--lpv-fg-3)]">superficie por confirmar</span>
+            <span className="lpt2-display-ligero text-[0.45em] text-[var(--lpv-fg-3)]">{t.fila.superficiePorConfirmar}</span>
           )}
         </p>
 
@@ -115,23 +119,23 @@ function Fila({
 
         <div className="lg:text-right">
           <p className="lpt2-display text-[clamp(1.5rem,1.1rem+1.4vw,2.5rem)] text-[var(--lpv-fg)]">
-            {lote.precio ? dinero(lote.precio) : 'Precio por confirmar'}
+            {lote.precio ? dinero(lote.precio) : t.fila.precioPorConfirmar}
           </p>
           <p className="lpt2-mono mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-[0.8125rem] text-[var(--lpv-fg-2)] lg:justify-end">
             <span className="inline-flex items-center gap-1.5">
               <Ruler className={ICONO} aria-hidden />
-              {lote.precioM2Mxn ? `${mxnExacto(lote.precioM2Mxn)} / m²` : 'precio por m² por confirmar'}
+              {lote.precioM2Mxn ? `${mxnExacto(lote.precioM2Mxn)} / m²` : t.fila.precioM2PorConfirmar}
             </span>
             {plazos.length > 0 && (
               <span className="inline-flex items-center gap-1.5">
                 <Calendar className={ICONO} aria-hidden />
-                hasta {Math.max(...plazos)} meses
+                {t.fila.hastaMeses(Math.max(...plazos))}
               </span>
             )}
             {lote.enganchePct ? (
               <span className="inline-flex items-center gap-1.5">
                 <Percent className={ICONO} aria-hidden />
-                enganche {lote.enganchePct}%
+                {t.fila.enganchePct(lote.enganchePct)}
               </span>
             ) : null}
           </p>
@@ -148,6 +152,7 @@ function Fila({
               sizes="(min-width: 1024px) 56vw, 100vw"
               tope={8}
               prioridad={prioridad}
+              locale={locale}
             />
           </div>
 
@@ -156,9 +161,9 @@ function Fila({
               <>
                 <p className="inline-flex items-center gap-1.5 text-[0.9375rem] text-[var(--lpv-fg-2)]">
                   <Calendar className={ICONO} aria-hidden />
-                  Plazo
+                  {t.fila.plazo}
                 </p>
-                <div role="group" aria-label="Plazo en meses" className="mt-3 flex flex-wrap gap-2">
+                <div role="group" aria-label={t.fila.plazoAria} className="mt-3 flex flex-wrap gap-2">
                   {plazos.map((m) => (
                     <button
                       key={m}
@@ -167,7 +172,7 @@ function Fila({
                       onClick={() => setPlazo(m)}
                       className="lpt2-plazo min-h-[40px] px-4 text-[0.9375rem]"
                     >
-                      {m} meses
+                      {t.fila.meses(m)}
                     </button>
                   ))}
                 </div>
@@ -175,30 +180,30 @@ function Fila({
                   {mxn(cuota)}
                 </p>
                 <p className="mt-1 text-[0.9375rem] text-[var(--lpv-fg-2)]">
-                  al mes durante {plazo} meses
+                  {t.fila.alMes(plazo)}
                 </p>
                 {enganche ? (
                   <p className="mt-1 inline-flex items-center gap-1.5 text-[0.9375rem] text-[var(--lpv-fg-2)]">
                     <Percent className={ICONO} aria-hidden />
-                    {mxn(enganche)} de enganche ({lote.enganchePct}%)
+                    {t.fila.engancheDe(mxn(enganche), lote.enganchePct as number)}
                   </p>
                 ) : null}
                 <p className="mt-4 max-w-[48ch] text-[0.8125rem] leading-relaxed text-[var(--lpv-fg-3)]">
-                  {NOTA_MENSUALIDAD}
+                  {t.notaMensualidad}
                 </p>
               </>
             ) : (
               <>
                 <p className="lpt2-display text-[clamp(2.25rem,1.6rem+2.4vw,4rem)] text-[var(--lpv-fg)]">
-                  {lote.precio ? dinero(lote.precio) : 'Precio por confirmar'}
+                  {lote.precio ? dinero(lote.precio) : t.fila.precioPorConfirmar}
                 </p>
                 {enganche ? (
                   <p className="mt-1 inline-flex items-center gap-1.5 text-[0.9375rem] text-[var(--lpv-fg-2)]">
                     <Percent className={ICONO} aria-hidden />
-                    Enganche {lote.enganchePct}%, {mxn(enganche)}
+                    {t.fila.engancheLinea(lote.enganchePct as number, mxn(enganche))}
                   </p>
                 ) : null}
-                <p className="mt-4 max-w-[48ch] text-[0.8125rem] leading-relaxed text-[var(--lpv-fg-3)]">{SIN_PLAN}</p>
+                <p className="mt-4 max-w-[48ch] text-[0.8125rem] leading-relaxed text-[var(--lpv-fg-3)]">{t.sinPlan}</p>
               </>
             )}
 
@@ -208,7 +213,7 @@ function Fila({
               aria-pressed={elegido}
               className="mt-8 inline-flex min-h-[52px] items-center rounded-full bg-[var(--lpv-fg)] px-7 text-[0.9375rem] font-medium text-white transition-opacity hover:opacity-90 active:translate-y-px"
             >
-              {elegido ? 'Elegido' : 'Quiero este terreno'}
+              {elegido ? t.fila.elegido : t.fila.quieroEste}
             </button>
           </div>
         </div>
@@ -221,11 +226,15 @@ export default function Catalogo({
   lotes,
   defs,
   telefonoWhatsApp,
+  locale = 'es',
 }: {
   lotes: PropiedadLanding[];
   defs: FiltroDef[];
   telefonoWhatsApp: string;
+  locale?: LocaleLp;
 }) {
+  const copy = COPY[locale];
+  const t = copy.catalogo;
   const { seleccion, alternar, limpiar, visibles, activos } = useFiltros(lotes, defs);
   const plazoFiltro = seleccion.plazo ? Number(seleccion.plazo) : null;
   const [abierta, setAbierta] = useState<string | null>(lotes[0]?.id ?? null);
@@ -249,7 +258,7 @@ export default function Catalogo({
         <div className="lpt2-filtros border-b border-[var(--lpv-line)]">
           <div className="lpt2-fila-chips mx-auto flex max-w-[96rem] items-center gap-6 overflow-x-auto px-5 py-3 sm:px-8">
             <button type="button" aria-pressed={activos === 0} onClick={limpiar} className="lpt2-chip">
-              Todos
+              {t.todos}
             </button>
             {defs.map((def) => (
               <div
@@ -272,7 +281,7 @@ export default function Catalogo({
               </div>
             ))}
             <p className="ml-auto shrink-0 whitespace-nowrap pl-6 text-sm text-[var(--lpv-fg-3)]" aria-live="polite">
-              {plural(visibles.length, 'terreno', 'terrenos')}
+              {t.conteo(visibles.length)}
             </p>
           </div>
         </div>
@@ -285,11 +294,12 @@ export default function Catalogo({
           onElegir={elegir}
           elegido={elegido}
           plazoFiltro={plazoFiltro}
+          locale={locale}
         />
 
         {visibles.length === 0 ? (
           <p className="mx-auto max-w-[96rem] px-5 py-24 text-[var(--lpv-fg-2)] sm:px-8">
-            Ningún terreno cumple con todo lo que elegiste. Quita un filtro, o pide que te avisemos cuando entre uno así.
+            {t.sinResultados}
           </p>
         ) : (
           <ul className="mx-auto max-w-[96rem] divide-y divide-[var(--lpv-line)] border-b border-[var(--lpv-line)]">
@@ -303,6 +313,7 @@ export default function Catalogo({
                 elegido={elegido === lote.slug}
                 prioridad={i === 0}
                 plazoFiltro={plazoFiltro}
+                locale={locale}
               />
             ))}
           </ul>
@@ -310,7 +321,7 @@ export default function Catalogo({
 
         <div className="mx-auto max-w-[96rem] px-5 py-16 sm:px-8 sm:py-24">
           <p className="lpt2-display-ligero max-w-[24ch] text-[clamp(1.5rem,1.1rem+1.8vw,2.75rem)] text-[var(--lpv-fg)]">
-            {COMERCIALIZADORA}
+            {t.comercializadora}
           </p>
         </div>
       </section>
@@ -323,19 +334,20 @@ export default function Catalogo({
       >
         <div className="mx-auto grid max-w-[96rem] gap-12 px-5 py-16 sm:px-8 sm:py-24 lg:grid-cols-12 lg:gap-16">
           <h2 className="lpt2-display max-w-[14ch] text-[clamp(2.25rem,1.4rem+3.4vw,5rem)] lg:col-span-6">
-            Te mandamos precio, plano y plan de pagos de cada lote.
+            {t.cierreTitulo}
           </h2>
           <div className="lg:col-span-6">
             <FormInventario
-              source="lp_terrenos_rm"
+              source={copy.source}
               variante="cierre"
-              copy={FORM}
+              copy={copy.form}
               opciones={opciones}
               seleccion={elegido}
               onSeleccion={setElegido}
               telefonoWhatsApp={telefonoWhatsApp}
               filtros={defs}
               propiedades={lotes}
+              locale={locale}
               className="!p-0"
             />
           </div>
