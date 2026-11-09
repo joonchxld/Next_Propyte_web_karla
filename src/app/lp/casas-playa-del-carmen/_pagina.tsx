@@ -166,8 +166,8 @@ export default async function PaginaCasasPlayaDelCarmen({ locale = 'es' }: { loc
           <div className="marca-reticula" aria-hidden="true" />
         </div>
 
-        <div className="relative mx-auto grid max-w-[96rem] gap-6 px-5 pb-8 pt-24 sm:px-8 sm:pb-14 lg:min-h-[100svh] lg:grid-cols-[minmax(0,1fr)_27rem] lg:gap-12 lg:pt-28">
-          <div className="lpx-hero-texto flex flex-col justify-end text-white">
+        <div className="relative mx-auto grid max-w-[96rem] gap-6 px-5 pb-8 pt-24 sm:px-8 sm:pb-14 lg:min-h-[100svh] lg:grid-cols-[minmax(0,1fr)_27rem] lg:items-start lg:gap-12 lg:pt-28">
+          <div className="lpx-hero-texto flex flex-col justify-end text-white lg:justify-start lg:pt-[12vh]">
             <h1 className="marca-titular lpx-sobre-foto max-w-[14ch] text-[clamp(2.75rem,1.4rem+5.4vw,6.25rem)]">
               {t.hero.titulo}
             </h1>
