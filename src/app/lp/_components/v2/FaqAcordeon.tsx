@@ -12,6 +12,8 @@ import { ChevronDown } from '@/lib/icons';
 // del sitio, no inventadas para la landing.
 // ============================================================
 
+import { KIT, type LocaleLp } from './i18n';
+
 export interface Faq {
   q: string;
   a: string;
@@ -19,10 +21,12 @@ export interface Faq {
 
 export default function FaqAcordeon({
   faqs,
-  titulo = 'Preguntas frecuentes',
+  locale = 'es',
+  titulo = KIT[locale].faqTitulo,
   className = '',
 }: {
   faqs: Faq[];
+  locale?: LocaleLp;
   titulo?: string;
   className?: string;
 }) {

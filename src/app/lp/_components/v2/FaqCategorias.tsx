@@ -14,6 +14,8 @@ import type { Faq } from './FaqAcordeon';
 // React.
 // ============================================================
 
+import { KIT, type LocaleLp } from './i18n';
+
 export interface CategoriaFaq {
   nombre: string;
   faqs: Faq[];
@@ -21,11 +23,13 @@ export interface CategoriaFaq {
 
 export default function FaqCategorias({
   categorias,
-  titulo = 'Preguntas frecuentes',
+  locale = 'es',
+  titulo = KIT[locale].faqTitulo,
   tono = 'claro',
   className = '',
 }: {
   categorias: CategoriaFaq[];
+  locale?: LocaleLp;
   titulo?: string;
   tono?: 'claro' | 'oscuro';
   className?: string;
@@ -62,7 +66,7 @@ export default function FaqCategorias({
       )}
       <div role="group" aria-label="Categoría de preguntas" className="mt-6 flex flex-wrap gap-2">
         <button type="button" aria-pressed={activa === '__todas__'} onClick={() => setActiva('__todas__')} className={chip(activa === '__todas__')}>
-          Todas
+          {KIT[locale].todas}
         </button>
         {categorias.map((c) => (
           <button key={c.nombre} type="button" aria-pressed={activa === c.nombre} onClick={() => setActiva(c.nombre)} className={chip(activa === c.nombre)}>

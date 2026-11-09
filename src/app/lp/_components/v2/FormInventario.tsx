@@ -10,6 +10,7 @@ import type { LeadSource } from '@/lib/zoho/field-maps';
 import type { PropiedadLanding } from '@/lib/supabase/lp-inventario';
 import { filtrar, textoLead, type FiltroDef } from './filtros';
 import { useSeleccionFiltros } from './useFiltros';
+import { rutaLegal, type LocaleLp } from './i18n';
 
 // ============================================================
 // Formulario compartido de las landings de inventario (familia v2).
@@ -82,7 +83,7 @@ export interface CopyForm {
   coinciden?: string;
 }
 
-const TEXTOS_FIJOS = {
+const TEXTOS_FIJOS_ES = {
   opcional: '(opcional)',
   enviando: 'Enviando',
   honeypot: 'No llenar',
@@ -99,7 +100,29 @@ const TEXTOS_FIJOS = {
   emailPlaceholder: 'tu@correo.com',
   coinciden: '{n} {n|propiedad coincide|propiedades coinciden} con lo que elegiste.',
   sinCoincidencias: 'Ninguna coincide con todo lo que elegiste. Quita un filtro, o mándanos el formulario y te decimos qué hay cerca.',
-} as const;
+};
+
+const TEXTOS_FIJOS: Record<LocaleLp, typeof TEXTOS_FIJOS_ES> = {
+  es: TEXTOS_FIJOS_ES,
+  en: {
+    opcional: '(optional)',
+    enviando: 'Sending',
+    honeypot: 'Do not fill',
+    notaPrivacidad: 'We only use your details to send you this information and get in touch. No third-party lists.',
+    avisoPrivacidad: 'Privacy notice',
+    error: "We couldn't send your details. Message us on WhatsApp and we'll sort it out there.",
+    faltanCampos: 'Please fill in your name, WhatsApp and email to receive the information.',
+    emailInvalido: 'Please check your email: that is where the information will arrive.',
+    telefonoInvalido: 'Please check the phone number: choose your country and type the full number.',
+    exitoTitulo: 'Thanks, {nombre}.',
+    sinNombre: 'all set',
+    nombrePlaceholder: 'Your name',
+    whatsappPlaceholder: '+1 555 000 0000',
+    emailPlaceholder: 'you@email.com',
+    coinciden: '{n} {n|property matches|properties match} your choices.',
+    sinCoincidencias: "None match everything you picked. Remove a filter, or send us the form and we'll tell you what's close.",
+  },
+};
 
 /**
  * `{total}` imprime el valor; `{total|casa|casas}` elige singular o plural
@@ -139,6 +162,7 @@ export default function FormInventario({
   telefonoWhatsApp,
   filtros = [],
   propiedades,
+  locale = 'es',
   className = '',
 }: {
   source: LeadSource;
@@ -158,8 +182,11 @@ export default function FormInventario({
   filtros?: FiltroDef[];
   /** Con `filtros`: para decir cuántas coinciden con lo elegido. */
   propiedades?: PropiedadLanding[];
+  /** Idioma de los textos fijos y del lead (`Idioma` en Zoho). */
+  locale?: LocaleLp;
   className?: string;
 }) {
+  const fijos = TEXTOS_FIJOS[locale];
   const [seleccionInterna, setSeleccionInterna] = useState<string | null>(null);
   const elegida = seleccion !== undefined ? seleccion : seleccionInterna;
   const elegir = onSeleccion ?? setSeleccionInterna;
@@ -221,17 +248,17 @@ export default function FormInventario({
     if (whatsappEnviado !== whatsapp) setWhatsapp(whatsappEnviado);
 
     if (!nombreEnviado || !emailEnviado || !whatsappEnviado) {
-      setError(TEXTOS_FIJOS.faltanCampos);
+      setError(fijos.faltanCampos);
       emitirEvento('form_invalido', source);
       return;
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailEnviado)) {
-      setError(TEXTOS_FIJOS.emailInvalido);
+      setError(fijos.emailInvalido);
       emitirEvento('form_invalido', source);
       return;
     }
     if (!isValidPhoneNumber(whatsappEnviado)) {
-      setError(TEXTOS_FIJOS.telefonoInvalido);
+      setError(fijos.telefonoInvalido);
       emitirEvento('form_invalido', source);
       return;
     }
@@ -240,7 +267,7 @@ export default function FormInventario({
     setError(null);
 
     const propiedad = opciones.find((o) => o.slug === elegida);
-    const deFiltros = textoLead(filtros, filtroSel);
+    const deFiltros = textoLead(filtros, filtroSel, locale);
     const resultado = await submitLead(source, {
       name: nombreEnviado,
       email: emailEnviado,
@@ -250,14 +277,14 @@ export default function FormInventario({
       budget: deFiltros.budget ?? presupuesto ?? undefined,
       location: deFiltros.location,
       interestOption: deFiltros.interestOption,
-      locale: 'es',
+      locale,
       website,
       ...atribucion.current,
     });
 
     setEnviando(false);
     if (!resultado.ok) {
-      setError(TEXTOS_FIJOS.error);
+      setError(fijos.error);
       emitirEvento('form_error', source);
       return;
     }
@@ -282,8 +309,8 @@ export default function FormInventario({
           <Check className="h-4 w-4" aria-hidden />
         </div>
         <h3 className="lpv-display mt-5 text-[1.5rem] font-semibold leading-tight">
-          {rellenar(TEXTOS_FIJOS.exitoTitulo, {
-            nombre: nombre.split(' ')[0] || TEXTOS_FIJOS.sinNombre,
+          {rellenar(fijos.exitoTitulo, {
+            nombre: nombre.split(' ')[0] || fijos.sinNombre,
           })}
         </h3>
         <p className="mt-3 max-w-[42ch] text-sm leading-relaxed text-[var(--lpv-panel-fg-2)]">
@@ -329,7 +356,7 @@ export default function FormInventario({
             value={nombre}
             onFocus={marcarInicio}
             onChange={(e) => setNombre(e.target.value)}
-            placeholder={TEXTOS_FIJOS.nombrePlaceholder}
+            placeholder={fijos.nombrePlaceholder}
             className="lpv-campo mt-2 text-base"
           />
         </div>
@@ -346,8 +373,9 @@ export default function FormInventario({
               marcarInicio();
               setWhatsapp(v);
             }}
-            placeholder={TEXTOS_FIJOS.whatsappPlaceholder}
+            placeholder={fijos.whatsappPlaceholder}
             required
+            defaultCountry={locale === 'en' ? 'US' : 'MX'}
             className="lpv-campo mt-2 text-base"
           />
         </div>
@@ -365,7 +393,7 @@ export default function FormInventario({
             value={email}
             onFocus={marcarInicio}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder={TEXTOS_FIJOS.emailPlaceholder}
+            placeholder={fijos.emailPlaceholder}
             className="lpv-campo mt-2 text-base"
           />
         </div>
@@ -374,7 +402,7 @@ export default function FormInventario({
           <div>
             <label htmlFor={`propiedad-${uid}`} className={ETIQUETA}>
               {copy.propiedadLabel}{' '}
-              <span className="normal-case tracking-normal">{TEXTOS_FIJOS.opcional}</span>
+              <span className="normal-case tracking-normal">{fijos.opcional}</span>
             </label>
             <select
               id={`propiedad-${uid}`}
@@ -399,7 +427,7 @@ export default function FormInventario({
           <fieldset key={f.id} data-lpv-filtro={f.id}>
             <legend className={ETIQUETA}>
               {f.etiqueta}{' '}
-              <span className="normal-case tracking-normal">{TEXTOS_FIJOS.opcional}</span>
+              <span className="normal-case tracking-normal">{fijos.opcional}</span>
             </legend>
             <div className="mt-3 flex flex-wrap gap-2">
               {f.opciones.map((o) => {
@@ -427,8 +455,8 @@ export default function FormInventario({
         {coinciden !== null && (
           <p aria-live="polite" className="-mt-2 text-xs text-[var(--lpv-panel-fg-3)]">
             {coinciden === 0
-              ? TEXTOS_FIJOS.sinCoincidencias
-              : rellenar(copy.coinciden ?? TEXTOS_FIJOS.coinciden, { n: coinciden })}
+              ? fijos.sinCoincidencias
+              : rellenar(copy.coinciden ?? fijos.coinciden, { n: coinciden })}
           </p>
         )}
 
@@ -436,7 +464,7 @@ export default function FormInventario({
           <fieldset>
             <legend className={ETIQUETA}>
               {copy.presupuestoLabel}{' '}
-              <span className="normal-case tracking-normal">{TEXTOS_FIJOS.opcional}</span>
+              <span className="normal-case tracking-normal">{fijos.opcional}</span>
             </legend>
             <div className="mt-3 grid grid-cols-2 gap-2">
               {copy.presupuestos.map((rango) => (
@@ -459,7 +487,7 @@ export default function FormInventario({
       </div>
 
       <div className="absolute left-[-9999px]" aria-hidden>
-        <label htmlFor={`website-${uid}`}>{TEXTOS_FIJOS.honeypot}</label>
+        <label htmlFor={`website-${uid}`}>{fijos.honeypot}</label>
         <input
           id={`website-${uid}`}
           name="website"
@@ -485,7 +513,7 @@ export default function FormInventario({
         {enviando ? (
           <>
             <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
-            {TEXTOS_FIJOS.enviando}
+            {fijos.enviando}
           </>
         ) : (
           <>
@@ -507,13 +535,13 @@ export default function FormInventario({
       </a>
 
       <p className="mt-5 text-xs leading-relaxed text-[var(--lpv-panel-fg-3)]">
-        {TEXTOS_FIJOS.notaPrivacidad}{' '}
+        {fijos.notaPrivacidad}{' '}
         <Link
-          href="/es/privacidad"
+          href={rutaLegal(locale, 'privacidad')}
           prefetch={false}
           className="underline underline-offset-2 hover:text-[var(--lpv-panel-fg-2)]"
         >
-          {TEXTOS_FIJOS.avisoPrivacidad}
+          {fijos.avisoPrivacidad}
         </Link>
       </p>
     </form>

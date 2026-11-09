@@ -18,6 +18,7 @@ import { ubicacionDe, ubicaciones } from '@/lib/supabase/lp-inventario';
 // eligió mal en un visitante que se fue.
 // ============================================================
 
+import { KIT, type LocaleLp } from './i18n';
 const EVENTO = 'lpv:ubicacion';
 export const ANCLA_INVENTARIO = 'inventario';
 
@@ -78,14 +79,16 @@ export function ChipsUbicacion({
   ubicaciones: lista,
   activa,
   onChange,
-  etiquetaTodas = 'Todas',
+  locale = 'es',
+  etiquetaTodas = KIT[locale].todas,
   tono = 'claro',
   conteo = true,
-  ariaLabel = 'Filtrar por ubicación',
+  ariaLabel = locale === 'en' ? 'Filter by location' : 'Filtrar por ubicación',
 }: {
   ubicaciones: Ubicacion[];
   activa: string;
   onChange: (clave: string) => void;
+  locale?: LocaleLp;
   etiquetaTodas?: string;
   tono?: 'claro' | 'oscuro';
   conteo?: boolean;
@@ -128,16 +131,18 @@ export function ChipsHero({
   tono = 'oscuro',
   conteo = true,
   etiquetaTodas,
+  locale = 'es',
 }: {
   ubicaciones: Ubicacion[];
   tono?: 'claro' | 'oscuro';
   conteo?: boolean;
   /** Si viene, se añade un chip «todas» al frente. */
   etiquetaTodas?: string;
+  locale?: LocaleLp;
 }) {
   const ir = useCallback((clave: string) => emitirUbicacion(clave), []);
   return (
-    <div role="group" aria-label="Ver inventario por ubicación" className="flex flex-wrap gap-2">
+    <div role="group" aria-label={KIT[locale].porUbicacionAria} className="flex flex-wrap gap-2">
       {etiquetaTodas && (
         <button type="button" onClick={() => ir(TODAS)} className={claseChip(false, tono)}>
           {etiquetaTodas}

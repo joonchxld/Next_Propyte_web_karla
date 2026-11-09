@@ -1,6 +1,7 @@
 import type { PropiedadLanding } from '@/lib/supabase/lp-inventario';
 import { ubicacionDe, ubicaciones } from '@/lib/supabase/lp-inventario';
-import { ESTADO_TEXTO } from './util';
+import { estadoTexto } from './util';
+import type { LocaleLp } from './i18n';
 
 // ============================================================
 // Filtros de inventario compartidos por las landings v2 (30-oct-2026).
@@ -54,11 +55,40 @@ function montoComparable(p: PropiedadLanding): number | null {
   return p.precio.moneda === 'USD' ? p.precio.monto * FX_SOLO_RANGO : p.precio.monto;
 }
 
-const ETIQUETA_CREDITO: Record<string, string> = {
-  infonavit: 'Infonavit',
-  fovissste: 'Fovissste',
-  hipotecario: 'Crédito bancario',
-  directo: 'Financiamiento directo',
+const ETIQUETA_CREDITO: Record<LocaleLp, Record<string, string>> = {
+  es: {
+    infonavit: 'Infonavit',
+    fovissste: 'Fovissste',
+    hipotecario: 'Crédito bancario',
+    directo: 'Financiamiento directo',
+  },
+  en: {
+    infonavit: 'Infonavit',
+    fovissste: 'Fovissste',
+    hipotecario: 'Bank mortgage',
+    directo: 'Developer financing',
+  },
+};
+
+// Etiquetas por defecto de cada filtro. El llamador puede pasar la suya; en
+// inglés pasa `undefined` en la etiqueta y `'en'` al final.
+const ETIQUETA_FILTRO: Record<LocaleLp, Record<IdFiltro, string>> = {
+  es: {
+    ubicacion: 'Ubicación',
+    presupuesto: 'Presupuesto',
+    recamaras: 'Recámaras',
+    plazo: 'Plazo',
+    credito: 'Cómo quieres pagar',
+    entrega: 'Entrega',
+  },
+  en: {
+    ubicacion: 'Location',
+    presupuesto: 'Budget',
+    recamaras: 'Bedrooms',
+    plazo: 'Payment term',
+    credito: 'How you want to pay',
+    entrega: 'Delivery',
+  },
 };
 
 /** ¿`p` pasa el valor `valor` del filtro `id`? */
@@ -115,8 +145,10 @@ function cerrar(def: FiltroDef): FiltroDef | null {
 export function filtroUbicacion(
   propiedades: PropiedadLanding[],
   nivel: 'ciudad' | 'zona' = 'ciudad',
-  etiqueta = 'Ubicación',
+  etiqueta?: string,
+  locale: LocaleLp = 'es',
 ): FiltroDef | null {
+  etiqueta ??= ETIQUETA_FILTRO[locale].ubicacion;
   const lista = ubicaciones(propiedades, nivel);
   return cerrar({
     id: 'ubicacion',
@@ -139,52 +171,76 @@ function corteTexto(n: number): string {
 export function filtroPresupuesto(
   propiedades: PropiedadLanding[],
   cortes: number[],
-  etiqueta = 'Presupuesto',
+  etiqueta?: string,
+  locale: LocaleLp = 'es',
 ): FiltroDef | null {
+  etiqueta ??= ETIQUETA_FILTRO[locale].presupuesto;
+  const [hasta, a, masDe] = locale === 'en' ? ['Up to', 'to', 'Over'] : ['Hasta', 'a', 'Más de'];
   const ordenados = [...cortes].sort((a, b) => a - b);
   const candidatas: { valor: string; etiqueta: string }[] = [];
   ordenados.forEach((corte, i) => {
     const anterior = i === 0 ? null : ordenados[i - 1];
     candidatas.push({
       valor: `${anterior ?? ''}-${corte}`,
-      etiqueta: anterior === null ? `Hasta ${corteTexto(corte)}` : `${corteTexto(anterior)} a ${corteTexto(corte)}`,
+      etiqueta: anterior === null ? `${hasta} ${corteTexto(corte)}` : `${corteTexto(anterior)} ${a} ${corteTexto(corte)}`,
     });
   });
   const ultimo = ordenados[ordenados.length - 1];
-  if (ultimo !== undefined) candidatas.push({ valor: `${ultimo}-`, etiqueta: `Más de ${corteTexto(ultimo)}` });
+  if (ultimo !== undefined) candidatas.push({ valor: `${ultimo}-`, etiqueta: `${masDe} ${corteTexto(ultimo)}` });
   return cerrar({ id: 'presupuesto', etiqueta, opciones: conConteo(propiedades, 'presupuesto', candidatas) });
 }
 
-export function filtroRecamaras(propiedades: PropiedadLanding[], etiqueta = 'Recámaras'): FiltroDef | null {
+export function filtroRecamaras(
+  propiedades: PropiedadLanding[],
+  etiqueta?: string,
+  locale: LocaleLp = 'es',
+): FiltroDef | null {
+  etiqueta ??= ETIQUETA_FILTRO[locale].recamaras;
   const max = Math.max(0, ...propiedades.map((p) => p.recamaras ?? 0));
   const tope = Math.min(max, 4);
   const candidatas: { valor: string; etiqueta: string }[] = [];
   for (let n = 1; n <= tope; n++) {
     const esUltimo = n === 4 && max > 4;
-    candidatas.push({ valor: esUltimo ? '4+' : String(n), etiqueta: esUltimo ? '4 o más' : String(n) });
+    candidatas.push({ valor: esUltimo ? '4+' : String(n), etiqueta: esUltimo ? (locale === 'en' ? '4 or more' : '4 o más') : String(n) });
   }
   return cerrar({ id: 'recamaras', etiqueta, opciones: conConteo(propiedades, 'recamaras', candidatas) });
 }
 
 /** Plazos declarados por los desarrolladores, en meses, de menor a mayor. */
-export function filtroPlazo(propiedades: PropiedadLanding[], etiqueta = 'Plazo'): FiltroDef | null {
+export function filtroPlazo(
+  propiedades: PropiedadLanding[],
+  etiqueta?: string,
+  locale: LocaleLp = 'es',
+): FiltroDef | null {
+  etiqueta ??= ETIQUETA_FILTRO[locale].plazo;
   const meses = [...new Set(propiedades.flatMap((p) => p.mesesOpciones))].sort((a, b) => a - b);
-  const candidatas = meses.map((m) => ({ valor: String(m), etiqueta: `${m} meses` }));
+  const candidatas = meses.map((m) => ({ valor: String(m), etiqueta: `${m} ${locale === 'en' ? 'months' : 'meses'}` }));
   return cerrar({ id: 'plazo', etiqueta, opciones: conConteo(propiedades, 'plazo', candidatas) });
 }
 
-export function filtroCredito(propiedades: PropiedadLanding[], etiqueta = 'Cómo quieres pagar'): FiltroDef | null {
-  const candidatas = Object.entries(ETIQUETA_CREDITO).map(([valor, etiq]) => ({ valor, etiqueta: etiq }));
+export function filtroCredito(
+  propiedades: PropiedadLanding[],
+  etiqueta?: string,
+  locale: LocaleLp = 'es',
+): FiltroDef | null {
+  etiqueta ??= ETIQUETA_FILTRO[locale].credito;
+  const candidatas = Object.entries(ETIQUETA_CREDITO[locale]).map(([valor, etiq]) => ({ valor, etiqueta: etiq }));
   // Aquí basta UNA opción: «Infonavit» solo ya le dice al visitante algo que
   // no sabía, y al asesor, que la persona lo eligió.
   const opciones = conConteo(propiedades, 'credito', candidatas);
   return opciones.length > 0 ? { id: 'credito', etiqueta, opciones } : null;
 }
 
-export function filtroEntrega(propiedades: PropiedadLanding[], etiqueta = 'Entrega'): FiltroDef | null {
-  const candidatas = (Object.keys(ESTADO_TEXTO) as (keyof typeof ESTADO_TEXTO)[]).map((k) => ({
+export function filtroEntrega(
+  propiedades: PropiedadLanding[],
+  etiqueta?: string,
+  locale: LocaleLp = 'es',
+): FiltroDef | null {
+  etiqueta ??= ETIQUETA_FILTRO[locale].entrega;
+  const textos = estadoTexto(locale);
+  const candidatas = (Object.keys(textos) as (keyof typeof textos)[]).map((k) => ({
     valor: k,
-    etiqueta: ESTADO_TEXTO[k],
+    etiqueta: textos[k],
   }));
   return cerrar({ id: 'entrega', etiqueta, opciones: conConteo(propiedades, 'entrega', candidatas) });
 }
@@ -203,7 +259,7 @@ export function etiquetaDe(defs: FiltroDef[], id: IdFiltro, valor: string | unde
  * Lo que viaja en el lead. Ubicación y presupuesto tienen campo propio en
  * Zoho; el resto se junta en `interestOption` como texto legible.
  */
-export function textoLead(defs: FiltroDef[], seleccion: Seleccion): {
+export function textoLead(defs: FiltroDef[], seleccion: Seleccion, locale: LocaleLp = 'es'): {
   location?: string;
   budget?: string;
   interestOption?: string;
@@ -215,7 +271,10 @@ export function textoLead(defs: FiltroDef[], seleccion: Seleccion): {
     .map((d) => {
       const etiq = etiquetaDe(defs, d.id, seleccion[d.id]);
       if (!etiq) return null;
-      if (d.id === 'recamaras') return `${etiq} ${etiq === '1' ? 'recámara' : 'recámaras'}`;
+      if (d.id === 'recamaras') {
+        if (locale === 'en') return `${etiq} ${etiq === '1' ? 'bedroom' : 'bedrooms'}`;
+        return `${etiq} ${etiq === '1' ? 'recámara' : 'recámaras'}`;
+      }
       return etiq;
     })
     .filter((t): t is string => t !== null);

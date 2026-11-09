@@ -32,6 +32,18 @@ export type LeadSource =
   | "lp_deptos_rm"
   | "lp_casas_merida"
   | "lp_frente_mar"
+  /**
+   * Versiones en inglés de las landings de pago (9-nov-2026). Fuente propia
+   * para separar el tráfico de EE.UU./Canadá en Zoho. Las tres de terrenos de
+   * PDC comparten `lp_lotes_pdc_en`, igual que sus pares en español.
+   * `homes-riviera-maya` sigue con `lp_casas_riviera` + locale en (ya corre en Ads).
+   */
+  | "lp_lotes_pdc_en"
+  | "lp_casas_pdc_en"
+  | "lp_terrenos_rm_en"
+  | "lp_deptos_rm_en"
+  | "lp_casas_merida_en"
+  | "lp_frente_mar_en"
   /** Sitio de Avica (Webflow): formulario de contacto «Email Footer». Va al Zoho de Propyte. */
   | "avica_contacto"
   /** Sitio de Avica: marcó «¿Eres broker inmobiliario?» o eligió «Soy Broker». */
@@ -339,6 +351,12 @@ function campaignSlug(source: LeadSource): string {
     case "lp_deptos_rm":          return "lp/departamentos-riviera-maya";
     case "lp_casas_merida":       return "lp/casas-merida";
     case "lp_frente_mar":         return "lp/frente-al-mar";
+    case "lp_lotes_pdc_en":       return "lp/lots-playa-del-carmen";
+    case "lp_casas_pdc_en":       return "lp/homes-playa-del-carmen";
+    case "lp_terrenos_rm_en":     return "lp/land-riviera-maya";
+    case "lp_deptos_rm_en":       return "lp/condos-riviera-maya";
+    case "lp_casas_merida_en":    return "lp/homes-merida";
+    case "lp_frente_mar_en":      return "lp/beachfront-riviera-maya";
     case "avica_contacto":        return "contacto";
     case "avica_broker":          return "broker";
     case "avica_newsletter":      return "newsletter";
@@ -401,6 +419,12 @@ function formDescription(source: LeadSource, locale: Locale): string {
       case "lp_deptos_rm":        return "Landing departamentos Riviera Maya (Ads)";
       case "lp_casas_merida":     return "Landing casas Mérida (Ads)";
       case "lp_frente_mar":       return "Landing frente al mar (Ads)";
+      case "lp_lotes_pdc_en":     return "Landing lotes Playa del Carmen INGLÉS (Ads)";
+      case "lp_casas_pdc_en":     return "Landing casas Playa del Carmen INGLÉS (Ads)";
+      case "lp_terrenos_rm_en":   return "Landing terrenos Riviera Maya INGLÉS (Ads)";
+      case "lp_deptos_rm_en":     return "Landing departamentos Riviera Maya INGLÉS (Ads)";
+      case "lp_casas_merida_en":  return "Landing casas Mérida INGLÉS (Ads)";
+      case "lp_frente_mar_en":    return "Landing frente al mar INGLÉS (Ads)";
       case "avica_contacto":      return "Contacto";
       case "avica_broker":        return "Broker";
       case "avica_newsletter":    return "Newsletter";
@@ -519,6 +543,7 @@ function composeDescription(source: LeadSource, data: FormData): string | undefi
       // sin Description — el form solo captura email
       break;
     case "lp_lotes_pdc":
+    case "lp_lotes_pdc_en":
       // Los dos taps de calificación de la landing. Son el dato que decide si
       // el lead vale una llamada, así que van primero en la Description.
       if (data.investmentType) parts.push(`Objetivo: ${data.investmentType}`);
@@ -538,6 +563,11 @@ function composeDescription(source: LeadSource, data: FormData): string | undefi
     case "lp_deptos_rm":
     case "lp_casas_merida":
     case "lp_frente_mar":
+    case "lp_casas_pdc_en":
+    case "lp_terrenos_rm_en":
+    case "lp_deptos_rm_en":
+    case "lp_casas_merida_en":
+    case "lp_frente_mar_en":
       // `propertyName` va SIEMPRE: el form manda «Riviera Maya (sin casa
       // específica)» cuando el visitante no eligió una, para que el asesor
       // sepa que debe abrir con el inventario completo y no que el dato se
