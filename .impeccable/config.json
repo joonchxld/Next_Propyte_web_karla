@@ -11,6 +11,15 @@
         ],
         "createdAt": "2026-08-27T15:43:41.640Z",
         "reason": "Pre-existing site-wide hero-atmosphere system (not authored this session) — documented in code comments as a deliberate 'architectural/blueprint feel' layer, used across Hero.tsx, DevelopersHero, etc. Not a generated-UI artifact; a shipped design decision predating this session."
+      },
+      {
+        "rule": "codex-grid-background",
+        "value": ".lpm-reticula",
+        "files": [
+          "src/app/lp/casas-riviera-maya/v3/monografia.css"
+        ],
+        "createdAt": "2026-11-09T19:52:53.066344Z",
+        "reason": "Retícula de líneas y nodos al 25% de #D8ECE9: elemento gráfico obligatorio del manual de marca oficial de Propyte (2026), no decoración generada."
       }
     ]
   }
