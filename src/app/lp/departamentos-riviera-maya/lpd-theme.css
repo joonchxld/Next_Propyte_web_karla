@@ -375,3 +375,10 @@
   filter: none;
   text-shadow: none;
 }
+
+/* Hoja de la portada (9-nov-2026): mismo recorte que casas PDC en móvil. */
+@media (max-width: 639px) {
+  .lpd-root .lpd-hoja-portada [data-lpv-form] > p:nth-of-type(2) {
+    display: none;
+  }
+}

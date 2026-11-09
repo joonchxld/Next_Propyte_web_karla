@@ -20,6 +20,7 @@ import {
 import type { LocaleLp } from '../_components/v2/i18n';
 import { ubicacionCorta } from '../_components/v2/util';
 import Catalogo from './_components/Catalogo';
+import FormInventario from '../_components/v2/FormInventario';
 import ChipsPortada from './_components/ChipsPortada';
 import { COPY } from './_copy';
 import '../_components/v2/tokens.css';
@@ -136,9 +137,10 @@ export default async function PaginaFrenteMar({ locale = 'es' }: { locale?: Loca
         <div className="marca-velo" aria-hidden="true" />
         <div className="marca-reticula" aria-hidden="true" />
 
-        <div className="relative mx-auto flex min-h-[100svh] max-w-[96rem] flex-col justify-end px-5 pb-12 pt-28 text-white sm:px-8 sm:pb-16 lg:pr-48">
+        <div className="relative mx-auto grid min-h-[100svh] max-w-[96rem] content-end gap-x-12 gap-y-6 px-5 pb-12 pt-24 text-white sm:px-8 sm:pb-16 lg:grid-cols-[minmax(0,1fr)_25rem] lg:content-start lg:items-start lg:pr-56 lg:pt-28">
+          <div className="min-w-0 lg:pt-[14vh]">
           <h1
-            className={`marca-titular lpo-sobre-foto ${copy.portada.anchoTitulo} text-[clamp(3rem,1.2rem+8vw,8.5rem)]`}
+            className={`marca-titular lpo-sobre-foto ${copy.portada.anchoTitulo} text-[clamp(2.5rem,1rem+7vw,7.5rem)]`}
           >
             {copy.portada.titulo}
           </h1>
@@ -150,12 +152,30 @@ export default async function PaginaFrenteMar({ locale = 'es' }: { locale?: Loca
               desde: resumen.desde ? dineroCompacto(resumen.desde) : null,
             })}
           </p>
-          <div className="mt-8">
+          <div className="mt-6 sm:mt-8">
             <ChipsPortada
               ubicacion={ubicacion}
               total={resumen.total}
               etiquetaTodas={copy.portada.verTodas(resumen.total)}
               locale={locale}
+            />
+          </div>
+          </div>
+
+          {/* Hoja de solicitud en la portada (9-nov-2026): el formulario del
+              final queda a nueve pantallas; esta lo pone en el primer pliegue.
+              Solo ciudad y presupuesto; el del cierre conserva los tres filtros. */}
+          <div className="lpo-hoja lpo-hoja-portada marca-vidrio p-6 sm:p-8">
+            <FormInventario
+              source={copy.source}
+              variante="hero"
+              copy={copy.form}
+              opciones={propiedades.map((p) => ({ slug: p.slug, titulo: p.titulo }))}
+              filtros={defs.filter((f) => f.id === 'ubicacion' || f.id === 'presupuesto')}
+              propiedades={propiedades}
+              telefonoWhatsApp={FALLBACK_WHATSAPP}
+              locale={locale}
+              className="!p-0"
             />
           </div>
         </div>
