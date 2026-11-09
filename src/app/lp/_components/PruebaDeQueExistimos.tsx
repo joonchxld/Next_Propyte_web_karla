@@ -79,10 +79,10 @@ export default function PruebaDeQueExistimos({
 
   return (
     <section id={ANCLA_PRUEBA} aria-label={t.ariaLabel} className="scroll-mt-6">
-      <div className="grid gap-px border-t-2 border-[var(--lp-accent)] bg-[var(--lp-line)] sm:grid-cols-2">
+      <div className="grid gap-3 sm:grid-cols-2">
         {oficina && (
-          <div className="bg-white p-5">
-            <h3 className="text-[0.6875rem] uppercase tracking-[0.08em] text-[var(--lp-muted)]">
+          <div className="marca-tarjeta p-5 sm:p-6">
+            <h3 className="lp-rotulo text-[var(--lp-muted)]">
               {t.oficina}
             </h3>
             <p className="mt-2.5 text-sm leading-relaxed text-[var(--lp-ink-soft)]">
@@ -96,8 +96,8 @@ export default function PruebaDeQueExistimos({
         )}
 
         {asesor && (
-          <div className="bg-white p-5">
-            <h3 className="text-[0.6875rem] uppercase tracking-[0.08em] text-[var(--lp-muted)]">
+          <div className="marca-tarjeta p-5 sm:p-6">
+            <h3 className="lp-rotulo text-[var(--lp-muted)]">
               {t.asesor}
             </h3>
             <div className="mt-3 flex items-center gap-3">

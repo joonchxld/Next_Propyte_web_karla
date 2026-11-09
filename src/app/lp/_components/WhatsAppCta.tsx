@@ -86,7 +86,7 @@ export default function WhatsAppCta({
       target="_blank"
       rel="noopener noreferrer"
       onClick={() => trackWhatsAppClick({ surface, propertySlug: loteSlug })}
-      className="inline-flex min-h-[52px] cursor-pointer items-center justify-center gap-2 rounded-[var(--lp-r-control)] border border-[var(--lp-on-dark)]/25 px-6 text-sm font-medium text-[var(--lp-on-dark)]/85 transition-colors duration-200 hover:border-[var(--lp-on-dark)]/45 hover:text-[var(--lp-on-dark)]"
+      className="inline-flex min-h-[56px] cursor-pointer items-center justify-center gap-2 rounded-full border border-[var(--lp-on-dark)]/25 px-6 text-sm font-medium text-[var(--lp-on-dark)]/85 transition-colors duration-200 hover:border-[var(--lp-on-dark)]/45 hover:text-[var(--lp-on-dark)]"
     >
       <MessageCircle className="size-4 shrink-0" aria-hidden="true" />
       {WA[locale].escribir}

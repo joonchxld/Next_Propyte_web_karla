@@ -134,7 +134,7 @@ export default function ComparadorLotes({
   const lotesVisibles = visibles.map((v) => lotes.find((l) => l.id === v.id)!).filter(Boolean);
 
   const CHIP =
-    'lp-num block cursor-pointer select-none rounded-[var(--lp-r-control)] border px-4 py-2.5 text-sm ' +
+    'lp-num block min-h-[44px] cursor-pointer select-none rounded-full border px-5 py-2.5 text-sm ' +
     'transition-colors duration-150 border-[var(--lp-line-dark)] text-[var(--lp-on-dark-soft)] ' +
     'hover:border-[var(--lp-on-dark-soft)] hover:text-[var(--lp-on-dark)] ' +
     'peer-checked:border-[var(--lp-accent-on-dark)] peer-checked:bg-[var(--lp-accent-on-dark)] ' +
@@ -223,7 +223,7 @@ export default function ComparadorLotes({
                   className="block w-full text-left"
                 >
                   <div className="p-3 sm:p-4">
-                    <p className="text-[0.6875rem] uppercase tracking-[0.08em] text-[var(--lp-on-dark-soft)]">
+                    <p className="lp-rotulo text-[var(--lp-on-dark-soft)]">
                       {l.ciudad}
                       {l.esDeEstaLanding ? t.esDeEstaLanding : ''}
                     </p>
@@ -248,7 +248,7 @@ export default function ComparadorLotes({
 
           {lote.plazos.length > 1 && (
             <fieldset className="mt-5">
-              <legend className="font-mono text-[0.6875rem] uppercase tracking-[0.08em] text-[var(--lp-on-dark-soft)]">
+              <legend className="lp-rotulo text-[var(--lp-on-dark-soft)]">
                                 {t.plazo}
               </legend>
               <div className="mt-3 flex flex-wrap gap-2">

@@ -81,17 +81,17 @@ function emitirEvento(evento: string, formType: string) {
  * ser tres chips opcionales. Mismo dato para el asesor, cero coste de entrada.
  */
 function chip(activo: boolean) {
-  return `min-h-[40px] cursor-pointer border px-3 text-left text-sm transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--lp-accent)] ${
+  return `min-h-[44px] cursor-pointer rounded-full border px-4 text-left text-sm transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--lp-foco)] ${
     activo
-      ? 'border-[var(--lp-accent)] bg-[var(--lp-accent)]/8 text-[var(--lp-accent)]'
-      : 'border-[var(--lp-line)] bg-white text-[var(--lp-ink-soft)] hover:border-[var(--lp-accent)]/50'
+      ? 'border-[var(--lp-ink)] bg-[var(--lp-ink)] font-medium text-[var(--lp-on-ink)]'
+      : 'border-[var(--lp-line)] bg-[var(--lp-campo)] text-[var(--lp-ink-soft)] hover:border-[var(--lp-ink-soft)]'
   }`;
 }
 
 const INPUT =
-  'min-h-[52px] w-full border border-[var(--lp-line)] bg-white px-4 font-mono text-sm text-[var(--lp-ink-soft)] transition-colors duration-200 placeholder:font-sans placeholder:text-[var(--lp-ink-soft)]/35 focus:border-[var(--lp-accent)] focus:outline-2 focus:outline-offset-0 focus:outline-[var(--lp-accent)]';
+  'min-h-[52px] w-full rounded-full border border-[var(--lp-line)] bg-[var(--lp-campo)] px-5 text-[0.9375rem] text-[var(--lp-ink)] transition-colors duration-200 placeholder:text-[var(--lp-muted)] focus:border-[var(--lp-foco)] focus:outline-2 focus:outline-offset-2 focus:outline-[var(--lp-foco)]';
 
-const ETIQUETA = 'text-[0.6875rem] uppercase tracking-[0.08em] text-[var(--lp-muted)]';
+const ETIQUETA = 'lp-rotulo pl-1 text-[var(--lp-muted)]';
 
 export default function LeadFormLotes({
   loteNombre,
@@ -249,7 +249,7 @@ export default function LeadFormLotes({
     return (
       <div
         data-lp-contacto={variante}
-        className="border-t-2 border-[var(--lp-accent)] bg-white p-6"
+        className="marca-tarjeta p-6 sm:p-7"
         role="status"
         aria-live="polite"
       >
@@ -259,7 +259,7 @@ export default function LeadFormLotes({
         </p>
         <p className="mt-3 text-sm leading-relaxed text-[var(--lp-ink-soft)]">
           {t.graciasA}{' '}
-          <span className="font-mono">{whatsapp}</span> {tiempo} {t.graciasB}
+          <span className="lp-num">{whatsapp}</span> {tiempo} {t.graciasB}
           {plazo ? t.graciasPlazo(plazo) : ''} {t.graciasC}
         </p>
         {!esHero && (
@@ -349,7 +349,7 @@ export default function LeadFormLotes({
     return (
       <div
         data-lp-contacto="hero"
-        className="border-t-[3px] border-[var(--lp-accent)] bg-white p-5 shadow-[0_8px_28px_rgb(22_25_28/0.18)] sm:p-6"
+        className="lpl-oscuro marca-vidrio p-5 sm:p-6"
       >
         <p className="lp-display text-base leading-snug text-[var(--lp-ink)]">
           {t.heroTitulo}
@@ -365,7 +365,7 @@ export default function LeadFormLotes({
           <button
             type="submit"
             disabled={enviando}
-            className="flex min-h-[52px] w-full cursor-pointer items-center justify-center gap-2 bg-[var(--lp-accent)] px-5 text-base font-semibold text-white shadow-[0_2px_10px_rgb(168_64_42/0.28)] transition-colors duration-200 hover:bg-[var(--lp-accent-strong)] disabled:cursor-default disabled:opacity-60"
+            className="flex min-h-[56px] w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-[var(--lp-accent)] px-6 text-base font-semibold text-[var(--lp-on-accent)] transition-colors duration-200 hover:bg-[var(--lp-accent-strong)] disabled:cursor-default disabled:opacity-60"
           >
             {enviando ? t.enviando : t.heroBoton}
             {!enviando && <ArrowRight className="size-4" aria-hidden="true" />}
@@ -383,9 +383,9 @@ export default function LeadFormLotes({
   return (
     <div
       data-lp-contacto="principal"
-      className="border-t-[3px] border-[var(--lp-accent)] bg-white shadow-[0_8px_28px_rgb(22_25_28/0.10)]"
+      className="marca-tarjeta"
     >
-      <div className="border-x border-b border-[var(--lp-line)] p-5 sm:p-6">
+      <div className="p-5 sm:p-7">
         {/* `p` y no `h3`: `globals.css` pisa el font-size de los headings
             fuera de `.lp-root`… y aquí sí estamos dentro, pero el encabezado
             real de la conversión es el `TituloSeccion` de la columna de al
@@ -406,10 +406,10 @@ export default function LeadFormLotes({
                 {plazosDisponibles.map((m) => (
                   <label
                     key={m}
-                    className={`flex min-h-[48px] flex-1 cursor-pointer items-center justify-center border text-sm transition-colors duration-200 ${
+                    className={`flex min-h-[48px] flex-1 cursor-pointer items-center justify-center rounded-full border text-sm transition-colors duration-200 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-[var(--lp-foco)] ${
                       plazo === m
-                        ? 'border-[var(--lp-accent)] bg-[var(--lp-accent)]/8 text-[var(--lp-accent)]'
-                        : 'border-[var(--lp-line)] bg-white text-[var(--lp-ink-soft)] hover:border-[var(--lp-accent)]/50'
+                        ? 'border-[var(--lp-ink)] bg-[var(--lp-ink)] font-medium text-[var(--lp-on-ink)]'
+                        : 'border-[var(--lp-line)] bg-[var(--lp-campo)] text-[var(--lp-ink-soft)] hover:border-[var(--lp-ink-soft)]'
                     }`}
                   >
                     <input
@@ -459,7 +459,7 @@ export default function LeadFormLotes({
           <button
             type="submit"
             disabled={enviando}
-            className="flex min-h-[52px] w-full cursor-pointer items-center justify-center gap-2 bg-[var(--lp-accent)] px-5 text-base font-semibold text-white shadow-[0_2px_10px_rgb(168_64_42/0.28)] transition-colors duration-200 hover:bg-[var(--lp-accent-strong)] disabled:cursor-default disabled:opacity-60"
+            className="flex min-h-[56px] w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-[var(--lp-accent)] px-6 text-base font-semibold text-[var(--lp-on-accent)] transition-colors duration-200 hover:bg-[var(--lp-accent-strong)] disabled:cursor-default disabled:opacity-60"
           >
             {enviando ? t.enviando : t.principalBoton}
             {!enviando && <ArrowRight className="size-4" aria-hidden="true" />}

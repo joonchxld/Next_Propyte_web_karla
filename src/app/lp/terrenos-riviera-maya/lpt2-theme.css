@@ -1,156 +1,208 @@
 /* ============================================================
-   Tema: terrenos en la Riviera Maya (`.lpt2-root`), segunda versión.
+   Tema: terrenos en la Riviera Maya (`.lpt2-root`), versión de MARCA
+   (manual oficial de Propyte 2026; ver DESIGN.md y
+   `_components/v2/marca.css`). La raíz lleva `lpv marca lpt2-root`.
 
-   LÓGICA DE ESTA LANDING: catálogo técnico. Quien compra suelo compara
-   números (superficie, precio, precio por metro, plazo), así que la página
-   es una TABLA grande y legible, no una galería. Hero tipográfico sobre
-   blanco, una banda de foto aérea sin texto, filas de ancho completo que se
-   abren, y el formulario sobre un bloque cobalto.
+   LÓGICA DE ESTA LANDING (no cambia): catálogo técnico. Quien compra suelo
+   compara números (superficie, precio, precio por metro, plazo), así que la
+   página es una TABLA grande y legible, no una galería. Hero tipográfico con
+   el formulario fijo a la derecha, mapa de puntos sincronizado con los
+   filtros, filas de ancho completo que se abren, y el formulario de cierre.
 
-   Deliberadamente distinta de la landing de casas (foto a sangre con el
-   titular encima, fotos con precio superpuesto): aquí la foto es secundaria
-   y el dato manda.
+   LO QUE CAMBIA (9-nov-2026, «misma marca, otra composición»): el hero es
+   una banda Aztec con la retícula de nodos y la cifra «desde» en New Aqua;
+   el formulario es vidrio Aztec con el envío en pastilla Aqua; los filtros,
+   chips y plazos son pastillas; el mapa vive en una tarjeta blanca
+   redondeada; cada fila es una tarjeta blanca sobre Tech White y la fila
+   abierta lleva su plan en una tabla Water Dew; el cierre va sobre el
+   degradado de marca. Nada de cobalto, nada de mono, ningún rótulo en
+   mayúsculas.
 
-   RADIOS, regla documentada: bloques y filas a 0; botones y chips de plazo
-   a 999px (píldora). Nada más lleva radio.
-
-   TIPOGRAFÍA: Archivo semicondensada (la de la v3 del home) para titular,
-   superficie y precios; DM Sans para el resto; JetBrains Mono del sitio para
-   el precio por metro, que es la cifra que se compara entre filas.
+   TIPOGRAFÍA: Inter (titulares y cifras grandes), DM Sans (texto) y Space
+   Grotesk (detalles y cifras pequeñas), todas desde `.marca`.
    ============================================================ */
 
 .lpt2-root {
-  --lpv-bg: #ffffff;
-  --lpv-bg-2: #f3f4f6;
-  --lpv-fg: #0f172a;
-  --lpv-fg-2: #475569;
-  --lpv-fg-3: #94a3b8;
-  --lpv-line: rgb(15 23 42 / 0.12);
-  --lpv-line-2: rgb(15 23 42 / 0.5);
-  --lpv-accent: #1d4ed8;
-  --lpv-on-accent: #ffffff;
-
-  /* El formulario vive sobre cobalto: campos blancos con regla inferior. */
-  --lpv-panel-bg: #1d4ed8;
-  --lpv-panel-bg-2: #1d4ed8;
-  --lpv-panel-fg: #ffffff;
-  --lpv-panel-fg-2: rgb(255 255 255 / 0.78);
-  --lpv-panel-fg-3: rgb(255 255 255 / 0.6);
-  --lpv-panel-line: rgb(255 255 255 / 0.35);
-  --lpv-panel-accent: #ffffff;
-  --lpv-panel-on-accent: #1d4ed8;
-
-  --lpv-r: 0px;
-  --lpv-r-control: 999px;
-  --lpv-font-display: var(--font-lpt2-display), var(--font-text), ui-sans-serif, system-ui, sans-serif;
-  --lpv-font-ui: var(--font-text), ui-sans-serif, system-ui, sans-serif;
+  background: var(--marca-tech);
+  color: var(--marca-aztec);
 }
 
+/* Cifras grandes: Inter 500 de marca con cifras tabulares. */
 .lpt2-root .lpt2-display {
-  font-family: var(--lpv-font-display);
-  font-stretch: 85%;
+  font-family: var(--marca-display);
   font-weight: 500;
-  letter-spacing: -0.025em;
-  line-height: 0.95;
+  letter-spacing: -0.035em;
+  line-height: 1;
   font-variant-numeric: tabular-nums lining-nums;
 }
 
+/* Segunda línea del titular y frases grandes: Inter ligera. */
 .lpt2-root .lpt2-display-ligero {
-  font-family: var(--lpv-font-display);
-  font-stretch: 90%;
-  font-weight: 300;
-  letter-spacing: -0.01em;
-  line-height: 1.05;
+  font-family: var(--marca-display);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
   font-variant-numeric: tabular-nums lining-nums;
 }
 
-.lpt2-root .lpt2-mono {
-  font-family: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: 0;
+/* ---------- Hero: banda Aztec con retícula ---------- */
+
+.lpt2-root .lpt2-hero {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
 }
 
-/* Chips de ciudad: texto con regla inferior, sin píldora. La activa lleva
-   la regla en tinta a 2px; las demás, fina. Mismo dibujo en el hero y en la
-   barra de filtros. */
+.lpt2-root .lpt2-hero .marca-reticula {
+  z-index: -1;
+}
+
+/* Datos del hero: icono en círculo sobre Aztec. */
+.lpt2-root .lpt2-dato-icono {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  flex-shrink: 0;
+  border-radius: 999px;
+  background: var(--marca-night);
+  color: var(--marca-aqua);
+  box-shadow: inset 0 0 0 1px rgb(162 249 255 / 0.22);
+}
+
+.lpt2-root .lpt2-foto {
+  border-radius: var(--marca-r);
+  overflow: hidden;
+  background: var(--marca-night);
+}
+
+/* ---------- Pastillas de filtro ----------
+   Una sola pieza en el hero (sobre Aztec) y en la barra (sobre Tech White).
+   Sobre claro: blanca con filete; elegida, Aztec con texto Aqua. Sobre
+   oscuro: filete Aqua; elegida, Aqua con texto Aztec. */
 .lpt2-root .lpt2-chip {
   appearance: none;
-  background: transparent;
-  border: 0;
-  border-bottom: 1px solid var(--lpv-line);
-  border-radius: 0;
-  padding: 0.5rem 0 0.4rem;
-  color: var(--lpv-fg-2);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 44px;
+  padding: 0 1.05rem;
+  border: 1px solid rgb(10 28 30 / 0.16);
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--marca-slate);
+  font-family: var(--marca-detalle);
   font-size: 0.9375rem;
   line-height: 1;
   white-space: nowrap;
   cursor: pointer;
-  transition: color 180ms ease, border-color 180ms ease;
+  transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease;
 }
 
 .lpt2-root .lpt2-chip:hover {
-  color: var(--lpv-fg);
-  border-bottom-color: var(--lpv-line-2);
+  border-color: var(--marca-teal);
 }
 
 .lpt2-root .lpt2-chip[aria-pressed='true'] {
-  color: var(--lpv-fg);
-  border-bottom: 2px solid var(--lpv-fg);
-  padding-bottom: calc(0.4rem - 1px);
+  background: var(--marca-aztec);
+  border-color: var(--marca-aztec);
+  color: var(--marca-aqua);
 }
 
-/* `ChipsHero` del kit viene en píldora con tokens del panel; aquí se vuelve
-   texto con regla, como los de la barra de filtros. */
-.lpt2-root .lpt2-chips-hero button {
+.lpt2-root .lpt2-chip .lpt2-chip-n {
+  color: var(--marca-teal);
+  font-variant-numeric: tabular-nums;
+}
+
+.lpt2-root .lpt2-chip[aria-pressed='true'] .lpt2-chip-n {
+  color: var(--marca-onahau);
+}
+
+.lpt2-root .marca-oscura .lpt2-chip {
   background: transparent;
-  border: 0;
-  border-bottom: 1px solid var(--lpv-line);
-  border-radius: 0;
-  padding: 0.5rem 0 0.4rem;
-  min-height: 0;
-  color: var(--lpv-fg-2);
-  font-size: 0.9375rem;
-  transition: color 180ms ease, border-color 180ms ease;
+  border-color: rgb(162 249 255 / 0.26);
+  color: rgb(255 255 255 / 0.85);
 }
 
-.lpt2-root .lpt2-chips-hero button:hover {
-  color: var(--lpv-fg);
-  border-bottom-color: var(--lpv-line-2);
-  background: transparent;
+.lpt2-root .marca-oscura .lpt2-chip:hover {
+  border-color: var(--marca-aqua);
+  color: #ffffff;
 }
 
-/* Barra de filtros pegajosa. */
+.lpt2-root .marca-oscura .lpt2-chip .lpt2-chip-n {
+  color: var(--marca-onahau);
+}
+
+.lpt2-root .marca-oscura .lpt2-chip[aria-pressed='true'] {
+  background: var(--marca-aqua);
+  border-color: var(--marca-aqua);
+  color: var(--marca-aztec);
+}
+
+.lpt2-root .marca-oscura .lpt2-chip[aria-pressed='true'] .lpt2-chip-n {
+  color: var(--marca-slate);
+}
+
+.lpt2-root .marca-oscura :focus-visible {
+  outline-color: var(--marca-aqua);
+}
+
+/* Barra de filtros pegajosa sobre Tech White. */
 .lpt2-root .lpt2-filtros {
   position: sticky;
   top: 0;
   z-index: 20;
-  background: color-mix(in srgb, #ffffff 94%, transparent);
-  backdrop-filter: blur(8px);
+  background: color-mix(in srgb, var(--marca-tech) 92%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 @media (prefers-reduced-transparency: reduce) {
   .lpt2-root .lpt2-filtros {
-    background: #ffffff;
+    background: var(--marca-tech);
     backdrop-filter: none;
   }
 }
 
-/* Filas deslizables sin barra visible (chips en móvil). */
-.lpt2-root .lpt2-fila-chips {
-  scrollbar-width: none;
-}
-.lpt2-root .lpt2-fila-chips::-webkit-scrollbar {
-  display: none;
-}
+/* ---------- Catálogo: cada fila es una tarjeta ---------- */
 
-/* Fila del catálogo: el fondo cambia al pasar el cursor y cuando está abierta. */
 .lpt2-root .lpt2-fila {
-  transition: background-color 180ms ease;
+  background: #ffffff;
+  border-radius: var(--marca-r);
+  box-shadow: 0 1px 2px rgb(10 28 30 / 0.05), 0 18px 40px -30px rgb(10 28 30 / 0.3);
+  transition: box-shadow 200ms ease;
 }
 
-.lpt2-root .lpt2-fila:hover,
+.lpt2-root .lpt2-fila:hover {
+  box-shadow: 0 1px 2px rgb(10 28 30 / 0.06), 0 22px 46px -28px rgb(10 28 30 / 0.4);
+}
+
 .lpt2-root .lpt2-fila[data-abierta='true'] {
-  background: var(--lpv-bg-2);
+  border-radius: var(--marca-r-l);
+  box-shadow: inset 0 0 0 1px rgb(72 115 121 / 0.22), 0 18px 40px -28px rgb(10 28 30 / 0.35);
+}
+
+.lpt2-root .lpt2-fila > button {
+  border-radius: inherit;
+}
+
+/* Cifra secundaria de la fila: precio por metro, plazo, enganche. */
+.lpt2-root .lpt2-meta {
+  font-family: var(--marca-detalle);
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+/* Tabla del plan dentro de la fila abierta: vidrio claro Water Dew. */
+.lpt2-root .lpt2-plan {
+  background: var(--marca-dew);
+  border: 1px solid rgb(72 115 121 / 0.14);
+  border-radius: var(--marca-r-s);
+}
+
+/* La galería del kit: esquinas de marca y pie en caja normal. */
+.lpt2-root .lpt2-detalle .lpv-galeria-pie,
+.lpt2-root .lpt2-detalle .lpv-galeria-pie * {
+  font-family: var(--marca-detalle);
 }
 
 /* El área expandida entra con un deslizamiento corto. */
@@ -169,21 +221,70 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .lpt2-root .lpt2-detalle {
-    animation: none;
-  }
-  .lpt2-root .lpt2-fila,
-  .lpt2-root .lpt2-chip,
-  .lpt2-root .lpt2-chips-hero button {
-    transition: none;
-  }
+/* Plazos dentro de la fila abierta y «me interesa» del mapa: pastillas. */
+.lpt2-root .lpt2-plazo {
+  border: 1px solid rgb(10 28 30 / 0.18);
+  border-radius: 999px;
+  color: var(--marca-slate);
+  background: #ffffff;
+  font-family: var(--marca-detalle);
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease;
 }
 
-/* Marcador del mapa: chip cobalto con los números en mono y una punta que
-   señala el punto. El del punto cuya fila está abierta va en tinta. Google
-   posiciona el elemento con su esquina inferior central sobre la coordenada,
-   así que la punta cuelga del chip sin desplazamientos a mano. */
+.lpt2-root .lpt2-plazo:hover {
+  border-color: var(--marca-teal);
+}
+
+.lpt2-root .lpt2-plazo[aria-pressed='true'] {
+  background: var(--marca-aztec);
+  border-color: var(--marca-aztec);
+  color: var(--marca-aqua);
+}
+
+/* Botón «quiero este»: primario de marca; elegido, Aqua sobre… Aqua no va
+   como texto sobre claro, así que el elegido es Aqua de FONDO con texto
+   Aztec (DESIGN.md, «Chosen»). */
+.lpt2-root .lpt2-elegir {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 56px;
+  padding: 0 1.5rem;
+  border-radius: 999px;
+  background: var(--marca-aztec);
+  color: #ffffff;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 200ms ease, color 200ms ease;
+}
+
+.lpt2-root .lpt2-elegir:hover {
+  background: var(--marca-slate);
+}
+
+.lpt2-root .lpt2-elegir[aria-pressed='true'] {
+  background: var(--marca-aqua);
+  color: var(--marca-aztec);
+}
+
+.lpt2-root .lpt2-elegir[aria-pressed='true']:hover {
+  background: var(--marca-onahau);
+}
+
+/* ---------- Mapa en tarjeta ---------- */
+
+.lpt2-root .lpt2-mapa {
+  border-radius: var(--marca-r);
+  overflow: hidden;
+  background: var(--marca-dew);
+}
+
+/* Marcador: pastilla Aztec con la cifra en Aqua (Aqua sobre oscuro); el del
+   punto abierto se invierte a Aqua con texto Aztec. Google y Leaflet pintan
+   el mismo marcado. */
 .lpt2-root .lpt2-marcador {
   display: flex;
   flex-direction: column;
@@ -193,15 +294,18 @@
 
 .lpt2-root .lpt2-marcador-chip {
   display: inline-block;
-  padding: 0.4rem 0.75rem;
+  padding: 0.45rem 0.8rem;
   border-radius: 999px;
-  background: var(--lpv-accent);
-  color: var(--lpv-on-accent);
+  background: var(--marca-aztec);
+  color: var(--marca-aqua);
+  font-family: var(--marca-detalle);
   font-size: 0.75rem;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
   line-height: 1;
   white-space: nowrap;
-  box-shadow: 0 2px 8px rgb(15 23 42 / 0.18);
-  transition: background-color 180ms ease, transform 180ms ease;
+  box-shadow: 0 0 0 1px rgb(162 249 255 / 0.3), 0 6px 16px -6px rgb(10 28 30 / 0.55);
+  transition: background-color 200ms ease, color 200ms ease, transform 200ms ease;
 }
 
 .lpt2-root .lpt2-marcador-pie {
@@ -209,8 +313,8 @@
   height: 0;
   border-left: 6px solid transparent;
   border-right: 6px solid transparent;
-  border-top: 7px solid var(--lpv-accent);
-  transition: border-color 180ms ease;
+  border-top: 7px solid var(--marca-aztec);
+  transition: border-color 200ms ease;
 }
 
 .lpt2-root .lpt2-marcador:hover .lpt2-marcador-chip {
@@ -218,39 +322,158 @@
 }
 
 .lpt2-root .lpt2-marcador[data-activo='true'] .lpt2-marcador-chip {
-  background: var(--lpv-fg);
+  background: var(--marca-aqua);
+  color: var(--marca-aztec);
+  box-shadow: 0 0 0 1px var(--marca-aztec), 0 8px 20px -6px rgb(10 28 30 / 0.6);
 }
 
 .lpt2-root .lpt2-marcador[data-activo='true'] .lpt2-marcador-pie {
-  border-top-color: var(--lpv-fg);
+  border-top-color: var(--marca-aztec);
 }
 
-/* Teselas de OpenStreetMap: desaturadas para que el único color del mapa sea
-   el cobalto de los marcadores, y la familia de interfaz en los controles. */
+/* Teselas de OpenStreetMap con tinte frío de marca: el color del mapa lo
+   ponen los marcadores. */
 .lpt2-root .leaflet-tile-pane {
-  filter: saturate(0.35);
+  filter: saturate(0.25) hue-rotate(-10deg) brightness(1.02);
 }
 
 .lpt2-root .leaflet-container {
-  font-family: var(--lpv-font-ui);
-  background: var(--lpv-bg-2);
+  font-family: var(--marca-texto);
+  background: var(--marca-dew);
+}
+
+.lpt2-root .leaflet-bar {
+  border: 0;
+  border-radius: 999px;
+  overflow: hidden;
+  box-shadow: 0 6px 16px -8px rgb(10 28 30 / 0.45);
 }
 
 .lpt2-root .leaflet-bar a {
   border-radius: 0;
-  color: var(--lpv-fg);
+  color: var(--marca-aztec);
 }
 
-/* Lote del panel del mapa: el abierto en el catálogo comparte el fondo de la fila abierta. */
+.lpt2-root .leaflet-control-attribution {
+  border-top-left-radius: 10px;
+  font-family: var(--marca-detalle);
+}
+
+/* Lote del panel del mapa: el abierto en el catálogo va en Water Dew. */
 .lpt2-root .lpt2-mapa-lote {
-  transition: background-color 180ms ease;
+  border-radius: var(--marca-r-s);
+  transition: background-color 200ms ease;
 }
 
 .lpt2-root .lpt2-mapa-lote[data-abierto='true'] {
-  background: var(--lpv-bg-2);
+  background: var(--marca-dew);
+}
+
+/* ---------- Formularios del kit ---------- */
+
+/* Formulario sobre vidrio Aztec (hero y cierre). El fondo del kit sale de
+   `--lpv-panel-bg`; aquí se vuelve vidrio sin tocar el componente. */
+.lpt2-root [data-lpv-form],
+.lpt2-root [data-lpv-estado] {
+  background: rgb(10 28 30 / 0.8);
+  border: 1px solid rgb(162 249 255 / 0.24);
+  border-radius: var(--marca-r);
+  box-shadow: 0 30px 70px -30px rgb(0 0 0 / 0.6);
+  backdrop-filter: blur(18px) saturate(1.2);
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+}
+
+/* La etiqueta del formulario deja de ser un eyebrow en mayúsculas. */
+.lpt2-root [data-lpv-form] > p:first-child {
+  text-transform: none;
+  letter-spacing: 0;
+  font-family: var(--marca-detalle);
+  font-size: 0.9375rem;
+  color: var(--marca-onahau);
+}
+
+.lpt2-root [data-lpv-form] h2,
+.lpt2-root [data-lpv-estado] h3 {
+  font-family: var(--marca-display);
+  font-weight: 500;
+  letter-spacing: -0.03em;
+}
+
+/* Etiquetas de campo en caja normal, Space Grotesk. */
+.lpt2-root [data-lpv-form] label,
+.lpt2-root [data-lpv-form] legend {
+  text-transform: none;
+  letter-spacing: 0;
+  font-family: var(--marca-detalle);
+  font-size: 0.875rem;
+  color: rgb(235 253 255 / 0.76);
+}
+
+/* Campos: 14 px de radio con filete Aqua, como la hoja de casas. */
+.lpt2-root .lpv-campo {
+  min-height: 52px;
+  padding: 0 0.95rem;
+  border: 1px solid rgb(162 249 255 / 0.24);
+  border-radius: var(--marca-r-s);
+  background: rgb(255 255 255 / 0.04);
+}
+
+.lpt2-root .lpv-campo:hover {
+  border-color: rgb(162 249 255 / 0.45);
+}
+
+.lpt2-root .lpv-campo:focus,
+.lpt2-root .lpv-campo:focus-within {
+  border-color: var(--marca-aqua);
+}
+
+.lpt2-root .lpv-campo[aria-invalid='true'] {
+  border-color: #ffb4a8;
+}
+
+/* Envío: pastilla Aqua, blanca al pasar. */
+.lpt2-root [data-lpv-form] button[type='submit'] {
+  font-size: 1rem;
+  font-weight: 600;
+  transition: background-color 200ms ease;
+}
+
+.lpt2-root [data-lpv-form] button[type='submit']:hover:not(:disabled) {
+  opacity: 1;
+  background: #ffffff;
+}
+
+.lpt2-root [data-lpv-form] [role='alert'] {
+  color: #ffb4a8;
+}
+
+/* Cualquier rótulo en versalitas que traiga el kit (galería sin foto, pie
+   de galería) vuelve a caja normal: regla de marca. */
+.lpt2-root .uppercase {
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+/* ---------- Cierre: degradado de marca ---------- */
+
+.lpt2-root .lpt2-cierre {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.lpt2-root .lpt2-cierre .marca-reticula {
+  z-index: -1;
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .lpt2-root .lpt2-detalle {
+    animation: none;
+  }
+  .lpt2-root .lpt2-fila,
+  .lpt2-root .lpt2-chip,
+  .lpt2-root .lpt2-plazo,
+  .lpt2-root .lpt2-elegir,
   .lpt2-root .lpt2-marcador-chip,
   .lpt2-root .lpt2-marcador-pie,
   .lpt2-root .lpt2-mapa-lote {
@@ -261,52 +484,20 @@
   }
 }
 
-/* Chips de plazo dentro de la fila abierta: píldora, la activa en tinta. */
-.lpt2-root .lpt2-plazo {
-  border: 1px solid var(--lpv-line-2);
-  border-radius: 999px;
-  color: var(--lpv-fg);
-  background: transparent;
-  transition: background-color 180ms ease, color 180ms ease;
-}
-
-.lpt2-root .lpt2-plazo[aria-pressed='true'] {
-  background: var(--lpv-fg);
-  border-color: var(--lpv-fg);
-  color: #ffffff;
-}
-
-/* La etiqueta del formulario deja de ser un eyebrow en mayúsculas. */
-.lpt2-root [data-lpv-form] > p:first-child {
-  text-transform: none;
-  letter-spacing: 0;
-  font-size: 0.9375rem;
-  color: var(--lpv-panel-fg-2);
-}
-
-/* Las etiquetas de campo del kit vienen en mayúsculas con tracking; aquí van
-   en caja normal. */
-.lpt2-root [data-lpv-form] label,
-.lpt2-root [data-lpv-form] legend {
-  text-transform: none;
-  letter-spacing: 0;
-  font-size: 0.8125rem;
-}
-
-/* Cabecera compartida de `app/lp/layout.tsx`: abre en blanco, el logo
-   blanco se vuelve tinta y el rótulo lateral se apaga. */
+/* Cabecera compartida de `app/lp/layout.tsx`: la página abre en Aztec, así
+   que el logo queda blanco y el rótulo lateral en Water Dew. */
 .lp-root:has(.lpt2-root) {
-  background: #ffffff;
-  --lp-accent: #1d4ed8;
-  --lp-accent-strong: #1e40af;
+  background: var(--marca-aztec, #0a1c1e);
+  --lp-accent: #0a1c1e;
+  --lp-accent-strong: #2e4f52;
 }
 
 .lp-root:has(.lpt2-root) header img {
-  filter: invert(1);
+  filter: drop-shadow(0 1px 10px rgb(0 0 0 / 0.35));
 }
 
 .lp-root:has(.lpt2-root) header span {
-  color: #94a3b8;
+  color: rgb(235 253 255 / 0.85);
   filter: none;
   text-shadow: none;
 }

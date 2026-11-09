@@ -26,6 +26,10 @@ import { COPY } from '../_copy';
 // estado por evento (`useFiltros`). Un capitulo sin propiedades no se pinta;
 // si no queda nada, un aviso con «quitar filtros» en vez de una pagina vacia.
 //
+// MARCA (9-nov-2026): laminas en tarjeta blanca redondeada sobre Tech White,
+// caracteristicas en tabla Water Dew con iconos en circulo, «Me interesa» en
+// pastilla y el formulario en vidrio Aztec sobre el degradado de marca.
+//
 // Capitulos y formulario viven en el mismo componente porque comparten el
 // estado que es el eje de la pagina: «Me interesa» en una lamina deja ese
 // departamento elegido abajo y baja hasta el formulario.
@@ -58,13 +62,15 @@ function Specs({ p, locale }: { p: PropiedadLanding; locale: LocaleLp }) {
   if (p.entrega) items.push({ clave: 'entrega', icono: Home, valor: p.entrega, etiqueta: t.seEntrega });
   if (items.length === 0) return null;
   return (
-    <ul className="lpd-specs mt-4 grid grid-cols-2 gap-x-4 gap-y-3" aria-label={t.aria}>
+    <ul className="lpd-specs marca-vidrio-claro mt-4 grid grid-cols-2 gap-x-3 gap-y-3 p-3" aria-label={t.aria}>
       {items.map(({ clave, icono: Icono, valor, etiqueta }) => (
-        <li key={clave} className="flex items-center gap-2.5">
-          <Icono className="h-5 w-5 shrink-0 text-[var(--lpv-accent)]" aria-hidden />
+        <li key={clave} className="flex min-w-0 items-center gap-2.5">
+          <span className="marca-icono" aria-hidden>
+            <Icono className="h-4 w-4" />
+          </span>
           <span className="min-w-0 leading-none">
-            <span className="lpd-serif block truncate text-[1.25rem] text-[var(--lpv-fg)]">{valor}</span>
-            <span className="mt-1 block text-[0.6875rem] text-[var(--lpv-fg-2)]">{etiqueta}</span>
+            <span className="lpd-spec-valor block truncate text-[1rem] text-[var(--marca-aztec)]">{valor}</span>
+            <span className="lpd-spec-etiqueta mt-1 block truncate text-[0.75rem]">{etiqueta}</span>
           </span>
         </li>
       ))}
@@ -98,14 +104,14 @@ function Riel({
   }, []);
 
   return (
-    <section id={ubicacion.clave} aria-labelledby={`cap-${ubicacion.clave}`} className="scroll-mt-6 border-t border-[var(--lpv-line)]">
-      <div className="mx-auto max-w-[96rem] px-5 pt-10 sm:px-8 sm:pt-14">
+    <section id={ubicacion.clave} aria-labelledby={`cap-${ubicacion.clave}`} className="scroll-mt-6 bg-[var(--marca-tech)]">
+      <div className="mx-auto max-w-[92rem] px-5 pt-12 sm:px-8 sm:pt-16">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between sm:gap-8">
-          <h2 id={`cap-${ubicacion.clave}`} className="lpd-serif text-[clamp(3rem,1.6rem+6vw,7rem)] text-[var(--lpv-fg)]">
+          <h2 id={`cap-${ubicacion.clave}`} className="marca-titular text-[clamp(3rem,1.6rem+6vw,7rem)] text-[var(--marca-aztec)]">
             {ubicacion.nombre}
           </h2>
           <div className="flex items-center gap-5 pb-2 sm:pb-4">
-            <p className="text-[0.9375rem] text-[var(--lpv-fg-2)]">
+            <p className="marca-detalle marca-cifra text-[0.9375rem] font-medium text-[var(--marca-slate)]">
               {plural(propiedades.length, ...t.departamento)}
               {desde ? `${t.riel.desde}${dineroCompacto(desde)}` : ''}
             </p>
@@ -115,7 +121,7 @@ function Riel({
                   type="button"
                   onClick={() => desplazar(-1)}
                   aria-label={t.riel.anteriores(ubicacion.nombre)}
-                  className="lpd-flecha h-10 w-10 items-center justify-center border border-[var(--lpv-line-2)] text-[var(--lpv-fg)] hover:border-[var(--lpv-fg)]"
+                  className="lpd-flecha h-11 w-11 items-center justify-center"
                 >
                   <ChevronLeft className="h-4 w-4" aria-hidden />
                 </button>
@@ -123,7 +129,7 @@ function Riel({
                   type="button"
                   onClick={() => desplazar(1)}
                   aria-label={t.riel.siguientes(ubicacion.nombre)}
-                  className="lpd-flecha h-10 w-10 items-center justify-center border border-[var(--lpv-line-2)] text-[var(--lpv-fg)] hover:border-[var(--lpv-fg)]"
+                  className="lpd-flecha h-11 w-11 items-center justify-center"
                 >
                   <ChevronRight className="h-4 w-4" aria-hidden />
                 </button>
@@ -135,13 +141,13 @@ function Riel({
 
       <ul
         ref={pista}
-        className="lpd-riel mx-auto mt-8 flex max-w-[96rem] gap-5 overflow-x-auto px-5 pb-14 sm:px-8 sm:pb-20"
+        className="lpd-riel mx-auto mt-6 flex max-w-[92rem] gap-5 overflow-x-auto px-5 pb-14 pt-2 sm:px-8 sm:pb-20"
         aria-label={t.riel.lista(ubicacion.nombre)}
       >
         {propiedades.map((p, i) => {
           const esElegida = elegida === p.slug;
           return (
-            <li key={p.id} className="lpd-lamina w-[min(80vw,22rem)] shrink-0">
+            <li key={p.id} className="lpd-lamina marca-tarjeta w-[min(80vw,22rem)] shrink-0 p-3">
               <GaleriaFicha
                 imagenes={p.imagenes}
                 alt={`${p.titulo}, ${ubicacionCorta(p)}`}
@@ -150,20 +156,19 @@ function Riel({
                 prioridad={prioridad && i < 2}
                 tope={6}
                 locale={locale}
-                className="!rounded-none"
               />
-              <div className="mt-4">
-                <p className="lpd-serif text-[1.5rem] text-[var(--lpv-fg)]">
+              <div className="mt-4 px-1 pb-1">
+                <p className="marca-titular marca-cifra text-[1.5rem] text-[var(--marca-aztec)]">
                   {p.precio ? dinero(p.precio) : t.riel.precioPorConfirmar}
                 </p>
-                <p className="mt-1.5 line-clamp-2 text-[0.9375rem] leading-snug text-[var(--lpv-fg)]">{p.titulo}</p>
-                <p className="mt-1 text-[0.8125rem] text-[var(--lpv-fg-2)]">{ubicacionCorta(p)}</p>
+                <p className="mt-1.5 line-clamp-2 text-[0.9375rem] leading-snug text-[var(--marca-aztec)]">{p.titulo}</p>
+                <p className="marca-detalle mt-1 text-[0.8125rem] text-[var(--marca-teal)]">{ubicacionCorta(p)}</p>
                 <Specs p={p} locale={locale} />
-                <p className="mt-3 text-[0.8125rem] text-[var(--lpv-fg-2)]">
+                <p className="mt-3 text-[0.8125rem] text-[var(--marca-slate)]">
                   {p.enganchePct ? (
                     <>{t.riel.enganche(p.enganchePct)}</>
                   ) : (
-                    <span className="border-b border-dotted border-[var(--lpv-fg-3)] text-[var(--lpv-fg-3)]">
+                    <span className="border-b border-dotted border-[var(--marca-teal)] text-[var(--marca-teal)]">
                       {t.riel.enganchePorConfirmar}
                     </span>
                   )}
@@ -172,7 +177,7 @@ function Riel({
                   type="button"
                   onClick={() => onElegir(p.slug)}
                   aria-pressed={esElegida}
-                  className="lpd-enlace mt-3 text-[0.9375rem]"
+                  className="marca-boton lpd-elegir mt-4"
                 >
                   {esElegida ? t.riel.elegido : t.riel.meInteresa}
                 </button>
@@ -224,15 +229,15 @@ export default function Catalogo({
 
   return (
     <>
-      <div id={ANCLA_INVENTARIO} className="scroll-mt-4">
+      <div id={ANCLA_INVENTARIO} className="scroll-mt-4 bg-[var(--marca-tech)]">
         {activos > 0 && (
-          <div className="mx-auto flex max-w-[96rem] flex-wrap items-baseline justify-between gap-3 px-5 pt-8 sm:px-8">
-            <p aria-live="polite" className="text-[0.9375rem] text-[var(--lpv-fg-2)]">
+          <div className="mx-auto flex max-w-[92rem] flex-wrap items-center justify-between gap-3 px-5 pt-8 sm:px-8">
+            <p aria-live="polite" className="marca-cifra text-[0.9375rem] text-[var(--marca-slate)]">
               {visibles.length === 0
                 ? t.catalogo.ninguno
                 : `${plural(visibles.length, t.catalogo.coincidenSing, t.catalogo.coincidenPlural)}${t.catalogo.coincidenResto}`}
             </p>
-            <button type="button" onClick={limpiar} className="lpd-enlace text-[0.9375rem]">
+            <button type="button" onClick={limpiar} className="lpd-contorno">
               {t.catalogo.quitarFiltros}
             </button>
           </div>
@@ -243,27 +248,32 @@ export default function Catalogo({
         ))}
 
         {visibles.length === 0 && (
-          <div className="mx-auto max-w-[96rem] border-t border-[var(--lpv-line)] px-5 py-16 sm:px-8 sm:py-24">
-            <p className="lpd-serif max-w-[22ch] text-[clamp(2rem,1.4rem+2.6vw,3.5rem)] text-[var(--lpv-fg)]">
+          <div className="mx-auto max-w-[92rem] px-5 py-16 sm:px-8 sm:py-24">
+            <p className="marca-titular max-w-[22ch] text-[clamp(2rem,1.4rem+2.6vw,3.5rem)] text-[var(--marca-aztec)]">
               {t.catalogo.sinResultadosTitulo}
             </p>
-            <p className="mt-5 max-w-[48ch] text-base leading-relaxed text-[var(--lpv-fg-2)]">
+            <p className="mt-5 max-w-[48ch] text-base leading-relaxed text-[var(--marca-slate)]">
               {t.catalogo.sinResultadosCuerpo}
             </p>
           </div>
         )}
       </div>
 
-      <section id="solicitar" ref={anclaForm} className="scroll-mt-6 pb-28 sm:pb-0">
-        <div className="mx-auto max-w-[34rem] px-5 py-16 sm:px-0 sm:py-24">
-          <h2 className="lpd-serif text-[clamp(2rem,1.4rem+2.6vw,3.5rem)] text-[var(--lpv-fg)]">
+      <section
+        id="solicitar"
+        ref={anclaForm}
+        className="marca-oscura marca-degradado relative scroll-mt-6 overflow-hidden pb-28 sm:pb-0"
+      >
+        <div className="marca-reticula" aria-hidden />
+        <div className="relative mx-auto max-w-[36rem] px-5 py-16 sm:px-0 sm:py-24">
+          <h2 className="marca-titular text-[clamp(2rem,1.4rem+2.6vw,3.5rem)] text-white">
             {activos > 0 && visibles.length > 0
               ? visibles.length === 1
                 ? t.catalogo.cierreUno
                 : t.catalogo.cierreVarios(visibles.length)
               : t.catalogo.cierreTodos(todos.length)}
           </h2>
-          <div className="mt-10">
+          <div className="lpd-hoja marca-vidrio mt-10 p-6 sm:p-8">
             <FormInventario
               source={t.fuente}
               variante="cierre"

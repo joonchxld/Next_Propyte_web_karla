@@ -34,7 +34,7 @@ function escapar(texto: string): string {
 function icono(etiqueta: string, activo: boolean): L.DivIcon {
   return L.divIcon({
     className: '',
-    html: `<div class="lpt2-marcador" data-activo="${activo}" data-lpt2-marcador style="position:absolute;left:0;top:0;transform:translate(-50%,-100%)"><span class="lpt2-marcador-chip lpt2-mono">${escapar(etiqueta)}</span><span class="lpt2-marcador-pie"></span></div>`,
+    html: `<div class="lpt2-marcador" data-activo="${activo}" data-lpt2-marcador style="position:absolute;left:0;top:0;transform:translate(-50%,-100%)"><span class="lpt2-marcador-chip">${escapar(etiqueta)}</span><span class="lpt2-marcador-pie"></span></div>`,
     iconSize: [0, 0],
     iconAnchor: [0, 0],
   });

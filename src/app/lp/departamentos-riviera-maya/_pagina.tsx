@@ -1,5 +1,4 @@
 import Image from 'next/image';
-import localFont from 'next/font/local';
 import { TIPOS_DEPTO, getInventario, resumenInventario, totalDesarrollos, enIdioma } from '@/lib/supabase/lp-inventario';
 import { FALLBACK_WHATSAPP } from '@/lib/site-contact';
 import { Calendar, CheckCircle, KeySquare, Tag } from '@/lib/icons';
@@ -15,6 +14,7 @@ import Catalogo from './_components/Catalogo';
 import FiltrosPortada from './_components/FiltrosPortada';
 import { COPY } from './_copy';
 import '../_components/v2/tokens.css';
+import '../_components/v2/marca.css';
 import './lpd-theme.css';
 
 // ============================================================
@@ -48,17 +48,12 @@ import './lpd-theme.css';
 //
 // Reglas heredadas: toda cifra sale del inventario; ningun nombre de
 // desarrollo llega al DOM (el id solo se cuenta); cero urgencia inventada.
+//
+// MARCA (9-nov-2026): la composicion se queda, la piel es la del manual de
+// Propyte (`_components/v2/marca.css`, DESIGN.md). Portada y cierre en banda
+// Aztec con la reticula de nodos; capitulos sobre Tech White con laminas en
+// tarjeta blanca; sin Cormorant ni la paleta tan.
 // ============================================================
-
-const display = localFont({
-  src: [
-    { path: '../../../fonts/cormorant-garamond-latin.woff2', weight: '400 600', style: 'normal' },
-    { path: '../../../fonts/cormorant-garamond-latin-italic.woff2', weight: '400 500', style: 'italic' },
-  ],
-  declarations: [{ prop: 'font-family', value: 'Cormorant Garamond' }],
-  variable: '--font-lpd-display',
-  display: 'swap',
-});
 
 const CIUDADES = ['Playa del Carmen', 'Tulum', 'Puerto Morelos'] as const;
 
@@ -70,11 +65,12 @@ export default async function PaginaDepartamentos({ locale = 'es' }: { locale?: 
 
   if (departamentos.length === 0) {
     return (
-      <div className={`lpv lpd-root ${display.variable} min-h-[70vh]`}>
-        <div className="mx-auto max-w-2xl px-5 py-32 sm:px-8">
-          <h1 className="lpd-serif text-[clamp(2.25rem,1.5rem+3vw,4rem)] text-[var(--lpv-fg)]">{t.vacio.titulo}</h1>
-          <p className="mt-6 max-w-[54ch] text-base leading-relaxed text-[var(--lpv-fg-2)]">{t.vacio.cuerpo}</p>
-          <a href={`https://wa.me/${FALLBACK_WHATSAPP}`} target="_blank" rel="noopener noreferrer" className="lpd-boton mt-9">
+      <div className="lpv marca lpd-root marca-oscura relative min-h-[70vh] overflow-hidden">
+        <div className="marca-reticula" aria-hidden />
+        <div className="relative mx-auto max-w-2xl px-5 py-32 sm:px-8">
+          <h1 className="marca-titular text-[clamp(2.25rem,1.5rem+3vw,4rem)] text-white">{t.vacio.titulo}</h1>
+          <p className="mt-6 max-w-[54ch] text-base leading-relaxed text-white/80">{t.vacio.cuerpo}</p>
+          <a href={`https://wa.me/${FALLBACK_WHATSAPP}`} target="_blank" rel="noopener noreferrer" className="marca-boton mt-9">
             {t.vacio.cta}
           </a>
         </div>
@@ -113,18 +109,19 @@ export default async function PaginaDepartamentos({ locale = 'es' }: { locale?: 
   const panoramica = conFoto.find((p) => p.ciudad !== portada?.ciudad) ?? conFoto[1] ?? null;
 
   return (
-    <div className={`lpv lpd-root ${display.variable}`}>
-      {/* ══ PORTADA ══ */}
-      <section id="hero" className="bg-[var(--lpv-bg)]">
-        <div className="mx-auto grid min-h-[100svh] max-w-[96rem] content-center gap-10 px-5 pb-12 pt-24 sm:px-8 lg:grid-cols-12 lg:gap-14 lg:pb-14">
+    <div className="lpv marca lpd-root">
+      {/* ══ PORTADA: banda Aztec con la reticula de nodos ══ */}
+      <section id="hero" className="marca-oscura relative overflow-hidden">
+        <div className="marca-reticula" aria-hidden />
+        <div className="relative mx-auto grid min-h-[100svh] max-w-[92rem] content-center gap-10 px-5 pb-12 pt-24 sm:px-8 lg:grid-cols-12 lg:gap-14 lg:pb-14">
           <div className="lg:col-span-7">
-            <h1 className="text-[var(--lpv-fg)]">
-              <span className="lpd-serif block text-[clamp(2.5rem,1.3rem+5vw,5.5rem)]">{t.hero.tituloLinea1}</span>
-              <span className="lpd-serif-italic block pb-1 text-[clamp(1.75rem,1.1rem+3.2vw,4rem)] text-[var(--lpv-accent)]">
+            <h1 className="marca-titular text-white">
+              <span className="block text-[clamp(2.5rem,1.3rem+5vw,5.5rem)]">{t.hero.tituloLinea1}</span>
+              <span className="marca-acento block pb-1 text-[clamp(1.75rem,1.1rem+3.2vw,4rem)]">
                 {t.hero.tituloLinea2}
               </span>
             </h1>
-            <p className="mt-4 max-w-[46ch] text-[1.0625rem] leading-relaxed text-[var(--lpv-fg-2)]">
+            <p className="mt-5 max-w-[46ch] text-[1.0625rem] leading-relaxed text-white/80">
               {t.hero.subtitulo(
                 resumen.ciudades,
                 resumen.desde ? dineroCompacto(resumen.desde) : null,
@@ -136,15 +133,15 @@ export default async function PaginaDepartamentos({ locale = 'es' }: { locale?: 
               <ul className="lpd-badges mt-5 flex flex-wrap gap-2" aria-label={t.hero.badgesAria}>
                 {badges.map(({ n, texto, Icono }) => (
                   <li key={texto} className="lpd-badge">
-                    <Icono className="h-3.5 w-3.5 text-[var(--lpv-accent)]" aria-hidden />
+                    <Icono className="h-3.5 w-3.5 text-[var(--marca-aqua)]" aria-hidden />
                     {texto}
-                    <span className="lpv-cifra opacity-60">{n}</span>
+                    <span className="marca-cifra text-[var(--marca-onahau)]">{n}</span>
                   </li>
                 ))}
               </ul>
             )}
 
-            <p className="mt-4 text-[0.9375rem] text-[var(--lpv-fg-3)]">
+            <p className="marca-detalle marca-cifra mt-4 text-[0.9375rem] text-[var(--marca-onahau)]">
               {plural(resumen.total, ...t.hero.unidades)}
               {desarrollos > 1 ? `${t.hero.unidadesDe}${plural(desarrollos, ...t.hero.desarrollos)}` : ''}
               {t.hero.unidadesRemate}
@@ -153,14 +150,14 @@ export default async function PaginaDepartamentos({ locale = 'es' }: { locale?: 
             {/* Presupuesto + indice de ciudades como filtro. */}
             <FiltrosPortada defs={defs} todos={departamentos} locale={locale} />
 
-            <a href="#solicitar" className="lpd-boton mt-6">
+            <a href="#solicitar" className="marca-boton mt-6">
               {t.hero.cta}
             </a>
           </div>
 
           {portada?.imagen && (
             <figure className="lg:col-span-5 lg:self-center">
-              <div className="relative aspect-[3/4] w-full overflow-hidden bg-[var(--lpv-bg-2)]">
+              <div className="relative aspect-[3/4] w-full overflow-hidden rounded-[var(--marca-r-l)] bg-[var(--marca-night)]">
                 <Image
                   src={portada.imagen}
                   alt={`${portada.titulo}, ${ubicacionCorta(portada)}`}
@@ -170,9 +167,9 @@ export default async function PaginaDepartamentos({ locale = 'es' }: { locale?: 
                   className="object-cover"
                 />
               </div>
-              <figcaption className="mt-3 flex items-baseline justify-between gap-4 text-[0.875rem] text-[var(--lpv-fg-2)]">
+              <figcaption className="lpd-pie mt-3 flex items-baseline justify-between gap-4 px-1 text-white/80">
                 <span>{ubicacionCorta(portada)}</span>
-                <span className="text-[var(--lpv-fg)]">{portada.precio ? dinero(portada.precio) : ''}</span>
+                <span className="marca-cifra text-[var(--marca-aqua)]">{portada.precio ? dinero(portada.precio) : ''}</span>
               </figcaption>
             </figure>
           )}
@@ -186,7 +183,8 @@ export default async function PaginaDepartamentos({ locale = 'es' }: { locale?: 
           Una foto sin texto entre el formulario y las preguntas: respiro
           entre la conversion y la lectura. */}
       {panoramica?.imagen && (
-        <figure className="relative aspect-[21/9] w-full overflow-hidden bg-[var(--lpv-bg-2)]">
+        <div className="bg-[var(--marca-tech)] px-5 pt-16 sm:px-8 sm:pt-24">
+        <figure className="relative mx-auto aspect-[4/3] w-full max-w-[92rem] overflow-hidden rounded-[var(--marca-r-l)] bg-[var(--marca-dew)] sm:aspect-[21/9]">
           <Image
             src={panoramica.imagen}
             alt={`${panoramica.titulo}, ${ubicacionCorta(panoramica)}`}
@@ -196,15 +194,18 @@ export default async function PaginaDepartamentos({ locale = 'es' }: { locale?: 
             className="object-cover"
           />
         </figure>
+        </div>
       )}
 
       {/* ══ PREGUNTAS ══ */}
+      <div className="bg-[var(--marca-tech)]">
       <div className="mx-auto max-w-[44rem] px-5 py-16 sm:px-8 sm:py-24">
         <FaqAcordeon
           faqs={locale === 'en' ? FAQ_COMPRA_Y_FINANCIAMIENTO_EN : FAQ_COMPRA_Y_FINANCIAMIENTO}
           titulo={t.faqTitulo}
           locale={locale}
         />
+      </div>
       </div>
 
       <PieLegal

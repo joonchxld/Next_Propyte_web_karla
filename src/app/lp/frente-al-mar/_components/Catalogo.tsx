@@ -31,6 +31,11 @@ import { COPY, type CopyFrenteMar } from '../_copy';
 // vista y entrega, cada una como una cifra grande sobre la foto. Solo lo que
 // el Hub declara: lo que falta no se pinta, no se estima.
 //
+// MARCA (9-nov-2026): velo Aztec del manual, ubicación y contador en
+// pastillas de vidrio, precio en New Aqua (sobre el velo), cifras en un panel
+// de vidrio con iconos en círculo y el cierre sobre el degradado de marca con
+// el formulario en vidrio.
+//
 // Pulsar la píldora deja la propiedad elegida en el formulario y baja hasta
 // él. Es el mismo contrato que en la landing de casas: informar y convertir,
 // no navegar.
@@ -110,20 +115,21 @@ export default function Catalogo({
         <section
           id="inventario"
           aria-label={t.sinCoincidenciasAria}
-          className="lpo-pantalla relative flex min-h-[100svh] items-center bg-[var(--lpv-bg-2)]"
+          className="lpo-pantalla marca-oscura relative flex min-h-[100svh] items-center overflow-hidden"
         >
-          <div className="mx-auto w-full max-w-[96rem] px-5 py-20 sm:px-8 lg:pr-48">
-            <h2 className="lpo-display max-w-[16ch] text-[clamp(2rem,1.3rem+3vw,4rem)]">
+          <div className="marca-reticula" aria-hidden="true" />
+          <div className="relative mx-auto w-full max-w-[92rem] px-5 py-20 sm:px-8 lg:pr-48">
+            <h2 className="marca-titular max-w-[16ch] text-[clamp(2rem,1.3rem+3vw,4rem)] text-white">
               {t.sinCoincidenciasTitulo(total)}
             </h2>
-            <p className="mt-6 max-w-[44ch] text-[1.0625rem] leading-relaxed text-[var(--lpv-fg-2)]">
+            <p className="mt-6 max-w-[44ch] text-[1.0625rem] leading-relaxed text-white/80">
               {t.sinCoincidenciasCuerpo}
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <button
                 type="button"
                 onClick={limpiar}
-                className="inline-flex min-h-[48px] items-center rounded-full bg-[var(--lpv-accent)] px-6 text-[0.9375rem] font-medium text-[var(--lpv-on-accent)] hover:opacity-90 active:translate-y-px"
+                className="marca-boton min-h-[48px] text-[0.9375rem] font-semibold"
               >
                 {t.quitarFiltros}
               </button>
@@ -135,7 +141,7 @@ export default function Catalogo({
                     block: 'start',
                   })
                 }
-                className="inline-flex min-h-[48px] items-center rounded-full border border-[var(--lpv-line-2)] px-6 text-[0.9375rem] hover:border-[var(--lpv-fg)] active:translate-y-px"
+                className="lpo-contorno"
               >
                 {t.pedirInformacion}
               </button>
@@ -158,7 +164,7 @@ export default function Catalogo({
             data-ciudad={ciudad}
             data-pantalla-ciudad={esPrimeraDeCiudad ? 'si' : undefined}
             aria-label={p.titulo}
-            className="lpo-pantalla relative min-h-[100svh] overflow-hidden bg-[var(--lpv-bg-2)]"
+            className="lpo-pantalla marca-oscura relative min-h-[100svh] overflow-hidden"
           >
             <GaleriaFicha
               imagenes={p.imagenes}
@@ -170,24 +176,24 @@ export default function Catalogo({
               tope={6}
               className="!rounded-none"
             />
-            <div className="lpo-velo pointer-events-none absolute inset-0" aria-hidden="true" />
+            <div className="marca-velo" aria-hidden="true" />
 
             {/* Contador de pantalla: «3 de 9», arriba a la derecha. */}
-            <p className="lpv-cifra lpo-sobre-foto pointer-events-none absolute right-5 top-4 text-[0.8125rem] text-white/75 sm:right-8 lg:right-48">
+            <p className="lpo-pastilla-vidrio marca-cifra pointer-events-none absolute right-5 top-4 text-[0.8125rem] sm:right-8 lg:right-48">
               {t.contador(i + 1, visibles.length, activos > 0)}
             </p>
 
             <div className="pointer-events-none absolute inset-x-0 bottom-0 flex flex-col gap-6 p-5 pb-24 text-white sm:p-8 sm:pb-10 lg:pr-48">
               <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
                 <div className="min-w-0">
-                  <p className="lpo-sobre-foto text-[0.9375rem] text-white/80">{ubicacionCorta(p)}</p>
-                  <h2 className="lpo-display lpo-sobre-foto mt-2 max-w-[20ch] text-[clamp(1.625rem,1.1rem+2.2vw,3.25rem)]">
+                  <p className="lpo-pastilla-vidrio text-[0.875rem]">{ubicacionCorta(p)}</p>
+                  <h2 className="marca-titular lpo-sobre-foto mt-3 max-w-[20ch] text-[clamp(1.625rem,1.1rem+2.2vw,3.25rem)]">
                     {p.titulo}
                   </h2>
-                  <p className="lpo-display lpo-sobre-foto mt-3 text-[clamp(1.75rem,1.3rem+1.8vw,3rem)] text-[var(--lpv-accent)]">
+                  <p className="marca-titular marca-acento marca-cifra lpo-sobre-foto mt-3 text-[clamp(1.75rem,1.3rem+1.8vw,3rem)]">
                     {p.precio ? dinero(p.precio) : t.precioPorConfirmar}
                   </p>
-                  <p className="lpo-sobre-foto mt-1 text-[0.9375rem] text-white/70">
+                  <p className="lpo-sobre-foto mt-1.5 text-[0.9375rem] text-white/85">
                     {t.enganche(p.enganchePct)}
                   </p>
                 </div>
@@ -197,11 +203,7 @@ export default function Catalogo({
                   type="button"
                   onClick={() => elegir(p.slug)}
                   aria-pressed={esElegida}
-                  className={`pointer-events-auto inline-flex min-h-[48px] shrink-0 items-center justify-center rounded-full px-6 text-[0.9375rem] font-medium transition-opacity hover:opacity-90 active:translate-y-px ${
-                    esElegida
-                      ? 'bg-white text-[var(--lpv-bg)]'
-                      : 'bg-[var(--lpv-accent)] text-[var(--lpv-on-accent)]'
-                  }`}
+                  className="marca-boton lpo-elegir pointer-events-auto min-h-[48px] shrink-0 text-[0.9375rem] font-semibold"
                 >
                   {esElegida ? t.elegida : t.meInteresa}
                 </button>
@@ -209,15 +211,17 @@ export default function Catalogo({
 
               {/* Las características, en grande y con icono. */}
               {cifras.length > 0 && (
-                <ul className="lpo-cifras grid grid-cols-2 gap-x-6 gap-y-4 border-t border-white/20 pt-5 sm:flex sm:flex-wrap sm:gap-x-10">
+                <ul className="lpo-cifras grid grid-cols-2 gap-x-4 gap-y-4 p-4 sm:flex sm:flex-wrap sm:gap-x-10 sm:p-5">
                   {cifras.map((c) => (
-                    <li key={c.etiqueta + c.valor} className="flex items-center gap-3">
-                      <c.icono className="h-7 w-7 shrink-0 text-[var(--lpv-accent)] sm:h-8 sm:w-8" strokeWidth={1.5} aria-hidden />
+                    <li key={c.etiqueta + c.valor} className="flex min-w-0 items-center gap-3">
+                      <span className="lpo-cifra-icono" aria-hidden>
+                        <c.icono className="h-5 w-5 sm:h-6 sm:w-6" strokeWidth={1.5} />
+                      </span>
                       <span className="min-w-0">
-                        <span className="lpo-display lpo-sobre-foto block text-[clamp(1.375rem,1rem+1.4vw,2.125rem)] leading-none">
+                        <span className="marca-titular marca-cifra block text-[clamp(1.25rem,1rem+1.2vw,2rem)] leading-none text-white">
                           {c.valor}
                         </span>
-                        <span className="lpo-sobre-foto mt-1 block text-[0.8125rem] text-white/75">{c.etiqueta}</span>
+                        <span className="lpo-cifra-etiqueta mt-1 block text-[0.8125rem]">{c.etiqueta}</span>
                       </span>
                     </li>
                   ))}
@@ -235,18 +239,19 @@ export default function Catalogo({
       <section
         id="solicitar"
         ref={anclaForm}
-        className="lpo-pantalla relative min-h-[100svh] scroll-mt-0 bg-[var(--lpv-bg)] text-[var(--lpv-fg)]"
+        className="lpo-pantalla marca-oscura marca-degradado relative min-h-[100svh] scroll-mt-0 overflow-hidden"
       >
-        <div className="mx-auto grid min-h-[100svh] max-w-[96rem] gap-12 px-5 py-20 sm:px-8 lg:grid-cols-12 lg:items-center lg:gap-16 lg:pr-48">
+        <div className="marca-reticula" aria-hidden="true" />
+        <div className="relative mx-auto grid min-h-[100svh] max-w-[92rem] gap-12 px-5 py-20 sm:px-8 lg:grid-cols-12 lg:items-center lg:gap-16 lg:pr-48">
           <div className="lg:col-span-5">
-            <h2 className="lpo-display text-[clamp(2.25rem,1.4rem+3.4vw,4.5rem)]">
+            <h2 className="marca-titular text-[clamp(2.25rem,1.4rem+3.4vw,4.5rem)] text-white">
               {t.cierreTitulo}
             </h2>
-            <p className="mt-6 max-w-[40ch] text-[1.0625rem] leading-relaxed text-[var(--lpv-fg-2)]">
+            <p className="mt-6 max-w-[40ch] text-[1.0625rem] leading-relaxed text-white/80">
               {t.cierreCuerpo}
             </p>
           </div>
-          <div className="lg:col-span-6 lg:col-start-7">
+          <div className="lpo-hoja marca-vidrio p-6 sm:p-8 lg:col-span-6 lg:col-start-7">
             <FormInventario
               source={copy.source}
               variante="cierre"

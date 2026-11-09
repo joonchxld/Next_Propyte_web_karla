@@ -48,7 +48,7 @@ export default function PendingStatus({
       }`}
     >
       <p
-        className={`text-[0.625rem] uppercase tracking-[0.14em] ${
+        className={`lp-rotulo ${
           oscuro ? 'text-[var(--lp-accent-on-dark)]' : 'text-[var(--lp-accent)]'
         }`}
       >

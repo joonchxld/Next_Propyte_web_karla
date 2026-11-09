@@ -190,13 +190,13 @@ export default function QueEstasComprando({
                   if (delGrupo.length === 0) return null;
                   return (
                     <div key={t}>
-                      <p className="text-[0.625rem] uppercase tracking-[0.14em] text-[var(--lp-muted)]">
+                      <p className="lp-rotulo text-[var(--lp-muted)]">
                         {c.rotulo[t]}
                       </p>
                       <dl className="mt-3 grid gap-x-10 gap-y-5 sm:grid-cols-2">
                         {delGrupo.map((a) => (
                           <div key={a.nombre}>
-                            <dt className="text-[0.6875rem] uppercase tracking-[0.12em] text-[var(--lp-accent)]">
+                            <dt className="lp-rotulo text-[var(--lp-accent)]">
                               {a.nombre}
                             </dt>
                             <dd className="mt-1 text-sm leading-relaxed text-[var(--lp-ink-soft)]">

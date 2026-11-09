@@ -1,199 +1,122 @@
 /* ============================================================
-   Tema: casas en Playa del Carmen (`.lpx-root`), segunda versión.
+   Tema: casas en Playa del Carmen (`.lpx-root`), versión de MARCA.
 
-   REFERENCIAS (30-oct-2026, elegidas por Luis): Alexander Millett
-   (Barbados: la foto ES la ficha, nombre y precio encima, sin tarjetas),
-   Gerax (foto a sangre, un titular, un botón) y los pines de Pinterest de
-   "real estate landing pages" (hero oscuro de foto, tipografía grande,
-   precio flotando sobre la imagen).
+   La composición es la de la segunda versión (30-oct-2026, referencias de
+   Luis: Alexander Millett, Gerax, Pinterest): LA FOTO ES LA FICHA. Foto a
+   sangre con el titular encima, las casas como fotos grandes con precio y
+   nombre sobre la imagen, una franja oscura con las cifras del inventario y
+   el formulario junto a una foto.
 
-   La regla de esta versión: NADA de cajas. No hay tarjetas con borde, no
-   hay panel oscuro de formulario, no hay etiquetas en mayúsculas sobre los
-   títulos. El color lo ponen las fotos; la interfaz es blanco, tinta y una
-   regla fina. Tipografía: Archivo (la de la v3 del home) con el eje de ancho
-   cerrado para los titulares; DM Sans para el resto.
+   La piel es la del manual oficial (9-nov-2026; ver DESIGN.md y
+   `_components/v2/marca.css`): velo Aztec y retícula de nodos sobre la foto,
+   New Aqua solo sobre oscuro, Tech White de fondo, fichas redondeadas,
+   pastillas en todo lo que se pulsa, hoja de solicitud en vidrio Aztec.
+   Inter en titulares, DM Sans en texto, Space Grotesk en detalles. Rótulos en
+   caja normal.
+
+   Los valores del contrato `--lpv-*` los pone `.marca`; aquí solo se ajusta
+   lo propio de esta composición.
    ============================================================ */
 
-.lpx-root {
-  --lpv-bg: #ffffff;
-  --lpv-bg-2: #f4f4f1;
-  --lpv-fg: #111111;
-  --lpv-fg-2: #4d4d4a;
-  --lpv-fg-3: #8a8a85;
-  --lpv-line: rgb(17 17 17 / 0.12);
-  --lpv-line-2: rgb(17 17 17 / 0.5);
-  --lpv-accent: #111111;
-  --lpv-on-accent: #ffffff;
+/* ---------- Tipografía ---------- */
 
-  /* El formulario va en CLARO: campos con regla inferior sobre blanco. */
-  --lpv-panel-bg: #ffffff;
-  --lpv-panel-bg-2: #ffffff;
-  --lpv-panel-fg: #111111;
-  --lpv-panel-fg-2: #4d4d4a;
-  --lpv-panel-fg-3: #8a8a85;
-  --lpv-panel-line: rgb(17 17 17 / 0.22);
-  --lpv-panel-accent: #111111;
-  --lpv-panel-on-accent: #ffffff;
-
-  --lpv-r: 0px;
-  --lpv-r-control: 999px;
-  --lpv-font-display: var(--font-lpx-display), var(--font-text), ui-sans-serif, system-ui, sans-serif;
-  --lpv-font-ui: var(--font-text), ui-sans-serif, system-ui, sans-serif;
-}
-
-/* Titular: Archivo semicondensada. El ancho cerrado es lo que hace que un
-   titular de cinco palabras se lea como rótulo y no como párrafo. */
-.lpx-root .lpx-display {
-  font-family: var(--lpv-font-display);
+.lpx-root .lpx-titulo {
+  font-family: var(--marca-display);
   font-weight: 500;
-  font-stretch: 88%;
   letter-spacing: -0.02em;
-  line-height: 0.96;
-  font-variant-numeric: tabular-nums lining-nums;
+  line-height: 1.15;
+  text-wrap: balance;
 }
 
-.lpx-root .lpx-display-ligero {
-  font-family: var(--lpv-font-display);
-  font-weight: 300;
-  font-stretch: 92%;
-  letter-spacing: -0.01em;
-  line-height: 1;
-  font-variant-numeric: tabular-nums lining-nums;
+/* Segunda línea del hero: el gancho en New Aqua (va sobre el velo Aztec). */
+.lpx-root .lpx-gancho {
+  font-family: var(--marca-display);
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+  color: var(--marca-aqua);
 }
 
 /* Texto sobre foto: sombra suave que no se nota como sombra. */
 .lpx-root .lpx-sobre-foto {
-  text-shadow: 0 1px 2px rgb(0 0 0 / 0.35), 0 8px 32px rgb(0 0 0 / 0.35);
+  text-shadow: 0 1px 2px rgb(10 28 30 / 0.35), 0 8px 32px rgb(10 28 30 / 0.35);
 }
 
-/* Degradado de legibilidad del hero y de cada ficha. Dos paradas: la foto
-   conserva su luz arriba y cede en el tercio inferior. */
-.lpx-root .lpx-velo {
-  background: linear-gradient(to top, rgb(10 10 10 / 0.72) 0%, rgb(10 10 10 / 0.3) 38%, rgb(10 10 10 / 0) 70%);
+/* Sentence case en todo lo que montan los componentes compartidos (rótulos
+   del formulario, «sin foto» de la galería): el manual no lleva versalitas. */
+.lpx-root .uppercase {
+  text-transform: none;
+  letter-spacing: 0;
 }
 
-/* La ficha es la foto. Las características van siempre visibles (30-oct-2026:
-   antes aparecían al pasar el cursor y en móvil nadie las veía). El velo sube
-   un poco más para que la fila de datos lea bien sobre cualquier foto. */
-.lpx-root .lpx-ficha .lpx-velo {
-  background: linear-gradient(to top, rgb(10 10 10 / 0.78) 0%, rgb(10 10 10 / 0.42) 42%, rgb(10 10 10 / 0) 72%);
+/* ---------- Hero ---------- */
+
+.lpx-root .lpx-hero {
+  background: var(--marca-aztec);
 }
 
-.lpx-root .lpx-ficha .lpx-foto {
-  transition: transform 900ms cubic-bezier(0.2, 0, 0, 1);
+/* Móvil: la foto ocupa la parte alta y la hoja sigue sobre Aztec. */
+.lpx-root .lpx-hero-foto {
+  height: max(62svh, 30rem);
 }
 
-@media (hover: hover) and (pointer: fine) {
-  .lpx-root .lpx-ficha:hover .lpx-foto {
-    transform: scale(1.03);
+.lpx-root .lpx-hero-texto {
+  min-height: calc(max(62svh, 30rem) - 7rem);
+}
+
+@media (min-width: 1024px) {
+  .lpx-root .lpx-hero-foto {
+    inset: 0;
+    height: auto;
+  }
+  .lpx-root .lpx-hero-texto {
+    min-height: 0;
+    padding-bottom: 0.5rem;
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .lpx-root .lpx-ficha .lpx-foto {
-    transition: none;
-  }
-  .lpx-root .lpx-ficha:hover .lpx-foto {
-    transform: none;
+@media (prefers-reduced-motion: no-preference) {
+  .lpx-root .lpx-asentar {
+    animation: lpx-asentar 1600ms cubic-bezier(0.16, 1, 0.3, 1) both;
   }
 }
 
-/* Chips sobre la foto del hero: texto blanco con regla, sin relleno. */
+@keyframes lpx-asentar {
+  from {
+    transform: scale(1.045);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+/* Chips de zona sobre la foto: pastillas de vidrio Aztec con filete aqua. */
 .lpx-root .lpx-chip-foto {
   color: #ffffff;
-  border: 1px solid rgb(255 255 255 / 0.45);
-  background: rgb(10 10 10 / 0.25);
-  backdrop-filter: blur(6px);
-  transition: background 200ms ease, border-color 200ms ease;
+  border-color: rgb(162 249 255 / 0.32);
+  background: rgb(10 28 30 / 0.45);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: background-color 200ms ease, border-color 200ms ease;
 }
 
 .lpx-root .lpx-chip-foto:hover {
-  background: rgb(255 255 255 / 0.16);
-  border-color: #ffffff;
+  border-color: var(--marca-aqua);
+  background: rgb(10 28 30 / 0.7);
+}
+
+.lpx-root .lpx-chip-foto:focus-visible {
+  outline-color: var(--marca-aqua);
 }
 
 @media (prefers-reduced-transparency: reduce) {
   .lpx-root .lpx-chip-foto {
     backdrop-filter: none;
-    background: rgb(10 10 10 / 0.55);
+    background: rgb(10 28 30 / 0.85);
   }
 }
 
-/* Chips de la barra de filtros (fondo claro): la activa se invierte. */
-.lpx-root .lpx-chip {
-  border: 1px solid var(--lpv-line-2);
-  color: var(--lpv-fg);
-  transition: background 200ms ease, color 200ms ease;
-}
-
-.lpx-root .lpx-chip[aria-pressed='true'] {
-  background: var(--lpv-fg);
-  color: #ffffff;
-  border-color: var(--lpv-fg);
-}
-
-.lpx-root .lpx-filtros {
-  position: sticky;
-  top: 0;
-  z-index: 20;
-  background: color-mix(in srgb, #ffffff 92%, transparent);
-  backdrop-filter: blur(8px);
-}
-
-@media (prefers-reduced-transparency: reduce) {
-  .lpx-root .lpx-filtros {
-    background: #ffffff;
-    backdrop-filter: none;
-  }
-}
-
-/* Cabecera compartida: abre sobre foto oscura, el logo blanco va bien. Solo
-   se fija el acento del banner de consentimiento. */
-.lp-root:has(.lpx-root) {
-  background: #ffffff;
-  --lp-accent: #111111;
-  --lp-accent-strong: #333333;
-}
-
-/* Chips de zona del hero: van sobre la foto, en blanco. Sobrescriben los
-   tokens del kit, que aqui son claros porque el formulario es claro. */
-.lpx-root .lpx-hero-chips button {
-  color: #ffffff;
-  border-color: rgb(255 255 255 / 0.45);
-  background: rgb(10 10 10 / 0.25);
-  backdrop-filter: blur(6px);
-  border-radius: 999px;
-  text-shadow: 0 1px 2px rgb(0 0 0 / 0.35);
-}
-
-.lpx-root .lpx-hero-chips button:hover {
-  background: rgb(255 255 255 / 0.16);
-  border-color: #ffffff;
-}
-
-/* La etiqueta del formulario deja de ser un eyebrow en mayusculas. */
-.lpx-root [data-lpv-form] > p:first-child {
-  text-transform: none;
-  letter-spacing: 0;
-  font-size: 0.9375rem;
-  color: var(--lpv-fg-3);
-}
-
-/* El contador de fotos sube a la esquina superior: abajo choca con el precio. */
-.lpx-root .lpx-ficha .lpv-galeria-contador {
-  top: 0.75rem;
-  bottom: auto;
-}
-
-/* Fila de filtros deslizable en movil, sin barra visible. */
-.lpx-root .lpx-filtros-fila {
-  scrollbar-width: none;
-}
-.lpx-root .lpx-filtros-fila::-webkit-scrollbar {
-  display: none;
-}
-
-/* Chips del hero en movil: una fila deslizable. */
+/* Chips del hero en móvil: una fila deslizable. */
 @media (max-width: 639px) {
   .lpx-root .lpx-hero-chips > div {
     flex-wrap: nowrap;
@@ -208,4 +131,195 @@
   .lpx-root .lpx-hero-chips button {
     flex-shrink: 0;
   }
+}
+
+/* ---------- Hoja de solicitud (vidrio Aztec) ----------
+   `FormInventario` pinta su panel con `--lpv-panel-bg`; aquí el vidrio lo
+   pone el envoltorio (`.marca-vidrio`) y el panel queda transparente. */
+
+.lpx-root .lpx-hoja {
+  --lpv-panel-bg: transparent;
+  --lpv-panel-bg-2: var(--marca-aztec);
+}
+
+.lpx-root .lpx-hoja :focus-visible {
+  outline-color: var(--marca-aqua);
+}
+
+.lpx-root .lpx-hoja [data-lpv-form] > h2 {
+  font-weight: 500;
+  letter-spacing: -0.025em;
+}
+
+.lpx-root .lpx-hoja [data-lpv-form] > p:first-child {
+  font-family: var(--marca-detalle);
+  font-size: 0.9375rem;
+  font-weight: 500;
+}
+
+.lpx-root .lpx-hoja label,
+.lpx-root .lpx-hoja legend {
+  font-family: var(--marca-detalle);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--lpv-panel-fg-2);
+}
+
+.lpx-root .lpx-hoja button[type='submit'] {
+  font-size: 1rem;
+  transition: background-color 200ms ease;
+}
+
+.lpx-root .lpx-hoja button[type='submit']:hover:not(:disabled) {
+  opacity: 1;
+  background: #ffffff;
+}
+
+/* Rojo legible sobre Aztec para el error y el campo inválido. */
+.lpx-root .lpx-hoja [role='alert'] {
+  color: #ffb4a8;
+}
+
+.lpx-root .lpx-hoja .lpv-campo[aria-invalid='true'] {
+  border-bottom-color: #ffb4a8;
+}
+
+/* Móvil: en el hero la hoja pierde el párrafo de apoyo para que el campo
+   Nombre quede en el primer pliegue (el título ya dice qué pasa). */
+@media (max-width: 639px) {
+  .lpx-root .lpx-hoja-hero [data-lpv-form] > p:nth-of-type(2) {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .lpx-root .lpx-hoja.marca-vidrio {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: var(--marca-aztec);
+  }
+}
+
+/* ---------- Catálogo: la ficha es la foto ---------- */
+
+/* Velo Aztec de legibilidad. Dos paradas: la foto conserva su luz arriba y
+   cede en el tercio inferior, donde van precio y características. */
+.lpx-root .lpx-velo {
+  background: linear-gradient(to top, rgb(10 28 30 / 0.84) 0%, rgb(10 28 30 / 0.46) 42%, rgb(10 28 30 / 0) 72%);
+}
+
+.lpx-root .lpx-ficha {
+  background: var(--marca-aztec);
+  box-shadow: 0 1px 2px rgb(10 28 30 / 0.05), 0 18px 40px -28px rgb(10 28 30 / 0.35);
+}
+
+.lpx-root .lpx-ficha .lpx-foto,
+.lpx-root .lpx-ficha .lpv-galeria img {
+  transition: transform 900ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .lpx-root .lpx-ficha:hover .lpv-galeria img {
+    transform: scale(1.03);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lpx-root .lpx-ficha .lpv-galeria img {
+    transition: none;
+  }
+  .lpx-root .lpx-ficha:hover .lpv-galeria img {
+    transform: none;
+  }
+}
+
+/* El contador de fotos sube a la esquina superior: abajo choca con el precio. */
+.lpx-root .lpx-ficha .lpv-galeria-contador {
+  top: 0.75rem;
+  bottom: auto;
+  right: 0.75rem;
+  padding: 0.25rem 0.6rem;
+  font-family: var(--marca-detalle);
+  font-size: 0.75rem;
+  background: rgb(10 28 30 / 0.6);
+}
+
+/* Barra de filtros fija: Tech White translúcido con pastillas. */
+.lpx-root .lpx-filtros {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: color-mix(in srgb, var(--marca-tech) 90%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .lpx-root .lpx-filtros {
+    background: var(--marca-tech);
+    backdrop-filter: none;
+  }
+}
+
+.lpx-root .lpx-filtros-fila {
+  scrollbar-width: none;
+}
+
+.lpx-root .lpx-filtros-fila::-webkit-scrollbar {
+  display: none;
+}
+
+/* Pastilla de índice: blanca con filete; pulsada se invierte a Aztec con
+   texto New Aqua (aqua sobre oscuro). */
+.lpx-root .lpx-chip {
+  border: 1px solid rgb(10 28 30 / 0.16);
+  background: #ffffff;
+  color: var(--marca-slate);
+  font-family: var(--marca-detalle);
+  transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease;
+}
+
+.lpx-root .lpx-chip:hover {
+  border-color: var(--marca-teal);
+}
+
+.lpx-root .lpx-chip .lpx-chip-num {
+  color: var(--marca-teal);
+}
+
+.lpx-root .lpx-chip[aria-pressed='true'] {
+  background: var(--marca-aztec);
+  border-color: var(--marca-aztec);
+  color: var(--marca-aqua);
+}
+
+.lpx-root .lpx-chip[aria-pressed='true'] .lpx-chip-num {
+  color: var(--marca-onahau);
+}
+
+/* ---------- Cabecera compartida de /lp ----------
+   Abre sobre la foto: logo blanco con sombra, fondo Aztec y el acento del
+   banner de consentimiento en la paleta de marca. */
+
+.lp-root:has(.lpx-root) {
+  background: var(--marca-aztec, #0a1c1e);
+  --lp-accent: #0a1c1e;
+  --lp-accent-strong: #2e4f52;
+}
+
+.lp-root:has(.lpx-root) header img {
+  filter: drop-shadow(0 1px 10px rgb(0 0 0 / 0.35));
+}
+
+.lp-root:has(.lpx-root) header span {
+  color: rgb(235 253 255 / 0.85);
+}
+
+/* Sin inventario no hay foto: la página es Tech White y el logo se invierte. */
+.lp-root:has(.lpx-root):not(:has(.lpx-hero)) {
+  background: #f5f5f5;
+}
+
+.lp-root:has(.lpx-root):not(:has(.lpx-hero)) header img {
+  filter: invert(1);
 }

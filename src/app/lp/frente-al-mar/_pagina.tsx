@@ -1,5 +1,4 @@
 import Image from 'next/image';
-import localFont from 'next/font/local';
 import {
   VISTAS_MAR,
   getInventario,
@@ -24,6 +23,7 @@ import Catalogo from './_components/Catalogo';
 import ChipsPortada from './_components/ChipsPortada';
 import { COPY } from './_copy';
 import '../_components/v2/tokens.css';
+import '../_components/v2/marca.css';
 import './lpo-theme.css';
 
 // ============================================================
@@ -48,22 +48,16 @@ import './lpo-theme.css';
 // Reglas heredadas: toda cifra sale del inventario; ningún nombre de
 // desarrollo llega al DOM; cero urgencia inventada. La vista al mar es la que
 // declara el desarrollador en el Hub (`view_type`).
+//
+// MARCA (9-nov-2026): la composición se queda (una propiedad por pantalla,
+// índice fijo, cifras grandes con icono); la piel es la del manual de Propyte
+// (`_components/v2/marca.css`, DESIGN.md): velo Aztec, retícula de nodos,
+// vidrio y pastillas, New Aqua solo sobre oscuro. Fuera Bricolage y el azul
+// océano propio.
 // ============================================================
 
 /** Cortes de presupuesto en MXN. Se ajustan al rango real (hoy $4 M a $30 M). */
 const CORTES_PRESUPUESTO = [5_000_000, 10_000_000, 15_000_000];
-
-const display = localFont({
-  src: '../../../fonts/bricolage-grotesque-latin.woff2',
-  weight: '300 800',
-  style: 'normal',
-  declarations: [
-    { prop: 'font-family', value: 'Bricolage Grotesque' },
-    { prop: 'font-stretch', value: '75% 100%' },
-  ],
-  variable: '--font-lpo-display',
-  display: 'swap',
-});
 
 /**
  * Corrige `<html lang>` antes de la hidratación. El root layout lo deja
@@ -97,16 +91,17 @@ export default async function PaginaFrenteMar({ locale = 'es' }: { locale?: Loca
 
   if (propiedades.length === 0) {
     return (
-      <div className={`lpv lpo-root ${display.variable} min-h-[70vh]`}>
+      <div className="lpv marca lpo-root marca-oscura relative min-h-[70vh] overflow-hidden">
         <CorrigeLang locale={locale} />
-        <div className="mx-auto max-w-2xl px-5 py-32 sm:px-8">
-          <h1 className="lpo-display text-[clamp(2rem,1.3rem+2.5vw,3.25rem)]">{copy.vacio.titulo}</h1>
-          <p className="mt-6 max-w-[54ch] text-base leading-relaxed text-[var(--lpv-fg-2)]">{copy.vacio.cuerpo}</p>
+        <div className="marca-reticula" aria-hidden />
+        <div className="relative mx-auto max-w-2xl px-5 py-32 sm:px-8">
+          <h1 className="marca-titular text-[clamp(2rem,1.3rem+2.5vw,3.25rem)] text-white">{copy.vacio.titulo}</h1>
+          <p className="mt-6 max-w-[54ch] text-base leading-relaxed text-white/80">{copy.vacio.cuerpo}</p>
           <a
             href={`https://wa.me/${FALLBACK_WHATSAPP}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-9 inline-flex min-h-[52px] items-center rounded-full bg-[var(--lpv-accent)] px-7 text-sm font-medium text-[var(--lpv-on-accent)]"
+            className="marca-boton mt-9"
           >
             {copy.vacio.cta}
           </a>
@@ -121,12 +116,12 @@ export default async function PaginaFrenteMar({ locale = 'es' }: { locale?: Loca
   const estados = [...new Set(propiedades.map((p) => p.estado).filter(Boolean))];
 
   return (
-    <div className={`lpv lpo-root ${display.variable}`}>
+    <div className="lpv marca lpo-root">
       <CorrigeLang locale={locale} />
       {/* ══ PANTALLA 0: la portada ══ */}
       <section
         id="hero"
-        className="lpo-pantalla relative isolate min-h-[100svh] overflow-hidden bg-[var(--lpv-bg-2)]"
+        className="lpo-pantalla marca-oscura relative isolate min-h-[100svh] overflow-hidden"
       >
         {portada.imagen && (
           <Image
@@ -138,15 +133,16 @@ export default async function PaginaFrenteMar({ locale = 'es' }: { locale?: Loca
             className="object-cover"
           />
         )}
-        <div className="lpo-velo absolute inset-0" aria-hidden="true" />
+        <div className="marca-velo" aria-hidden="true" />
+        <div className="marca-reticula" aria-hidden="true" />
 
         <div className="relative mx-auto flex min-h-[100svh] max-w-[96rem] flex-col justify-end px-5 pb-12 pt-28 text-white sm:px-8 sm:pb-16 lg:pr-48">
           <h1
-            className={`lpo-display lpo-sobre-foto ${copy.portada.anchoTitulo} text-[clamp(3rem,1.2rem+8vw,8.5rem)]`}
+            className={`marca-titular lpo-sobre-foto ${copy.portada.anchoTitulo} text-[clamp(3rem,1.2rem+8vw,8.5rem)]`}
           >
             {copy.portada.titulo}
           </h1>
-          <p className="lpo-display-ligero lpo-sobre-foto mt-5 max-w-[36ch] text-[clamp(1.25rem,1rem+1.5vw,2.25rem)] text-white/90">
+          <p className="lpo-sobre-foto marca-cifra mt-5 max-w-[40ch] text-[clamp(1.125rem,0.95rem+0.9vw,1.625rem)] leading-snug text-white/90">
             {copy.portada.subtitulo({
               total: resumen.total,
               ciudades: ciudades.map((c) => c.nombre),
@@ -169,8 +165,10 @@ export default async function PaginaFrenteMar({ locale = 'es' }: { locale?: Loca
       <Catalogo propiedades={propiedades} filtros={defs} telefonoWhatsApp={FALLBACK_WHATSAPP} locale={locale} />
 
       {/* ══ PREGUNTAS, fuera del snap ══ */}
+      <div className="bg-[var(--marca-tech)]">
       <div className="mx-auto max-w-3xl px-5 py-16 sm:px-8 sm:py-24">
         <FaqAcordeon faqs={copy.preguntas.faqs} titulo={copy.preguntas.titulo} locale={locale} />
+      </div>
       </div>
 
       <PieLegal

@@ -1,0 +1,259 @@
+/* ============================================================
+   Capa de MARCA compartida de las landings /lp/* (manual oficial de
+   Propyte 2026; ver DESIGN.md en la raíz del repo).
+
+   Cada landing conserva su composición propia, pero toda la familia habla
+   el mismo idioma visual: New Aqua sobre Aztec, superficies Water Dew /
+   Tech White, retícula de líneas y nodos, paneles «glassy», pastillas y
+   esquinas redondeadas. Inter (sustituto de Neue Haas Grotesk Display) en
+   titulares, DM Sans (sustituto de Normalidad) en texto y Space Grotesk en
+   detalles y cifras pequeñas. Rótulos SIEMPRE en caja normal.
+
+   USO: la raíz de la landing lleva `lpv marca` junto a su clase propia.
+   `.marca` fija los valores de marca del contrato `--lpv-*` (tokens.css) y
+   expone `--marca-*` para lo que el contrato no cubre. Una landing puede
+   ajustar acentos dentro de la paleta del manual bajo su propia raíz, pero
+   no salir de ella.
+   ============================================================ */
+
+.marca {
+  /* Paleta del manual */
+  --marca-aqua: #a2f9ff;
+  --marca-sparkling: #aaf6ff;
+  --marca-onahau: #ccffff;
+  --marca-dew: #ebfdff;
+  --marca-cyan: #68a4a9;
+  --marca-teal: #487379;
+  --marca-slate: #2e4f52;
+  --marca-te-papa: #1e3a3d;
+  --marca-night: #152b2e;
+  --marca-onyx: #223232;
+  --marca-aztec: #0a1c1e;
+  --marca-tech: #f5f5f5;
+  --marca-charcoal: #707a7b;
+  --marca-nodo: rgb(216 236 233 / 0.25);
+
+  /* Forma */
+  --marca-r: 22px;
+  --marca-r-s: 14px;
+  --marca-r-l: 28px;
+
+  /* Tipografía (familias literales: la variable de localFont puede no
+     coincidir con el nombre declarado; ver casas-riviera-maya) */
+  --marca-display: 'Inter', var(--font-display), ui-sans-serif, system-ui, sans-serif;
+  --marca-texto: 'DM Sans', var(--font-text), ui-sans-serif, system-ui, sans-serif;
+  --marca-detalle: 'Space Grotesk', var(--font-space-grotesk), ui-sans-serif, sans-serif;
+
+  /* Contrato --lpv-* en versión clara de marca */
+  --lpv-bg: var(--marca-tech);
+  --lpv-bg-2: var(--marca-dew);
+  --lpv-fg: var(--marca-aztec);
+  --lpv-fg-2: var(--marca-slate);
+  --lpv-fg-3: var(--marca-teal);
+  --lpv-line: rgb(72 115 121 / 0.18);
+  --lpv-line-2: rgb(10 28 30 / 0.35);
+  --lpv-accent: var(--marca-aztec);
+  --lpv-on-accent: var(--marca-aqua);
+  --lpv-panel-bg: var(--marca-aztec);
+  --lpv-panel-bg-2: rgb(10 28 30 / 0.82);
+  --lpv-panel-fg: #ffffff;
+  --lpv-panel-fg-2: rgb(235 253 255 / 0.76);
+  --lpv-panel-fg-3: rgb(204 255 255 / 0.62);
+  --lpv-panel-line: rgb(162 249 255 / 0.26);
+  --lpv-panel-accent: var(--marca-aqua);
+  --lpv-panel-on-accent: var(--marca-aztec);
+  --lpv-r: var(--marca-r);
+  --lpv-r-control: 999px;
+  --lpv-font-display: var(--marca-display);
+  --lpv-font-ui: var(--marca-texto);
+
+  font-family: var(--marca-texto);
+}
+
+.marca ::selection {
+  background: var(--marca-aqua);
+  color: var(--marca-aztec);
+}
+
+.marca :focus-visible {
+  outline: 2px solid var(--marca-teal);
+  outline-offset: 3px;
+}
+
+/* Superficie oscura de marca para bandas completas (hero, colofón, cierre).
+   Re-mapea el contrato para que lo que viva dentro lea sobre Aztec. */
+.marca .marca-oscura,
+.marca-oscura.marca {
+  --lpv-bg: var(--marca-aztec);
+  --lpv-bg-2: var(--marca-night);
+  --lpv-fg: #ffffff;
+  --lpv-fg-2: rgb(235 253 255 / 0.8);
+  --lpv-fg-3: rgb(204 255 255 / 0.66);
+  --lpv-line: rgb(162 249 255 / 0.18);
+  --lpv-line-2: rgb(162 249 255 / 0.4);
+  --lpv-accent: var(--marca-aqua);
+  --lpv-on-accent: var(--marca-aztec);
+  background: var(--marca-aztec);
+  color: #ffffff;
+}
+
+/* ---------- Utilidades de marca ---------- */
+
+/* Titular de marca: Inter 500, tracking cerrado. */
+.marca .marca-titular {
+  font-family: var(--marca-display);
+  font-weight: 500;
+  letter-spacing: -0.035em;
+  line-height: 1;
+  text-wrap: balance;
+}
+
+/* Énfasis en New Aqua: SOLO sobre fondo oscuro (Aztec, velo, degradado). */
+.marca .marca-acento {
+  color: var(--marca-aqua);
+  font-weight: 600;
+}
+
+/* Detalle / rótulo: Space Grotesk en caja normal. */
+.marca .marca-detalle {
+  font-family: var(--marca-detalle);
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.marca .marca-cifra {
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+/* Retícula de líneas y nodos (elemento gráfico obligatorio del manual,
+   #D8ECE9 al 25 %). Va como capa absoluta dentro de un contenedor
+   `position: relative`. */
+.marca .marca-reticula {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle, rgb(216 236 233 / 0.55) 2.5px, transparent 3px),
+    linear-gradient(to right, var(--marca-nodo) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--marca-nodo) 1px, transparent 1px);
+  background-size: 160px 160px, 160px 160px, 160px 160px;
+  background-position: -80px -80px, 0 0, 0 0;
+  mask-image: linear-gradient(to left, #000 0%, rgb(0 0 0 / 0.6) 40%, transparent 85%);
+}
+
+/* Degradado de marca (Aztec → Onyx → Teal → Cyan). */
+.marca .marca-degradado {
+  background: linear-gradient(170deg, var(--marca-aztec) 0%, var(--marca-onyx) 45%, var(--marca-teal) 85%, var(--marca-cyan) 100%);
+}
+
+/* Velo Aztec para texto sobre foto. */
+.marca .marca-velo {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(100deg, rgb(10 28 30 / 0.88) 0%, rgb(10 28 30 / 0.55) 42%, rgb(10 28 30 / 0.05) 78%),
+    linear-gradient(to top, rgb(10 28 30 / 0.7) 0%, rgb(10 28 30 / 0) 30%);
+}
+
+@media (max-width: 1023px) {
+  .marca .marca-velo {
+    background: linear-gradient(to bottom, rgb(10 28 30 / 0.55) 0%, rgb(10 28 30 / 0.5) 60%, rgb(10 28 30 / 0.85) 100%);
+  }
+}
+
+/* Vidrio oscuro (formularios sobre foto) y vidrio claro (tablas de datos). */
+.marca .marca-vidrio {
+  background: rgb(10 28 30 / 0.8);
+  border: 1px solid rgb(162 249 255 / 0.24);
+  border-radius: var(--marca-r);
+  box-shadow: 0 30px 70px -30px rgb(0 0 0 / 0.6);
+  backdrop-filter: blur(18px) saturate(1.2);
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+}
+
+.marca .marca-vidrio-claro {
+  background: var(--marca-dew);
+  border: 1px solid rgb(72 115 121 / 0.14);
+  border-radius: var(--marca-r-s);
+}
+
+/* Tarjeta blanca redondeada sobre Tech White. */
+.marca .marca-tarjeta {
+  background: #ffffff;
+  border-radius: var(--marca-r-l);
+  box-shadow: 0 1px 2px rgb(10 28 30 / 0.05), 0 18px 40px -28px rgb(10 28 30 / 0.35);
+}
+
+/* Pastilla: filtros, chips y etiquetas de estado. */
+.marca .marca-pastilla {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: 999px;
+  background: var(--marca-onahau);
+  color: var(--marca-slate);
+  font-family: var(--marca-detalle);
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+/* Botón primario de marca: pastilla Aqua sobre oscuro, Aztec sobre claro. */
+.marca .marca-boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  min-height: 56px;
+  padding: 0 1.5rem;
+  border-radius: 999px;
+  background: var(--marca-aztec);
+  color: #ffffff;
+  font-weight: 500;
+  transition: background-color 200ms ease, color 200ms ease;
+}
+
+.marca .marca-boton:hover {
+  background: var(--marca-slate);
+}
+
+.marca .marca-oscura .marca-boton,
+.marca .marca-vidrio .marca-boton {
+  background: var(--marca-aqua);
+  color: var(--marca-aztec);
+}
+
+.marca .marca-oscura .marca-boton:hover,
+.marca .marca-vidrio .marca-boton:hover {
+  background: #ffffff;
+}
+
+/* Icono de dato en círculo. */
+.marca .marca-icono {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  flex-shrink: 0;
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--marca-teal);
+  box-shadow: inset 0 0 0 1px rgb(72 115 121 / 0.16);
+}
+
+/* Barra de desplazamiento oculta para filas de pastillas en móvil. */
+.marca .marca-sin-barra {
+  scrollbar-width: none;
+}
+
+.marca .marca-sin-barra::-webkit-scrollbar {
+  display: none;
+}
+
+/* El layout compartido de /lp monta el logo blanco con sombra y un rótulo
+   en versalitas: en la familia de marca el rótulo va en caja normal. */
+.lp-root:has(.marca) header span {
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 0.8125rem;
+}

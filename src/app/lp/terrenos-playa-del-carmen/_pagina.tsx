@@ -1,7 +1,7 @@
 import Image from 'next/image';
-import localFont from 'next/font/local';
 import { getLotePlayaDelCarmen, type ImagenesLanding } from '@/lib/supabase/lp-lotes';
 import { FALLBACK_WHATSAPP } from '@/lib/site-contact';
+import { FileCheck, Landmark, Layers, MapPin } from '@/lib/icons';
 import MotionProvider from './_components/MotionProvider';
 import { BarraEscala, Escalon, Escalonado, ParallaxHero, Reveal } from './_components/motion';
 import FormTerrenos from './_components/FormTerrenos';
@@ -14,6 +14,7 @@ import { numerarLaminas } from './_components/laminas';
 import { normalizarClave, type CopyTerrenos } from './_copy';
 import type { LocaleLp } from '../_components/v2/i18n';
 import { COPY } from './_copy';
+import '../_components/v2/marca.css';
 import './lpt-theme.css';
 
 // ============================================================
@@ -44,9 +45,18 @@ import './lpt-theme.css';
 //
 // ═══ QUÉ NO SE HEREDA DE LA VARIANTE A ═══
 //
-// Ni un token visual. La A es crema con serif y acento terracota; ésta es
-// selva drenada con naranja de estaca y una sola grotesca. Dos variantes que
-// se parecen miden ruido. Ver la cabecera de `lpt-theme.css`.
+// Ni un token visual. La A es crema con serif y acento terracota.
+//
+// ═══ MARCA (9-nov-2026) ═══
+//
+// «Misma marca, otra composición». La selva con naranja de estaca, la grotesca
+// ensanchada y la mono se retiraron: la página habla el manual oficial de
+// Propyte (DESIGN.md, `_components/v2/marca.css`). La composición se conserva
+// entera —hero con foto y el formulario a la altura del titular, el sitio, la
+// mensualidad, el lote, la privada, el formulario detrás del mosaico y el
+// cierre—; cambian la paleta (Aztec / New Aqua / Water Dew / Tech White), la
+// tipografía (Inter, DM Sans, Space Grotesk), las esquinas (redondeadas, todo
+// lo pulsable en pastilla) y los rótulos (caja normal, sin numeración).
 //
 // ═══ CUATRO REGLAS DE DATO QUE NO SE NEGOCIAN ═══
 //
@@ -92,46 +102,6 @@ import './lpt-theme.css';
 // creció delante del campo de teléfono; creció detrás.
 // ============================================================
 
-/**
- * Grotesca con eje de ANCHO. El eje es la decisión, no la familia: ensanchada
- * al 112% en titulares da la letra de rotulación de un plano —ancha, plana,
- * dibujada para leerse de lejos— y a ancho normal hace texto corrido sin
- * cambiar de voz. Una sola familia, con contraste real de peso y ancho, aguanta
- * toda la página sin el par display+cuerpo que lleva cualquier landing.
- *
- * Autoalojadas (esta y la mono), no next/font/google: el porqué está en
- * src/app/layout.tsx.
- */
-const sans = localFont({
-  src: '../../../fonts/archivo-latin.woff2',
-  weight: '100 900',
-  style: 'normal',
-  // Rango del eje wdth tal como lo declaraba Google. Sin este descriptor el
-  // navegador trata la cara como de ancho normal y recorta el
-  // `font-stretch: 112%` de los titulares (lpt-theme.css) a 100%.
-  declarations: [
-    { prop: 'font-family', value: 'Archivo' },
-    { prop: 'font-stretch', value: '62% 125%' },
-  ],
-  variable: '--font-lpt-sans',
-  display: 'swap',
-});
-
-/**
- * Mono para las cotas. No es disfraz de «técnico»: la página publica
- * superficies, plazos y dinero en columnas que tienen que cuadrar
- * verticalmente, y eso pide cifras tabulares. Se usa SOLO en cifras y rótulos.
- */
-const mono = localFont({
-  src: [
-    { path: '../../../fonts/azeret-mono-latin.woff2', weight: '400', style: 'normal' },
-    { path: '../../../fonts/azeret-mono-latin.woff2', weight: '500', style: 'normal' },
-  ],
-  declarations: [{ prop: 'font-family', value: 'Azeret Mono' }],
-  variable: '--font-lpt-mono',
-  display: 'swap',
-});
-
 const BLUR_HERO =
   'data:image/jpeg;base64,/9j/2wBDABQODxIPDRQSEBIXFRQYHjIhHhwcHj0sLiQySUBMS0dARkVQWnNiUFVtVkVGZIhlbXd7gYKBTmCNl4x9lnN+gXz/2wBDARUXFx4aHjshITt8U0ZTfHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHz/wAARCAAJABADASIAAhEBAxEB/8QAFgABAQEAAAAAAAAAAAAAAAAABAEF/8QAHhABAAICAQUAAAAAAAAAAAAAAQIDABESMUVRcYL/xAAVAQEBAAAAAAAAAAAAAAAAAAABA//EABYRAQEBAAAAAAAAAAAAAAAAAAABIf/aAAwDAQACEQMRAD8AJVZVJFCDs2efWW6secGzc4hLprCmaHbqfrJTS//Z';
 
@@ -170,12 +140,13 @@ export default async function PaginaTerrenos({ locale }: { locale: LocaleLp }) {
   // lote como si fuera el mismo.
   if (!lote) {
     return (
-      <div className={`lpt-root ${sans.variable} ${mono.variable} bg-[var(--lpt-selva)]`}>
+      <div className="marca lpt-root marca-oscura lpt-banda">
+        <div className="marca-reticula" aria-hidden="true" />
         <div className="mx-auto max-w-2xl px-5 py-32">
-          <h1 className="lpt-titular text-[clamp(1.75rem,1.3rem+2vw,2.5rem)] text-[var(--lpt-claro)]">
+          <h1 className="lpt-titular text-[clamp(1.75rem,1.3rem+2vw,2.5rem)] text-white">
             {copy.agotado.titulo}
           </h1>
-          <p className="lpt-cuerpo mt-5 max-w-[52ch] text-base leading-relaxed text-[var(--lpt-claro-2)]">
+          <p className="lpt-cuerpo mt-5 max-w-[52ch] text-base leading-relaxed text-[rgb(235_253_255/0.8)]">
             {copy.agotado.cuerpo}
           </p>
           <div className="mt-8">
@@ -271,6 +242,7 @@ export default async function PaginaTerrenos({ locale }: { locale: LocaleLp }) {
   const verificables = [
     lote.licencia.licenciaNumero
       ? {
+          Icono: FileCheck,
           rotulo: copy.verificables.licencia.rotulo,
           titulo: copy.verificables.licencia.titulo(lote.licencia.licenciaNumero),
           nota: copy.verificables.licencia.nota(lote.licencia.licenciaFecha),
@@ -278,6 +250,7 @@ export default async function PaginaTerrenos({ locale }: { locale: LocaleLp }) {
       : null,
     lote.regimenPropiedad
       ? {
+          Icono: Landmark,
           rotulo: copy.verificables.regimen.rotulo,
           // Palabra literal del catálogo; en inglés se traduce solo si se reconoce.
           titulo: catalogo(copy.catalogo.regimen, lote.regimenPropiedad),
@@ -287,13 +260,14 @@ export default async function PaginaTerrenos({ locale }: { locale: LocaleLp }) {
     // Aquí iba «Escritura». Ver el bloque de arriba antes de reponerla.
     lote.subtipoLiteral
       ? {
+          Icono: MapPin,
           rotulo: copy.verificables.queEs.rotulo,
           titulo: catalogo(copy.catalogo.subtipo, lote.subtipoLiteral),
           nota: copy.verificables.queEs.nota(lote.usoSuelo),
         }
       : null,
   ].filter(
-    (v): v is { rotulo: string; titulo: string; nota: string } => v !== null,
+    (v): v is { Icono: typeof FileCheck; rotulo: string; titulo: string; nota: string } => v !== null,
   );
 
   /**
@@ -315,15 +289,18 @@ export default async function PaginaTerrenos({ locale }: { locale: LocaleLp }) {
    * entran como una cota más.
    */
   const ficha = [
-    ...verificables.map((v) => ({ rotulo: v.rotulo, valor: v.titulo, nota: v.nota })),
+    ...verificables.map((v) => ({ Icono: v.Icono, rotulo: v.rotulo, valor: v.titulo, nota: v.nota })),
     apr
       ? {
+          Icono: Layers,
           rotulo: copy.verificables.aprovechamiento.rotulo,
           valor: `COS ${apr.cos} · CUS ${apr.cus}`,
           nota: copy.verificables.aprovechamiento.nota(m2(apr.huellaM2)),
         }
       : null,
-  ].filter((f): f is { rotulo: string; valor: string; nota: string } => f !== null);
+  ].filter(
+    (f): f is { Icono: typeof FileCheck; rotulo: string; valor: string; nota: string } => f !== null,
+  );
 
   const mensajeWa = [
     copy.mensajeWa.saludo(lote.slug),
@@ -335,14 +312,12 @@ export default async function PaginaTerrenos({ locale }: { locale: LocaleLp }) {
 
   return (
     <MotionProvider>
-      <div
-        className={`lpt-root ${sans.variable} ${mono.variable} bg-[var(--lpt-selva)] text-[var(--lpt-claro)]`}
-      >
+      <div className="marca lpt-root">
         {/* ═══════════ 01 · Hero + conversión ═══════════
             Una sola pantalla que contiene la promesa Y el campo de teléfono.
             En la variante A el formulario completo vivía a y ≈ 3,374 px: tres
             pantallas y media de scroll entre el anuncio y la conversión. */}
-        <section className="relative isolate overflow-hidden bg-[var(--lpt-abismo)]">
+        <section className="marca-oscura lpt-banda">
           {hero && (
             <ParallaxHero className="absolute inset-0 -z-10">
               <Image
@@ -363,24 +338,18 @@ export default async function PaginaTerrenos({ locale }: { locale: LocaleLp }) {
             </ParallaxHero>
           )}
 
-          {/* Velo en dos capas: vertical para asentar el texto, y uno lateral
-              que solo existe en escritorio para que la caliza del formulario
-              no compita con la hora dorada de la foto. */}
+          {/* Velo Aztec de marca (lateral en escritorio, vertical en móvil) y
+              una capa más desde abajo para asentar las pruebas y el formulario
+              sobre cualquier foto del desarrollador. */}
+          <div aria-hidden="true" className="marca-velo -z-10" />
           <div
             aria-hidden="true"
-            className="absolute inset-0 -z-10 bg-gradient-to-t from-[var(--lpt-abismo)] via-[var(--lpt-abismo)]/80 to-[var(--lpt-abismo)]/25"
+            className="absolute inset-0 -z-10 bg-gradient-to-t from-[rgb(10_28_30/0.9)] via-[rgb(10_28_30/0.35)] to-transparent"
           />
-          <div
-            aria-hidden="true"
-            className="absolute inset-0 -z-10 hidden bg-gradient-to-r from-[var(--lpt-abismo)] via-[var(--lpt-abismo)]/55 to-transparent lg:block"
-          />
-          {/* La trama del plano. Se funde despacio al cargar: es lo único de la
-              página que sí puede animar opacidad, porque si se quedara a cero
-              no faltaría ninguna información. */}
-          <div
-            aria-hidden="true"
-            className="lpt-plano lpt-entra-trama absolute inset-0 -z-10 opacity-60"
-          />
+          {/* La retícula de nodos del manual. Se funde despacio al cargar: es lo
+              único de la página que sí puede animar opacidad, porque si se
+              quedara a cero no faltaría ninguna información. */}
+          <div aria-hidden="true" className="marca-reticula lpt-entra-trama" />
 
           {/* ═══ EL ORDEN CAMBIA ENTRE MÓVIL Y ESCRITORIO, Y ESO ES EL DISEÑO ═══
               En escritorio el formulario va a la derecha, a la altura del
@@ -395,22 +364,19 @@ export default async function PaginaTerrenos({ locale }: { locale: LocaleLp }) {
               teléfono es el objetivo, y va primero. */}
           <div className="mx-auto grid max-w-6xl gap-x-12 gap-y-10 px-5 pb-16 pt-28 sm:px-8 lg:grid-cols-12 lg:grid-rows-[auto_auto] lg:pb-24 lg:pt-36">
             <div className="lg:col-span-7 lg:col-start-1 lg:row-start-1 lg:pt-6">
-              <p
-                className="lpt-rotulo lpt-entra text-[var(--lpt-estaca)]"
-                style={{ animationDelay: '40ms' }}
-              >
+              <p className="lpt-rotulo lpt-entra" style={{ animationDelay: '40ms' }}>
                 {[lote.zona, lote.ciudad].filter(Boolean).join(' · ')}
               </p>
 
               {/* EL H1 ES EL LCP. Solo se mueve, jamás se funde: un `opacity:0`
                   aquí retrasa el LCP de una página que se paga por clic, y si
                   se atasca deja la página sin titular para siempre. */}
-              <h1 className="lpt-titular lpt-entra mt-4 text-[clamp(2.5rem,1.5rem+4.6vw,4.75rem)] text-[var(--lpt-claro)]">
+              <h1 className="lpt-titular lpt-entra mt-4 text-[clamp(2.5rem,1.5rem+4.6vw,4.75rem)] text-white">
                 {copy.hero.h1}
                 {mensualidadMin && (
                   <>
                     {' '}
-                    <span className="text-[var(--lpt-estaca)]">
+                    <span className="marca-acento marca-cifra">
                       {copy.hero.desdeAlMes(mxn(mensualidadMin))}
                     </span>
                   </>
@@ -418,7 +384,7 @@ export default async function PaginaTerrenos({ locale }: { locale: LocaleLp }) {
               </h1>
 
               <p
-                className="lpt-cuerpo lpt-entra mt-6 max-w-[54ch] text-[1.0625rem] leading-relaxed text-[var(--lpt-claro-2)]"
+                className="lpt-cuerpo lpt-entra mt-6 max-w-[54ch] text-[1.0625rem] leading-relaxed text-[rgb(235_253_255/0.84)]"
                 style={{ animationDelay: '120ms' }}
               >
                 {copy.hero.subtitulo}
@@ -426,8 +392,8 @@ export default async function PaginaTerrenos({ locale }: { locale: LocaleLp }) {
 
             </div>
 
-            {/* El formulario. Única superficie clara del primer pliegue, a la
-                altura del titular en escritorio y justo debajo en móvil. */}
+            {/* El formulario, en vidrio Aztec con el envío en Aqua, a la altura
+                del titular en escritorio y justo debajo en móvil. */}
             <div
               id="solicitud"
               className="scroll-mt-8 lg:col-span-5 lg:col-start-8 lg:row-span-2 lg:row-start-1"
@@ -445,13 +411,13 @@ export default async function PaginaTerrenos({ locale }: { locale: LocaleLp }) {
 
             {pruebas.length > 0 && (
               <ul
-                className="lpt-entra flex flex-wrap gap-x-10 gap-y-6 border-t border-[var(--lpt-linea-fuerte)] pt-6 lg:col-span-7 lg:col-start-1 lg:row-start-2 lg:self-end"
+                className="lpt-entra flex flex-wrap gap-x-10 gap-y-6 border-t border-[rgb(162_249_255/0.22)] pt-6 lg:col-span-7 lg:col-start-1 lg:row-start-2 lg:self-end"
                 style={{ animationDelay: '200ms' }}
               >
                 {pruebas.map((p) => (
                   <li key={p.pie}>
-                    <p className="lpt-titular text-[1.75rem] text-[var(--lpt-claro)]">{p.cifra}</p>
-                    <p className="lpt-cota mt-0.5 text-[0.6875rem] uppercase tracking-[0.1em] text-[var(--lpt-claro-3)]">
+                    <p className="lpt-titular marca-cifra text-[1.875rem] text-white">{p.cifra}</p>
+                    <p className="lpt-cota mt-1 text-[0.875rem] text-[var(--marca-onahau)]">
                       {p.pie}
                     </p>
                   </li>
@@ -482,10 +448,11 @@ export default async function PaginaTerrenos({ locale }: { locale: LocaleLp }) {
 
         {/* ═══════════ 03 · La mensualidad ═══════════ */}
         {plan && lote.precioMxn && (
-          <section className="lpt-plano border-t border-[var(--lpt-linea-fuerte)] bg-[var(--lpt-selva)]">
+          <section className="marca-oscura lpt-banda">
+            <div className="marca-reticula" aria-hidden="true" />
             <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8 lg:py-28">
               <Reveal>
-                <p className="lpt-rotulo text-[var(--lpt-estaca)]">03 · {copy.plan.rotulo}</p>
+                <p className="lpt-rotulo">{copy.plan.rotulo}</p>
               </Reveal>
               <Reveal delay={0.06}>
                 <div className="mt-10">
@@ -494,7 +461,7 @@ export default async function PaginaTerrenos({ locale }: { locale: LocaleLp }) {
               </Reveal>
 
               <Reveal delay={0.12}>
-                <p className="lpt-cuerpo mt-12 max-w-[62ch] border-t border-[var(--lpt-linea)] pt-6 text-sm leading-relaxed text-[var(--lpt-claro-3)]">
+                <p className="lpt-cuerpo mt-12 max-w-[62ch] border-t border-[rgb(162_249_255/0.16)] pt-6 text-sm leading-relaxed text-[rgb(235_253_255/0.76)]">
                   {copy.plan.precioLista({
                     precio: mxn(lote.precioMxn),
                     superficie: superficieM2 ? m2(superficieM2) : null,
@@ -514,22 +481,22 @@ export default async function PaginaTerrenos({ locale }: { locale: LocaleLp }) {
             multiplicación sobre el COS y el CUS que ya publica la ficha. Abajo,
             la ficha técnica en cotas. Ver el comentario de `ficha`. */}
         {(apr && superficieM2) || ficha.length > 0 ? (
-          <section className="lpt-plano border-t border-[var(--lpt-linea-fuerte)] bg-[var(--lpt-selva)]">
+          <section className="bg-[var(--marca-tech)]">
             <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8 lg:py-28">
               <Reveal>
-                <p className="lpt-rotulo text-[var(--lpt-estaca)]">04 · {copy.lote.rotulo}</p>
+                <p className="lpt-rotulo">{copy.lote.rotulo}</p>
               </Reveal>
 
               {apr && superficieM2 && (
                 <>
                   <Reveal delay={0.06}>
-                    <h2 className="lpt-titular mt-4 max-w-[20ch] text-[clamp(1.875rem,1.4rem+2.2vw,3rem)] text-[var(--lpt-claro)]">
+                    <h2 className="lpt-titular mt-4 max-w-[20ch] text-[clamp(1.875rem,1.4rem+2.2vw,3rem)] text-[var(--marca-aztec)]">
                       {copy.lote.titulo}
                     </h2>
                   </Reveal>
 
                   <Reveal delay={0.12}>
-                    <div className="mt-14 grid gap-10 sm:grid-cols-2 lg:gap-16">
+                    <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:gap-5">
                       {[
                         {
                           etiqueta: copy.lote.terreno.etiqueta,
@@ -542,24 +509,45 @@ export default async function PaginaTerrenos({ locale }: { locale: LocaleLp }) {
                           nota: copy.lote.construible.nota(apr.niveles, apr.cus),
                         },
                       ].map((d, i) => (
-                        <div key={d.etiqueta}>
-                          <p className="lpt-cota text-[0.6875rem] uppercase tracking-[0.14em] text-[var(--lpt-claro-3)]">
+                        <div
+                          key={d.etiqueta}
+                          className={
+                            i === 1
+                              ? 'marca-oscura rounded-[var(--marca-r-l)] p-6 sm:p-7'
+                              : 'marca-tarjeta p-6 sm:p-7'
+                          }
+                        >
+                          <p
+                            className={`lpt-cota text-[0.9375rem] ${
+                              i === 1 ? 'text-[var(--marca-onahau)]' : 'text-[var(--marca-teal)]'
+                            }`}
+                          >
                             {d.etiqueta}
                           </p>
                           <p
-                            className={`lpt-titular mt-2 text-[clamp(2.25rem,1.4rem+3.4vw,3.5rem)] ${
-                              i === 1 ? 'text-[var(--lpt-estaca)]' : 'text-[var(--lpt-claro)]'
+                            className={`lpt-titular marca-cifra mt-2 text-[clamp(2.25rem,1.4rem+3.4vw,3.5rem)] ${
+                              i === 1 ? 'marca-acento' : 'text-[var(--marca-aztec)]'
                             }`}
                           >
                             {m2(d.valor)}
                           </p>
-                          <BarraEscala
-                            pct={d.valor / Math.max(superficieM2, apr.construibleM2)}
-                            className={`mt-4 h-1.5 w-full ${
-                              i === 1 ? 'bg-[var(--lpt-estaca)]' : 'bg-[var(--lpt-claro-3)]'
+                          <span
+                            className={`mt-5 block h-2 w-full overflow-hidden rounded-full ${
+                              i === 1 ? 'bg-[rgb(162_249_255/0.16)]' : 'bg-[var(--marca-dew)]'
                             }`}
-                          />
-                          <p className="lpt-cuerpo mt-3 text-sm text-[var(--lpt-claro-2)]">
+                          >
+                            <BarraEscala
+                              pct={d.valor / Math.max(superficieM2, apr.construibleM2)}
+                              className={`h-full w-full rounded-full ${
+                                i === 1 ? 'bg-[var(--marca-aqua)]' : 'bg-[var(--marca-teal)]'
+                              }`}
+                            />
+                          </span>
+                          <p
+                            className={`lpt-cuerpo mt-3 text-sm ${
+                              i === 1 ? 'text-[rgb(235_253_255/0.82)]' : 'text-[var(--marca-slate)]'
+                            }`}
+                          >
                             {d.nota}
                           </p>
                         </div>
@@ -569,27 +557,28 @@ export default async function PaginaTerrenos({ locale }: { locale: LocaleLp }) {
                 </>
               )}
 
-              {/* La ficha. Columnas separadas por filete, como la leyenda de un
-                  plano: rótulo, valor y la línea que explica por qué importa. */}
+              {/* La ficha: la tabla de datos de marca (vidrio Water Dew), cada
+                  dato con su icono en círculo, su valor y la línea que explica
+                  por qué importa. */}
               {ficha.length > 0 && (
                 <Escalonado
-                  className="mt-16 grid border-t border-[var(--lpt-linea-fuerte)] sm:grid-cols-2 lg:grid-cols-3"
+                  className="lpt-tabla mt-6 grid gap-x-2 p-1 sm:grid-cols-2 sm:p-2 lg:mt-8"
                   delay={0.08}
                 >
-                  {ficha.map((f) => (
-                    <Escalon
-                      key={f.rotulo}
-                      className="border-b border-[var(--lpt-linea)] py-7 pr-8 lg:border-b-0 lg:border-r lg:pl-8 lg:first:pl-0 lg:last:border-r-0"
-                    >
-                      <p className="lpt-cota text-[0.6875rem] uppercase tracking-[0.14em] text-[var(--lpt-estaca)]">
-                        {f.rotulo}
-                      </p>
-                      <p className="lpt-titular mt-2.5 text-[1.25rem] leading-tight text-[var(--lpt-claro)]">
-                        {f.valor}
-                      </p>
-                      <p className="lpt-cuerpo mt-2.5 max-w-[42ch] text-[0.875rem] leading-relaxed text-[var(--lpt-claro-2)]">
-                        {f.nota}
-                      </p>
+                  {ficha.map(({ Icono, ...f }) => (
+                    <Escalon key={f.rotulo} className="flex gap-4 p-5 sm:p-6">
+                      <span className="marca-icono" aria-hidden="true">
+                        <Icono className="h-5 w-5" />
+                      </span>
+                      <div className="min-w-0">
+                        <p className="lpt-cota text-[0.875rem] text-[var(--marca-teal)]">{f.rotulo}</p>
+                        <p className="lpt-titular lpt-titular-corto mt-1.5 text-[1.25rem] text-[var(--marca-aztec)]">
+                          {f.valor}
+                        </p>
+                        <p className="lpt-cuerpo mt-2 max-w-[44ch] text-[0.875rem] leading-relaxed text-[var(--marca-slate)]">
+                          {f.nota}
+                        </p>
+                      </div>
                     </Escalon>
                   ))}
                 </Escalonado>
@@ -621,16 +610,17 @@ export default async function PaginaTerrenos({ locale }: { locale: LocaleLp }) {
 
             No repite argumento —eso es trabajo de la sección anterior—, solo
             nombra lo que se manda. */}
-        <section className="lpt-plano border-t border-[var(--lpt-linea-fuerte)] bg-[var(--lpt-selva-2)]">
+        <section className="marca-oscura lpt-banda">
+          <div className="marca-reticula" aria-hidden="true" />
           <div className="mx-auto grid max-w-6xl items-center gap-10 px-5 py-16 sm:px-8 lg:grid-cols-12 lg:gap-16 lg:py-20">
             <div className="lg:col-span-6">
               <Reveal>
-                <h2 className="lpt-titular text-[clamp(1.75rem,1.35rem+2vw,2.75rem)] text-[var(--lpt-claro)]">
+                <h2 className="lpt-titular text-[clamp(1.75rem,1.35rem+2vw,2.75rem)] text-white">
                   {copy.solicitud2.titulo}
                 </h2>
               </Reveal>
               <Reveal delay={0.06}>
-                <p className="lpt-cuerpo mt-5 max-w-[50ch] text-[1.0625rem] leading-relaxed text-[var(--lpt-claro-2)]">
+                <p className="lpt-cuerpo mt-5 max-w-[50ch] text-[1.0625rem] leading-relaxed text-[rgb(235_253_255/0.82)]">
                   {copy.solicitud2.cuerpo}
                 </p>
               </Reveal>
@@ -653,19 +643,20 @@ export default async function PaginaTerrenos({ locale }: { locale: LocaleLp }) {
             Tercera y última instancia del formulario. Quien llegó hasta aquí ya
             leyó los números y lo verificable: no hay nada nuevo que decirle,
             solo el campo donde escribir. */}
-        <section className="border-t border-[var(--lpt-linea-fuerte)] bg-[var(--lpt-abismo)]">
+        <section className="marca-oscura marca-degradado lpt-banda">
+          <div className="marca-reticula" aria-hidden="true" />
           <div className="mx-auto grid max-w-6xl gap-12 px-5 py-20 sm:px-8 lg:grid-cols-12 lg:gap-16 lg:py-28">
             <div className="lg:col-span-6">
               <Reveal>
-                <p className="lpt-rotulo text-[var(--lpt-estaca)]">07 · {copy.cierre.rotulo}</p>
+                <p className="lpt-rotulo">{copy.cierre.rotulo}</p>
               </Reveal>
               <Reveal delay={0.06}>
-                <h2 className="lpt-titular mt-4 text-[clamp(2rem,1.4rem+2.8vw,3.5rem)] text-[var(--lpt-claro)]">
+                <h2 className="lpt-titular mt-4 text-[clamp(2rem,1.4rem+2.8vw,3.5rem)] text-white">
                   {copy.cierre.titulo}
                 </h2>
               </Reveal>
               <Reveal delay={0.12}>
-                <p className="lpt-cuerpo mt-6 max-w-[48ch] text-[1.0625rem] leading-relaxed text-[var(--lpt-claro-2)]">
+                <p className="lpt-cuerpo mt-6 max-w-[48ch] text-[1.0625rem] leading-relaxed text-[rgb(235_253_255/0.84)]">
                   {copy.cierre.cuerpo}
                 </p>
               </Reveal>
@@ -694,12 +685,16 @@ export default async function PaginaTerrenos({ locale }: { locale: LocaleLp }) {
               </Reveal>
             </div>
           </div>
+        </section>
 
-          {/* Rótulo de la imagen y estado del inventario. Va en el pie porque es
-              obligación de honestidad, no argumento de venta, pero va: una foto
-              sin rotular en una página de preventa es una promesa implícita. */}
-          <div className="mx-auto max-w-6xl px-5 pb-16 sm:px-8">
-            <p className="lpt-cota border-t border-[var(--lpt-linea)] pt-6 text-[0.6875rem] leading-relaxed text-[var(--lpt-claro-3)]">
+        {/* Rótulo de la imagen y estado del inventario. Va en el pie porque es
+            obligación de honestidad, no argumento de venta, pero va: una foto
+            sin rotular en una página de preventa es una promesa implícita. Va
+            sobre Aztec y no sobre el final del degradado (Retro Cyan), donde
+            la letra chica no llegaría a 4.5:1. */}
+        <div className="bg-[var(--marca-aztec)] pb-24 lg:pb-0">
+          <div className="mx-auto max-w-6xl px-5 py-8 sm:px-8">
+            <p className="lpt-cota text-[0.8125rem] leading-relaxed text-[rgb(235_253_255/0.72)]">
               {/* Se cuentan las imágenes REALMENTE servidas y por tipo, en vez
                   de escribir «13 renders»: si un archivo desaparece de la
                   galería del Hub, la página resuelve ese hueco a null y este
@@ -715,7 +710,7 @@ export default async function PaginaTerrenos({ locale }: { locale: LocaleLp }) {
               })}
             </p>
           </div>
-        </section>
+        </div>
 
         <BarraMovil
           mensualidadTexto={mensualidadMin ? copy.barra.alMes(mxn(mensualidadMin)) : null}

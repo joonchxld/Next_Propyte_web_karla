@@ -51,6 +51,11 @@ import { COPY } from '../_copy';
 // Reglas heredadas: ningún nombre de desarrollo en el DOM (ni en el marcador
 // ni en el panel: ubicación, superficie y precio), ninguna cifra inventada,
 // `prefers-reduced-motion` respetado en el CSS del tema.
+//
+// MARCA (9-nov-2026): el mapa y su panel viven en una tarjeta blanca
+// redondeada sobre Tech White; el lienzo lleva esquinas de 22 px; los
+// marcadores son pastillas Aztec con la cifra en Aqua y el punto activo se
+// invierte (ver `lpt2-theme.css`).
 // ============================================================
 
 const PROVEEDOR: { preferido: 'google' | 'osm' } = { preferido: 'osm' };
@@ -60,7 +65,7 @@ const CENTRO_RIVIERA = { lat: 20.55, lng: -87.2 };
 const CLAVE_EJEMPLO = 'your_google_maps_api_key_here';
 /** Map ID del sitio (ya usado en `GeoAnalysis.tsx`); `AdvancedMarker` lo exige. */
 const MAP_ID = 'propyte-property-map';
-const ICONO = 'h-3.5 w-3.5 shrink-0 text-[var(--lpv-fg-3)]';
+const ICONO = 'h-3.5 w-3.5 shrink-0 text-[var(--marca-teal)]';
 
 const MapaOsm = dynamic(() => import('./MapaLotesOsm'), { ssr: false });
 
@@ -189,7 +194,7 @@ function MapaConGoogle({
                 }}
               >
                 <div className="lpt2-marcador" data-activo={esActivo} data-lpt2-marcador>
-                  <span className="lpt2-marcador-chip lpt2-mono">{punto.etiqueta}</span>
+                  <span className="lpt2-marcador-chip">{punto.etiqueta}</span>
                   <span className="lpt2-marcador-pie" aria-hidden />
                 </div>
               </AdvancedMarker>
@@ -255,10 +260,10 @@ export default function MapaLotes({
     PROVEEDOR.preferido === 'google' && !!claveGoogle && claveGoogle !== CLAVE_EJEMPLO && !falloGoogle;
 
   return (
-    <section aria-label={t.aria} className="border-b border-[var(--lpv-line)] bg-white">
-      <div className="mx-auto grid max-w-[96rem] lg:grid-cols-12">
+    <section aria-label={t.aria} className="mx-auto max-w-[96rem] px-3 pb-6 pt-3 sm:px-8 sm:pb-8">
+      <div className="marca-tarjeta grid gap-3 p-3 lg:grid-cols-12 lg:gap-4 lg:p-4">
         <div
-          className="relative h-[340px] bg-[var(--lpv-bg-2)] sm:h-[440px] lg:col-span-8 lg:h-[560px]"
+          className="lpt2-mapa relative h-[340px] sm:h-[440px] lg:col-span-8 lg:h-[560px]"
           data-lpt2-mapa={usarGoogle ? 'google' : 'osm'}
         >
           {usarGoogle ? (
@@ -275,24 +280,24 @@ export default function MapaLotes({
         </div>
 
         {/* Panel: los lotes del punto resaltado, con los números del catálogo. */}
-        <div className="flex min-w-0 flex-col border-t border-[var(--lpv-line)] lg:col-span-4 lg:border-l lg:border-t-0">
+        <div className="flex min-w-0 flex-col lg:col-span-4">
           {puntoActivo ? (
             <>
-              <div className="px-5 pb-4 pt-6 sm:px-8">
-                <p className="text-[0.8125rem] text-[var(--lpv-fg-3)]">{t.ubicacion}</p>
-                <p className="lpt2-display mt-1 text-[clamp(1.5rem,1.2rem+1vw,2rem)] text-[var(--lpv-fg)]">
+              <div className="px-3 pb-4 pt-3 sm:px-4">
+                <p className="marca-detalle text-[0.875rem] text-[var(--lpv-fg-3)]">{t.ubicacion}</p>
+                <p className="marca-titular mt-1.5 text-[clamp(1.5rem,1.2rem+1vw,2rem)] text-[var(--lpv-fg)]">
                   {puntoActivo.ubicacion}
                 </p>
                 <p className="mt-1 text-[0.9375rem] text-[var(--lpv-fg-2)]">
                   {t.terrenosEnPunto(puntoActivo.lotes.length)}
                 </p>
               </div>
-              <ul className="divide-y divide-[var(--lpv-line)] border-t border-[var(--lpv-line)] lg:max-h-[420px] lg:overflow-y-auto">
+              <ul className="flex flex-col gap-1 lg:max-h-[440px] lg:overflow-y-auto">
                 {puntoActivo.lotes.map((lote) => {
                   const esAbierto = lote.id === abierta;
                   const esElegido = elegido === lote.slug;
                   return (
-                    <li key={lote.id} className="lpt2-mapa-lote px-5 py-4 sm:px-8" data-abierto={esAbierto}>
+                    <li key={lote.id} className="lpt2-mapa-lote px-3 py-3.5 sm:px-4" data-abierto={esAbierto}>
                       <button
                         type="button"
                         onClick={() => {
@@ -306,7 +311,7 @@ export default function MapaLotes({
                           {lote.m2Terreno ? (
                             <>
                               {m2(lote.m2Terreno).replace(' m²', '')}
-                              <span className="ml-1 align-top text-[0.5em] font-normal text-[var(--lpv-fg-3)]">m²</span>
+                              <span className="marca-detalle ml-1 align-top text-[0.5em] font-normal text-[var(--lpv-fg-3)]">m²</span>
                             </>
                           ) : (
                             <span className="lpt2-display-ligero text-[0.6em] text-[var(--lpv-fg-3)]">{COPY[locale].catalogo.fila.superficiePorConfirmar}</span>
@@ -316,7 +321,7 @@ export default function MapaLotes({
                           {lote.precio ? dinero(lote.precio) : COPY[locale].catalogo.fila.precioPorConfirmar}
                         </span>
                       </button>
-                      <p className="lpt2-mono mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-[0.75rem] text-[var(--lpv-fg-2)]">
+                      <p className="lpt2-meta mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-[0.8125rem] text-[var(--lpv-fg-2)]">
                         <span className="inline-flex items-center gap-1.5">
                           <Ruler className={ICONO} aria-hidden />
                           {lote.precioM2Mxn ? `${mxnExacto(lote.precioM2Mxn)} / m²` : COPY[locale].catalogo.fila.precioM2PorConfirmar}
@@ -330,7 +335,7 @@ export default function MapaLotes({
                         type="button"
                         onClick={() => onElegir(lote.slug)}
                         aria-pressed={esElegido}
-                        className="lpt2-plazo mt-3 min-h-[36px] px-4 text-[0.8125rem]"
+                        className="lpt2-plazo mt-3 min-h-[40px] px-4 text-[0.875rem]"
                       >
                         {esElegido ? t.elegido : t.meInteresa}
                       </button>
@@ -340,14 +345,14 @@ export default function MapaLotes({
               </ul>
             </>
           ) : (
-            <p className="px-5 py-8 text-[0.9375rem] text-[var(--lpv-fg-2)] sm:px-8">
+            <p className="px-3 py-6 text-[0.9375rem] text-[var(--lpv-fg-2)] sm:px-4">
               {visibles.length === 0
                 ? t.sinFiltros
                 : t.eligePunto}
             </p>
           )}
           {sinPunto > 0 && (
-            <p className="mt-auto border-t border-[var(--lpv-line)] px-5 py-3 text-[0.75rem] text-[var(--lpv-fg-3)] sm:px-8">
+            <p className="marca-detalle mt-auto px-3 pb-1 pt-4 text-[0.8125rem] text-[var(--lpv-fg-3)] sm:px-4">
               {t.sinCoordenadas(sinPunto)}
             </p>
           )}

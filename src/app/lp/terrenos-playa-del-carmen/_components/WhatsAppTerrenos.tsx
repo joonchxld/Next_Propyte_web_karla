@@ -80,7 +80,7 @@ export default function WhatsAppTerrenos({
       onClick={() =>
         trackWhatsAppClick({ surface, propertySlug: loteSlug })
       }
-      className="lpt-cuerpo inline-flex min-h-[52px] items-center gap-2 border-b border-[var(--lpt-linea-fuerte)] px-1 text-sm text-[var(--lpt-claro-2)] transition-colors duration-200 hover:border-[var(--lpt-estaca)] hover:text-[var(--lpt-claro)]"
+      className="lpt-cuerpo lpt-wa"
     >
       <MessageCircle className="size-4 shrink-0" aria-hidden="true" />
       {etiqueta}

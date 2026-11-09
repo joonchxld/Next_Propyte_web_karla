@@ -68,7 +68,7 @@ export default function PlanDePagos({
       <SelectorPlazo opciones={plan.opciones} sinIntereses={plan.sinIntereses} locale={locale} />
 
       {/* Desglose completo: lo que entra al inicio, en medio y al final. */}
-      <dl className={`mt-6 border-x border-b border-t-2 border-t-[var(--lp-accent)] ${RULE_LIGHT}`}>
+      <dl className="mt-6 overflow-hidden rounded-[var(--lp-r-panel)] border border-[var(--lp-line-soft)] bg-[var(--lp-panel)]">
         {[
           {
             k: t.enganche(plan.enganchePct),
@@ -88,7 +88,7 @@ export default function PlanDePagos({
         ].map((f) => (
           <div
             key={f.k}
-            className={`grid grid-cols-[1fr_auto] items-baseline gap-4 border-t ${RULE_LIGHT} px-4 py-3.5`}
+            className={`grid grid-cols-[1fr_auto] items-baseline gap-4 border-t ${RULE_LIGHT} px-5 py-3.5 first:border-t-0`}
           >
             <dt className="text-sm text-[var(--lp-ink-soft)]">
               {f.k}

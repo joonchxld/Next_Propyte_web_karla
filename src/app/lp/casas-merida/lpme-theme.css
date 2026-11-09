@@ -1,0 +1,223 @@
+/* ============================================================
+   Tema: casas en Mérida (`.lpme-root`), versión de MARCA: EL DOSSIER.
+
+   Lógica propia, distinta del resto de la familia: no hay catálogo ni hero
+   de foto a sangre. Hay UNA casa y la página es su ficha completa en una
+   vista: la galería a la izquierda, fija; a la derecha el gancho, la hoja de
+   solicitud y la ficha. Debajo, todas las fotos en mosaico.
+
+   La piel es la del manual oficial (9-nov-2026; ver DESIGN.md y
+   `_components/v2/marca.css`): Tech White de fondo, hoja en vidrio Aztec con
+   el CTA New Aqua, características en tabla Water Dew con iconos en círculo,
+   créditos en pastillas Onahau, galería y mosaico redondeados, pastillas en
+   todo lo que se pulsa. Inter en titulares, DM Sans en texto, Space Grotesk
+   en detalles. Rótulos en caja normal.
+
+   PREFIJO `.lpme-`: el anterior (`.lpm-`) lo usa en producción
+   casas-riviera-maya con reglas sin ámbito (`.lpm-display`,
+   `.lpm-galeria > div`, `.lp-root:has(.lpm-root)`) y se pisaban.
+   ============================================================ */
+
+/* ---------- Tipografía ---------- */
+
+.lpme-root .lpme-titulo {
+  font-family: var(--marca-display);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  text-wrap: balance;
+}
+
+/* Sentence case en todo lo que montan los componentes compartidos (rótulos
+   del formulario, «sin foto» de la galería): el manual no lleva versalitas. */
+.lpme-root .uppercase {
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+/* ---------- Galería del dossier ---------- */
+
+.lpme-root .lpme-galeria .lpv-galeria-contador {
+  top: 0.75rem;
+  bottom: auto;
+  right: 0.75rem;
+  padding: 0.25rem 0.6rem;
+  font-family: var(--marca-detalle);
+  font-size: 0.75rem;
+  background: rgb(10 28 30 / 0.6);
+}
+
+/* Móvil: la galería abre a sangre bajo el logo; las esquinas redondeadas
+   van solo abajo. En escritorio se redondea entera dentro de su margen. */
+@media (max-width: 1023px) {
+  .lpme-root .lpme-galeria > div {
+    border-radius: 0 0 var(--marca-r) var(--marca-r);
+  }
+}
+
+/* Velo superior sutil para que el logo blanco lea sobre cualquier foto. */
+.lpme-root .lpme-galeria > div::after {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 7rem;
+  background: linear-gradient(to bottom, rgb(10 28 30 / 0.45), rgb(10 28 30 / 0));
+  pointer-events: none;
+}
+
+/* ---------- Pastillas ---------- */
+
+.lpme-root .lpme-chip {
+  border-color: rgb(10 28 30 / 0.16);
+  background: #ffffff;
+  color: var(--marca-slate);
+  transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease;
+}
+
+.lpme-root .lpme-chip:hover {
+  border-color: var(--marca-teal);
+}
+
+.lpme-root .lpme-chip-activo {
+  background: var(--marca-aztec);
+  border-color: var(--marca-aztec);
+  color: var(--marca-aqua);
+}
+
+.lpme-root .lpme-pastilla-md {
+  font-size: 0.875rem;
+}
+
+.lpme-root .lpme-icono-s {
+  width: 2.25rem;
+  height: 2.25rem;
+}
+
+/* «Elegida»: pastilla New Aqua con texto Aztec. */
+.lpme-root .marca-boton.lpme-boton-elegido {
+  background: var(--marca-aqua);
+  color: var(--marca-aztec);
+}
+
+.lpme-root .marca-boton.lpme-boton-elegido:hover {
+  background: var(--marca-onahau);
+}
+
+/* Sobre el degradado: botón New Aqua. */
+.lpme-root .marca-boton.lpme-boton-claro {
+  background: var(--marca-aqua);
+  color: var(--marca-aztec);
+}
+
+.lpme-root .marca-boton.lpme-boton-claro:hover {
+  background: #ffffff;
+}
+
+.lpme-root .marca-boton.lpme-boton-claro:focus-visible {
+  outline-color: var(--marca-aqua);
+}
+
+/* ---------- Hoja de solicitud (vidrio Aztec) ----------
+   `FormInventario` pinta su panel con `--lpv-panel-bg`; el vidrio lo pone el
+   envoltorio (`.marca-vidrio`) y el panel queda transparente. */
+
+.lpme-root .lpme-hoja {
+  --lpv-panel-bg: transparent;
+  --lpv-panel-bg-2: var(--marca-aztec);
+  /* Sobre Tech White el vidrio no tiene foto detrás: Aztec casi opaco. */
+  background: rgb(10 28 30 / 0.94);
+}
+
+.lpme-root .lpme-hoja :focus-visible {
+  outline-color: var(--marca-aqua);
+}
+
+.lpme-root .lpme-hoja [data-lpv-form] > h2 {
+  font-weight: 500;
+  letter-spacing: -0.025em;
+}
+
+.lpme-root .lpme-hoja [data-lpv-form] > p:first-child {
+  font-family: var(--marca-detalle);
+  font-size: 0.9375rem;
+  font-weight: 500;
+}
+
+.lpme-root .lpme-hoja label,
+.lpme-root .lpme-hoja legend {
+  font-family: var(--marca-detalle);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--lpv-panel-fg-2);
+}
+
+.lpme-root .lpme-hoja button[type='submit'] {
+  font-size: 1rem;
+  transition: background-color 200ms ease;
+}
+
+.lpme-root .lpme-hoja button[type='submit']:hover:not(:disabled) {
+  opacity: 1;
+  background: #ffffff;
+}
+
+.lpme-root .lpme-hoja [role='alert'] {
+  color: #ffb4a8;
+}
+
+.lpme-root .lpme-hoja .lpv-campo[aria-invalid='true'] {
+  border-bottom-color: #ffb4a8;
+}
+
+/* Móvil: la hoja pierde el párrafo de apoyo para que el campo Nombre quede
+   en el primer pliegue (el título ya dice qué pasa). */
+@media (max-width: 639px) {
+  .lpme-root .lpme-hoja [data-lpv-form] > p:nth-of-type(2) {
+    display: none;
+  }
+}
+
+/* ---------- Mosaico ---------- */
+
+.lpme-root .lpme-mosaico img {
+  transition: transform 900ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .lpme-root .lpme-mosaico figure:hover img {
+    transform: scale(1.03);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lpme-root .lpme-mosaico img {
+    transition: none;
+  }
+  .lpme-root .lpme-mosaico figure:hover img {
+    transform: none;
+  }
+}
+
+/* ---------- Cabecera compartida de /lp ----------
+   El logo flota sobre la galería (arriba a la izquierda en escritorio y a
+   sangre en móvil): blanco con sombra. El rótulo «Riviera Maya» no aplica a
+   Mérida y se oculta. */
+
+.lp-root:has(.lpme-root) {
+  background: #f5f5f5;
+  --lp-accent: #0a1c1e;
+  --lp-accent-strong: #2e4f52;
+}
+
+.lp-root:has(.lpme-root) header img {
+  filter: drop-shadow(0 1px 10px rgb(0 0 0 / 0.35));
+}
+
+.lp-root:has(.lpme-root) header span {
+  display: none;
+}
+
+/* Sin inventario no hay galería: el logo blanco se invierte sobre Tech White. */
+.lp-root:has(.lpme-root):not(:has(.lpme-galeria)) header img {
+  filter: invert(1);
+}

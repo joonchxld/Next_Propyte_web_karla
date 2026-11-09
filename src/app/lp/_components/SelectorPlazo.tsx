@@ -42,22 +42,22 @@ export default function SelectorPlazo({
   if (!activa) return null;
 
   const CHIP_BASE =
-    'block cursor-pointer select-none rounded-[var(--lp-r-control)] border px-4 py-2 text-sm ' +
+    'block min-h-[44px] cursor-pointer select-none rounded-full border px-5 py-2.5 text-sm ' +
     'transition-colors duration-150';
   const CHIP_OFF =
-    'border-[var(--lp-line)] text-[var(--lp-ink-soft)] hover:border-[var(--lp-ink-soft)]';
+    'border-[var(--lp-line)] bg-white text-[var(--lp-ink-soft)] hover:border-[var(--lp-ink-soft)]';
   const CHIP_ON =
-    'peer-checked:border-[var(--lp-accent)] peer-checked:bg-[var(--lp-accent)] ' +
-    'peer-checked:text-white';
+    'peer-checked:border-[var(--lp-ink)] peer-checked:bg-[var(--lp-ink)] ' +
+    'peer-checked:text-[var(--lp-on-ink)] peer-checked:font-medium';
   const CHIP_FOCUS =
     'peer-focus-visible:outline peer-focus-visible:outline-2 ' +
     'peer-focus-visible:outline-offset-2 peer-focus-visible:outline-[var(--lp-accent)]';
 
   return (
-    <div className="mt-6 border-t-2 border-[var(--lp-accent)] bg-[var(--lp-paper-2)] p-5">
+    <div className="mt-6 rounded-[var(--lp-r-media)] bg-[var(--lp-panel)] p-5 sm:p-6">
       {opciones.length > 1 && (
         <fieldset>
-          <legend className="font-mono text-[0.6875rem] uppercase tracking-[0.08em] text-[var(--lp-muted)]">
+          <legend className="lp-rotulo text-[var(--lp-muted)]">
             {t.elige}
           </legend>
           <div className="mt-3 flex flex-wrap gap-2">

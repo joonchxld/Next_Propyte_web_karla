@@ -28,7 +28,7 @@ export default function SituacionJuridica({
     <div className="flex flex-col gap-8">
       <dl className="flex flex-col gap-6">
         <div>
-          <dt className="text-[0.6875rem] uppercase tracking-[0.08em] text-white/40">
+          <dt className="lp-rotulo text-white/65">
             {t.regimen}
           </dt>
           <dd className="mt-2 max-w-[58ch] text-sm leading-relaxed text-white/80">
@@ -39,7 +39,7 @@ export default function SituacionJuridica({
           </dd>
         </div>
         <div>
-          <dt className="text-[0.6875rem] uppercase tracking-[0.08em] text-white/40">
+          <dt className="lp-rotulo text-white/65">
             {t.usoSuelo}
           </dt>
           <dd className="mt-2 max-w-[58ch] text-sm leading-relaxed text-white/80">
@@ -48,7 +48,7 @@ export default function SituacionJuridica({
           </dd>
         </div>
         <div>
-          <dt className="text-[0.6875rem] uppercase tracking-[0.08em] text-white/40">
+          <dt className="lp-rotulo text-white/65">
             {t.escrituracion}
           </dt>
           <dd className="mt-2 max-w-[58ch] text-sm leading-relaxed text-white/80">
@@ -57,7 +57,7 @@ export default function SituacionJuridica({
         </div>
         {lote.rentasCortoPlazoPermitidas !== null && (
           <div>
-            <dt className="text-[0.6875rem] uppercase tracking-[0.08em] text-white/40">
+            <dt className="lp-rotulo text-white/65">
               {t.renta}
             </dt>
             <dd className="mt-2 max-w-[58ch] text-sm leading-relaxed text-white/80">

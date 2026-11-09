@@ -32,7 +32,7 @@ export default function FichaLote({
     <section aria-labelledby="ficha-titulo">
       <TituloSeccion id="ficha-titulo">{t.titulo}</TituloSeccion>
 
-      <div className="mt-6 border-t-2 border-[var(--lp-accent)]">
+      <div className="mt-6">
         <BloqueCampos>
           <Campo etiqueta={t.superficie}>
             {lote.superficieM2 ? m2(lote.superficieM2) : <EnlaceGate que={g.superficie} locale={locale} />}

@@ -21,6 +21,8 @@ import type { LocaleLp } from '../../_components/v2/i18n';
 //
 // El efecto secundario es deseable: quien ve la barra ya decidió sobre cookies,
 // y si aceptó, su conversión sí va a llegar a Google Ads con atribución.
+//
+// Marca (9-nov-2026): vidrio Aztec con el CTA en pastilla Aqua.
 // ============================================================
 
 export default function BarraMovil({
@@ -64,7 +66,7 @@ export default function BarraMovil({
       // que provoque salto de layout, y `aria-hidden` mantiene el orden de
       // lectura limpio mientras no aplica.
       aria-hidden={!visible}
-      className={`fixed inset-x-0 bottom-0 z-40 border-t border-[var(--lpt-linea-fuerte)] bg-[var(--lpt-abismo)]/95 px-4 py-3 backdrop-blur-sm transition-transform duration-300 ease-out lg:hidden ${
+      className={`fixed inset-x-0 bottom-0 z-40 border-t border-[rgb(162_249_255/0.22)] bg-[rgb(10_28_30/0.92)] px-4 py-3 backdrop-blur-md transition-transform duration-300 ease-out motion-reduce:transition-none lg:hidden ${
         visible ? 'translate-y-0' : 'translate-y-full'
       }`}
       style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}
@@ -72,10 +74,10 @@ export default function BarraMovil({
       <div className="flex items-center gap-3">
         {mensualidadTexto && (
           <p className="min-w-0 flex-1">
-            <span className="lpt-cota block text-[0.625rem] uppercase tracking-[0.12em] text-[var(--lpt-claro-3)]">
+            <span className="lpt-cota block text-[0.8125rem] text-[rgb(204_255_255/0.72)]">
               {copy.desde}
             </span>
-            <span className="lpt-cota block truncate text-sm text-[var(--lpt-claro)]">
+            <span className="lpt-cota block truncate text-sm font-medium text-white">
               {mensualidadTexto}
             </span>
           </p>
@@ -83,7 +85,7 @@ export default function BarraMovil({
         <a
           href="#solicitud"
           tabIndex={visible ? undefined : -1}
-          className="lpt-titular shrink-0 rounded-[var(--lpt-r)] bg-[var(--lpt-estaca)] px-5 py-3.5 text-[0.9375rem] text-[var(--lpt-tinta)]"
+          className="lpt-cta shrink-0"
         >
           {copy.cta}
         </a>

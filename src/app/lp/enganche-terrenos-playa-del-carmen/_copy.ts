@@ -319,7 +319,7 @@ export const COPY_ES: CopyEnganche = {
   },
 
   cifras: {
-    rotulo: '08 · En números',
+    rotulo: 'En números',
     porLote: 'por lote',
     porM2: 'por m²',
     deInteres: 'de interés',
@@ -588,7 +588,7 @@ export const COPY_EN: CopyEnganche = {
   },
 
   cifras: {
-    rotulo: '08 · By the numbers',
+    rotulo: 'By the numbers',
     porLote: 'per lot',
     porM2: 'per m²',
     deInteres: 'interest',
